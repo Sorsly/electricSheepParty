@@ -1,0 +1,7 @@
+CMakeFiles/
+*.a
+*.cmake
+cmake-build-debug/
+CMakeCache.txt
+Makefile
+*.cbp
