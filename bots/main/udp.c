@@ -97,6 +97,9 @@ void send_thread(void *pvParameters)
     close(socket_fd); 
 }
 
+void move(){
+	printf("DOING THINGS TO ACHIEVE DESIRED STATE");
+}
 
 void receive_thread(void *pvParameters)
 {
@@ -208,10 +211,11 @@ static esp_err_t esp32_wifi_eventHandler(void *ctx, system_event_t *event) {
 			ESP_LOGD(TAG, "********************************************");
 			ESP_LOGD(TAG,"Starting receive\n");
 
-			receive_thread(NULL);
-
-			send_thread(NULL);
-
+			for(;;){
+				receive_thread(NULL);
+				move();
+				send_thread(NULL);
+			}
 			break;
 
 		default: // Ignore the other event types
