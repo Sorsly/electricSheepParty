@@ -1,7 +1,7 @@
 import socket
 
 UDP_IP = "192.168.42.24"
-UDP_PORT = 6001
+UDP_PORT = 1917
 MESSAGE = "Hello, World!"
 
 print "UDP target IP:", UDP_IP

@@ -15,6 +15,7 @@
 #include <lwip/netdb.h>
 #include <lwip/dns.h>
 #include "emul_ip.h"
+#include "driver/i2c.h"
 
 
 #define EXAMPLE_WIFI_PORT CONFIG_WIFI_PORT
@@ -29,15 +30,16 @@ const int CONNECTED_BIT = BIT0;
 const int STARTED_BIT = BIT1;
 
 
-#define RECEIVER_PORT_NUM 6001
+#define RECEIVER_PORT_NUM 1917
 
 
-#define SENDER_PORT_NUM 6000
-// TODO, GET THIS FROM GOT_IP
+#define SENDER_PORT_NUM 1918
+// TODO, GET THIS FROM GOT_IP OWN IP ADDRESS
 #define SENDER_IP_ADDR "192.168.42.24"
 //u32_t *my_ip=(u32_t *)&event->event_info.got_ip.ip_info.ip;
 char my_ip[32];
 
+//CPU IP ADDRESS
 #define RECEIVER_IP_ADDR "192.168.42.23"
 
 
@@ -61,7 +63,7 @@ void send_thread(void *pvParameters)
 {
 
     int socket_fd;
-    struct sockaddr_in sa,ra;
+    struct sockaddr_in sa;
 
     int sent_data; char data_buffer[80];
     /* Creates an UDP socket (SOCK_DGRAM) with Internet Protocol Family (PF_INET).
@@ -248,19 +250,58 @@ static void initialise_wifi(void)
     ESP_ERROR_CHECK( esp_wifi_start() );
 
 }
+static void initialise_i2c(void){
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = GPIO_NUM_18;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_io_num = GPIO_NUM_19;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = 100000;
+
+
+    esp_err_t i2cret = i2c_param_config(I2C_NUM_0,&conf);
+    if(i2cret == ESP_ERR_INVALID_ARG){
+	    ESP_LOGE(TAG,"ERROR WITH I2C\n");
+	    return;
+    }
+    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0,I2C_MODE_MASTER,0,0,0));
+    return;
+
+}
+static void i2c_comm(void){
+	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+	uint8_t * data = malloc(sizeof(uint8_t)*3);
+	data[0] = 0xff;
+	data[1] = 0xff;
+	data[2] = 0xff;
+	ESP_ERROR_CHECK(i2c_master_start(cmd));
+	ESP_ERROR_CHECK(i2c_master_write_byte(cmd, 0xff, true));
+	ESP_ERROR_CHECK(i2c_master_write(cmd, data, 3, true));
+	ESP_ERROR_CHECK(i2c_master_stop(cmd));
+	if(i2c_master_cmd_begin(I2C_NUM_0,cmd,(TickType_t)10) == ESP_FAIL){
+		ESP_LOGE(TAG,"SLAVE DID NOT ACK\n")
+		return;
+	}
+
+	return;
+}
 
 void app_main()
 {
-    esp_err_t ret = nvs_flash_init();
+    //init nvs_flash
+    esp_err_t nvsret = nvs_flash_init();
 
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES) {
+    if (nvsret == ESP_ERR_NVS_NO_FREE_PAGES) {
         ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
+        nvsret = nvs_flash_init();
     }
+    initialise_i2c();
+    i2c_comm();
 
 
-    wifi_event_group = xEventGroupCreate();
-    initialise_wifi();
+//    wifi_event_group = xEventGroupCreate();
+//    initialise_wifi();
 
-    ESP_LOGI(TAG, "WIFI Initialized");
+//    ESP_LOGI(TAG, "WIFI Initialized");
 }
