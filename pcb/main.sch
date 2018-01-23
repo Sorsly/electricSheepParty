@@ -2281,6 +2281,36 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <wire x1="-4.318" y1="0.635" x2="-4.318" y2="-0.635" width="0.2032" layer="21"/>
 <wire x1="-4.318" y1="-0.635" x2="-2.54" y2="-0.635" width="0.2032" layer="21"/>
 </package>
+<package name="HTSSOP-16">
+<wire x1="-2.5" y1="-2.2" x2="2.5" y2="-2.2" width="0.127" layer="51"/>
+<wire x1="2.5" y1="-2.2" x2="2.5" y2="2.2" width="0.127" layer="51"/>
+<wire x1="2.5" y1="2.2" x2="-2.5" y2="2.2" width="0.127" layer="51"/>
+<wire x1="-2.5" y1="2.2" x2="-2.5" y2="-2.2" width="0.127" layer="51"/>
+<smd name="P$1" x="-2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$2" x="-1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$3" x="-0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$4" x="-0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$5" x="0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$6" x="0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$7" x="1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$8" x="2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$9" x="2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$10" x="1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$11" x="0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$12" x="0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$13" x="-0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$14" x="-0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$15" x="-1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$16" x="-2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="P$17" x="0" y="0" dx="2.31" dy="2.46" layer="1" rot="R90"/>
+<text x="1.3" y="0.325" size="0.254" layer="25">Name</text>
+<text x="1.3" y="-0.325" size="0.254" layer="27">Value</text>
+<circle x="-1.95" y="-1.3" radius="0.325" width="0.2032" layer="21"/>
+<wire x1="-2.6" y1="1.95" x2="2.6" y2="1.95" width="0.127" layer="21"/>
+<wire x1="2.6" y1="1.95" x2="2.6" y2="-1.95" width="0.127" layer="21"/>
+<wire x1="2.6" y1="-1.95" x2="-2.6" y2="-1.95" width="0.127" layer="21"/>
+<wire x1="-2.6" y1="-1.95" x2="-2.6" y2="1.95" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="CONN_02">
@@ -2446,6 +2476,28 @@ Switches electrical signals</description>
 <pin name="ADJ" x="12.7" y="-2.54" length="short" rot="R90"/>
 <pin name="OUTPUT" x="27.94" y="10.16" length="short" rot="R180"/>
 <pin name="INPUT" x="-2.54" y="10.16" length="short"/>
+</symbol>
+<symbol name="DRV8833C">
+<wire x1="10.16" y1="-10.16" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="12.7" x2="-10.16" y2="12.7" width="0.254" layer="94"/>
+<pin name="NSLEEP" x="-15.24" y="10.16" length="middle" function="dot"/>
+<pin name="AOUT1" x="-15.24" y="7.62" length="middle"/>
+<pin name="AISEN" x="-15.24" y="5.08" length="middle"/>
+<pin name="AOUT2" x="-15.24" y="2.54" length="middle"/>
+<pin name="BOUT2" x="-15.24" y="0" length="middle"/>
+<pin name="BISEN" x="-15.24" y="-2.54" length="middle"/>
+<pin name="BOUT1" x="-15.24" y="-5.08" length="middle"/>
+<pin name="NFAULT" x="-15.24" y="-7.62" length="middle" function="dot"/>
+<pin name="BIN1" x="15.24" y="-7.62" length="middle" rot="R180"/>
+<wire x1="-10.16" y1="12.7" x2="-10.16" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-10.16" x2="10.16" y2="-10.16" width="0.254" layer="94"/>
+<pin name="BIN2" x="15.24" y="-5.08" length="middle" rot="R180"/>
+<pin name="NC" x="15.24" y="-2.54" length="middle" direction="nc" rot="R180"/>
+<pin name="VM" x="15.24" y="0" length="middle" rot="R180"/>
+<pin name="GND" x="15.24" y="2.54" length="middle" rot="R180"/>
+<pin name="VINT" x="15.24" y="5.08" length="middle" rot="R180"/>
+<pin name="AIN2" x="15.24" y="7.62" length="middle" rot="R180"/>
+<pin name="AIN1" x="15.24" y="10.16" length="middle" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3554,6 +3606,36 @@ Switches electrical signals</description>
 </device>
 </devices>
 </deviceset>
+<deviceset name="DRV8833C">
+<gates>
+<gate name="G$1" symbol="DRV8833C" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="HTSSOP-16">
+<connects>
+<connect gate="G$1" pin="AIN1" pad="P$16"/>
+<connect gate="G$1" pin="AIN2" pad="P$15"/>
+<connect gate="G$1" pin="AISEN" pad="P$3"/>
+<connect gate="G$1" pin="AOUT1" pad="P$2"/>
+<connect gate="G$1" pin="AOUT2" pad="P$4"/>
+<connect gate="G$1" pin="BIN1" pad="P$9"/>
+<connect gate="G$1" pin="BIN2" pad="P$10"/>
+<connect gate="G$1" pin="BISEN" pad="P$6"/>
+<connect gate="G$1" pin="BOUT1" pad="P$7"/>
+<connect gate="G$1" pin="BOUT2" pad="P$5"/>
+<connect gate="G$1" pin="GND" pad="P$13 P$17"/>
+<connect gate="G$1" pin="NC" pad="P$11"/>
+<connect gate="G$1" pin="NFAULT" pad="P$8"/>
+<connect gate="G$1" pin="NSLEEP" pad="P$1"/>
+<connect gate="G$1" pin="VINT" pad="P$14"/>
+<connect gate="G$1" pin="VM" pad="P$12"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
 </devicesets>
 </library>
 </libraries>
@@ -3612,11 +3694,13 @@ Switches electrical signals</description>
 <part name="U$1" library="electricSheepParty" deviceset="AZ1117E" device="">
 <attribute name="COMM" value="5-6V Lin Reg"/>
 </part>
+<part name="U$2" library="electricSheepParty" deviceset="DRV8833C" device="">
+<attribute name="COMM" value="H-Bridge"/>
+</part>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="1145.54" y="127" size="1.778" layer="91">H-bridge stuff</text>
 <text x="1153.16" y="63.5" size="1.778" layer="91">esp32 stuff</text>
 </plain>
 <instances>
@@ -3674,6 +3758,9 @@ Switches electrical signals</description>
 <instance part="GND7" gate="G$1" x="1127.76" y="76.2"/>
 <instance part="U$1" gate="G$1" x="1115.06" y="83.82">
 <attribute name="COMM" x="1115.06" y="99.06" size="1.778" layer="96"/>
+</instance>
+<instance part="U$2" gate="G$1" x="1181.1" y="116.84">
+<attribute name="COMM" x="1170.94" y="132.08" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>

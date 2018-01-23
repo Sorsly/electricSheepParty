@@ -2235,6 +2235,27 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <vertex x="1.8364" y="-0.0051" curve="-90.012967"/>
 </polygon>
 </package>
+<package name="SOT223">
+<description>&lt;b&gt;SOT-223&lt;/b&gt;</description>
+<wire x1="3.2766" y1="1.651" x2="3.2766" y2="-1.651" width="0.2032" layer="21"/>
+<wire x1="3.2766" y1="-1.651" x2="-3.2766" y2="-1.651" width="0.2032" layer="21"/>
+<wire x1="-3.2766" y1="-1.651" x2="-3.2766" y2="1.651" width="0.2032" layer="21"/>
+<wire x1="-3.2766" y1="1.651" x2="3.2766" y2="1.651" width="0.2032" layer="21"/>
+<rectangle x1="-1.6002" y1="1.8034" x2="1.6002" y2="3.6576" layer="51"/>
+<rectangle x1="-0.4318" y1="-3.6576" x2="0.4318" y2="-1.8034" layer="51"/>
+<rectangle x1="-2.7432" y1="-3.6576" x2="-1.8796" y2="-1.8034" layer="51"/>
+<rectangle x1="1.8796" y1="-3.6576" x2="2.7432" y2="-1.8034" layer="51"/>
+<rectangle x1="-1.6002" y1="1.8034" x2="1.6002" y2="3.6576" layer="51"/>
+<rectangle x1="-0.4318" y1="-3.6576" x2="0.4318" y2="-1.8034" layer="51"/>
+<rectangle x1="-2.7432" y1="-3.6576" x2="-1.8796" y2="-1.8034" layer="51"/>
+<rectangle x1="1.8796" y1="-3.6576" x2="2.7432" y2="-1.8034" layer="51"/>
+<smd name="1" x="-2.3114" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="2" x="0" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="3" x="2.3114" y="-3.0988" dx="1.2192" dy="2.2352" layer="1"/>
+<smd name="4" x="0" y="3.099" dx="3.6" dy="2.2" layer="1"/>
+<text x="-3.4925" y="0" size="0.6096" layer="25" font="vector" ratio="20" rot="R90" align="bottom-center">&gt;NAME</text>
+<text x="3.4925" y="-0.127" size="0.6096" layer="27" font="vector" ratio="20" rot="R90" align="top-center">&gt;VALUE</text>
+</package>
 </packages>
 <symbols>
 <symbol name="CONN_02">
@@ -2391,6 +2412,15 @@ Switches electrical signals</description>
 <rectangle x1="-2.032" y1="1.524" x2="2.032" y2="2.032" layer="94"/>
 <pin name="1" x="0" y="5.08" visible="off" length="short" direction="pas" swaplevel="1" rot="R270"/>
 <pin name="2" x="0" y="-2.54" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
+</symbol>
+<symbol name="AZ1117E">
+<wire x1="0" y1="0" x2="25.4" y2="0" width="0.254" layer="94"/>
+<wire x1="25.4" y1="0" x2="25.4" y2="12.7" width="0.254" layer="94"/>
+<wire x1="25.4" y1="12.7" x2="0" y2="12.7" width="0.254" layer="94"/>
+<wire x1="0" y1="12.7" x2="0" y2="0" width="0.254" layer="94"/>
+<pin name="ADJ" x="12.7" y="-2.54" length="short" rot="R90"/>
+<pin name="OUTPUT" x="27.94" y="10.16" length="short" rot="R180"/>
+<pin name="INPUT" x="-2.54" y="10.16" length="short"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3472,6 +3502,23 @@ Switches electrical signals</description>
 </device>
 </devices>
 </deviceset>
+<deviceset name="AZ1117E">
+<gates>
+<gate name="G$1" symbol="AZ1117E" x="-12.7" y="-7.62"/>
+</gates>
+<devices>
+<device name="" package="SOT223">
+<connects>
+<connect gate="G$1" pin="ADJ" pad="1"/>
+<connect gate="G$1" pin="INPUT" pad="3"/>
+<connect gate="G$1" pin="OUTPUT" pad="2 4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
 </devicesets>
 </library>
 </libraries>
@@ -3486,11 +3533,17 @@ Switches electrical signals</description>
 <parts>
 <part name="FRAME1" library="SparkFun-Aesthetics" deviceset="FRAME-LETTER" device="NO_PACKAGE"/>
 <part name="SUPPLY2" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="6V"/>
-<part name="J1" library="electricSheepParty" deviceset="CONN_02" device=""/>
-<part name="J2" library="electricSheepParty" deviceset="CONN_02" device=""/>
+<part name="J1" library="electricSheepParty" deviceset="CONN_02" device="">
+<attribute name="COMM" value="Battery Connector"/>
+</part>
+<part name="J2" library="electricSheepParty" deviceset="CONN_02" device="">
+<attribute name="COMM" value="Laser Connector"/>
+</part>
 <part name="GND1" library="electricSheepParty" deviceset="GND2" device=""/>
 <part name="GND2" library="electricSheepParty" deviceset="GND2" device=""/>
-<part name="J3" library="electricSheepParty" deviceset="CONN_03" device="" value="455-1750-1-ND"/>
+<part name="J3" library="electricSheepParty" deviceset="CONN_03" device="" value="455-1750-1-ND">
+<attribute name="COMM" value="Servo Connector"/>
+</part>
 <part name="R1" library="electricSheepParty" deviceset="RESISTOR" device="0603" value=" "/>
 <part name="R2" library="electricSheepParty" deviceset="RESISTOR" device="0603" value=" "/>
 <part name="D1" library="electricSheepParty" deviceset="DIODE" device="-BAS16J" value="250mA/100V"/>
@@ -3500,7 +3553,9 @@ Switches electrical signals</description>
 <part name="SUPPLY3" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="6V_RAW"/>
 <part name="Q1" library="electricSheepParty" deviceset="MOSFET_PCH" device="-DMG2307L" value="2.5A/30V/105mΩ"/>
 <part name="S1" library="electricSheepParty" deviceset="SWITCH-SPDT" device="-PTH-11.6X4.0MM"/>
-<part name="D2" library="electricSheepParty" deviceset="LED" device="0603"/>
+<part name="D2" library="electricSheepParty" deviceset="LED" device="0603">
+<attribute name="COMMENT" value="Power LED"/>
+</part>
 <part name="J4" library="electricSheepParty" deviceset="CONN_02" device=""/>
 <part name="J5" library="electricSheepParty" deviceset="CONN_02" device=""/>
 <part name="SUPPLY4" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="3V3"/>
@@ -3512,23 +3567,32 @@ Switches electrical signals</description>
 <part name="C2" library="electricSheepParty" deviceset="0.1UF" device="-0603-25V-(+80/-20%)" value="0.1uF"/>
 <part name="SUPPLY5" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="6V"/>
 <part name="SUPPLY6" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="5V"/>
+<part name="GND7" library="electricSheepParty" deviceset="GND2" device=""/>
+<part name="U$1" library="electricSheepParty" deviceset="AZ1117E" device="">
+<attribute name="COMM" value="5-6V Lin Reg"/>
+</part>
 </parts>
 <sheets>
 <sheet>
 <plain>
 <text x="1145.54" y="127" size="1.778" layer="91">H-bridge stuff</text>
-<text x="1109.98" y="104.14" size="1.778" layer="91">power regulator</text>
 <text x="1153.16" y="63.5" size="1.778" layer="91">esp32 stuff</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="1036.32" y="-38.1"/>
 <instance part="FRAME1" gate="V" x="1183.64" y="-38.1"/>
 <instance part="SUPPLY2" gate="G$1" x="1061.72" y="129.54"/>
-<instance part="J1" gate="G$1" x="1054.1" y="119.38"/>
-<instance part="J2" gate="G$1" x="1082.04" y="119.38"/>
+<instance part="J1" gate="G$1" x="1054.1" y="119.38">
+<attribute name="COMM" x="1054.1" y="119.38" size="1.778" layer="96"/>
+</instance>
+<instance part="J2" gate="G$1" x="1082.04" y="119.38">
+<attribute name="COMM" x="1082.04" y="119.38" size="1.778" layer="96"/>
+</instance>
 <instance part="GND1" gate="G$1" x="1061.72" y="111.76"/>
 <instance part="GND2" gate="G$1" x="1089.66" y="111.76"/>
-<instance part="J3" gate="J$1" x="1109.98" y="119.38"/>
+<instance part="J3" gate="J$1" x="1109.98" y="119.38">
+<attribute name="COMM" x="1109.98" y="119.38" size="1.778" layer="96"/>
+</instance>
 <instance part="R1" gate="G$1" x="1059.18" y="60.96" rot="R90"/>
 <instance part="R2" gate="G$1" x="1084.58" y="68.58" rot="R90"/>
 <instance part="D1" gate="G$1" x="1066.8" y="68.58" smashed="yes" rot="R90">
@@ -3544,7 +3608,9 @@ Switches electrical signals</description>
 <attribute name="VALUE" x="1054.1" y="83.82" size="1.778" layer="96" font="vector"/>
 </instance>
 <instance part="S1" gate="1" x="1069.34" y="93.98" rot="R270"/>
-<instance part="D2" gate="G$1" x="1084.58" y="58.42"/>
+<instance part="D2" gate="G$1" x="1084.58" y="58.42">
+<attribute name="COMMENT" x="1084.58" y="58.42" size="1.778" layer="96"/>
+</instance>
 <instance part="J4" gate="G$1" x="1099.82" y="45.72"/>
 <instance part="J5" gate="G$1" x="1125.22" y="45.72"/>
 <instance part="SUPPLY4" gate="G$1" x="1107.44" y="63.5"/>
@@ -3553,9 +3619,13 @@ Switches electrical signals</description>
 <instance part="GND5" gate="G$1" x="1107.44" y="40.64"/>
 <instance part="GND6" gate="G$1" x="1132.84" y="40.64"/>
 <instance part="C1" gate="G$1" x="1109.98" y="88.9"/>
-<instance part="C2" gate="G$1" x="1130.3" y="88.9"/>
+<instance part="C2" gate="G$1" x="1145.54" y="88.9"/>
 <instance part="SUPPLY5" gate="G$1" x="1109.98" y="96.52"/>
-<instance part="SUPPLY6" gate="G$1" x="1130.3" y="96.52"/>
+<instance part="SUPPLY6" gate="G$1" x="1145.54" y="96.52"/>
+<instance part="GND7" gate="G$1" x="1127.76" y="76.2"/>
+<instance part="U$1" gate="G$1" x="1115.06" y="83.82">
+<attribute name="COMM" x="1115.06" y="83.82" size="1.778" layer="96"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -3593,13 +3663,14 @@ Switches electrical signals</description>
 <wire x1="1109.98" y1="96.52" x2="1109.98" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="1109.98" y1="93.98" x2="1112.52" y2="93.98" width="0.1524" layer="91"/>
 <junction x="1109.98" y="93.98"/>
+<pinref part="U$1" gate="G$1" pin="INPUT"/>
 </segment>
 <segment>
 <pinref part="SUPPLY6" gate="G$1" pin="VCC"/>
 <pinref part="C2" gate="G$1" pin="1"/>
-<wire x1="1130.3" y1="96.52" x2="1130.3" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="1130.3" y1="93.98" x2="1127.76" y2="93.98" width="0.1524" layer="91"/>
-<junction x="1130.3" y="93.98"/>
+<wire x1="1145.54" y1="96.52" x2="1145.54" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="1145.54" y1="93.98" x2="1143" y2="93.98" width="0.1524" layer="91"/>
+<junction x="1145.54" y="93.98"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -3632,6 +3703,18 @@ Switches electrical signals</description>
 <pinref part="GND6" gate="G$1" pin="3.3V"/>
 <pinref part="J5" gate="G$1" pin="1"/>
 <wire x1="1132.84" y1="43.18" x2="1132.84" y2="45.72" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C1" gate="G$1" pin="2"/>
+<pinref part="U$1" gate="G$1" pin="ADJ"/>
+<wire x1="1109.98" y1="86.36" x2="1109.98" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="1109.98" y1="81.28" x2="1127.76" y2="81.28" width="0.1524" layer="91"/>
+<pinref part="C2" gate="G$1" pin="2"/>
+<wire x1="1145.54" y1="86.36" x2="1145.54" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="1145.54" y1="81.28" x2="1127.76" y2="81.28" width="0.1524" layer="91"/>
+<junction x="1127.76" y="81.28"/>
+<pinref part="GND7" gate="G$1" pin="3.3V"/>
+<wire x1="1127.76" y1="81.28" x2="1127.76" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="PWM_LASER" class="0">
@@ -3705,18 +3788,6 @@ Switches electrical signals</description>
 <pinref part="R4" gate="G$1" pin="2"/>
 <wire x1="1132.84" y1="60.96" x2="1132.84" y2="66.04" width="0.1524" layer="91"/>
 <label x="1132.84" y="66.04" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$6" class="0">
-<segment>
-<pinref part="C1" gate="G$1" pin="2"/>
-<wire x1="1109.98" y1="86.36" x2="1109.98" y2="83.82" width="0.1524" layer="91"/>
-<wire x1="1109.98" y1="83.82" x2="1120.14" y2="83.82" width="0.1524" layer="91"/>
-<pinref part="C2" gate="G$1" pin="2"/>
-<wire x1="1120.14" y1="83.82" x2="1130.3" y2="83.82" width="0.1524" layer="91"/>
-<wire x1="1130.3" y1="83.82" x2="1130.3" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="1120.14" y1="83.82" x2="1120.14" y2="86.36" width="0.1524" layer="91"/>
-<junction x="1120.14" y="83.82"/>
 </segment>
 </net>
 </nets>
