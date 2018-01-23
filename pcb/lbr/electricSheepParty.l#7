@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.325" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -2672,25 +2672,39 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <wire x1="2.5" y1="-2.2" x2="2.5" y2="2.2" width="0.127" layer="51"/>
 <wire x1="2.5" y1="2.2" x2="-2.5" y2="2.2" width="0.127" layer="51"/>
 <wire x1="-2.5" y1="2.2" x2="-2.5" y2="-2.2" width="0.127" layer="51"/>
-<smd name="P$1" x="-2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$2" x="-1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$3" x="-0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$4" x="-0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$5" x="0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$6" x="0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$7" x="1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$8" x="2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$9" x="2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$10" x="1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$11" x="0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$12" x="0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$13" x="-0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$14" x="-0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$15" x="-1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$16" x="-2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
-<smd name="P$17" x="0" y="0" dx="2.31" dy="2.46" layer="1" rot="R90"/>
+<smd name="1" x="-2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="2" x="-1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="3" x="-0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="4" x="-0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="5" x="0.325" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="6" x="0.975" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="7" x="1.625" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="8" x="2.275" y="-2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="9" x="2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="10" x="1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="11" x="0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="12" x="0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="13" x="-0.325" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="14" x="-0.975" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="15" x="-1.625" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="16" x="-2.275" y="2.925" dx="1.15" dy="0.29" layer="1" rot="R90"/>
+<smd name="17" x="0" y="0" dx="2.31" dy="2.46" layer="1" rot="R90"/>
 <text x="1.3" y="0.325" size="0.254" layer="25">Name</text>
 <text x="1.3" y="-0.325" size="0.254" layer="27">Value</text>
+<circle x="-1.95" y="-1.3" radius="0.325" width="0.2032" layer="21"/>
+<wire x1="-2.6" y1="1.95" x2="2.6" y2="1.95" width="0.127" layer="21"/>
+<wire x1="2.6" y1="1.95" x2="2.6" y2="-1.95" width="0.127" layer="21"/>
+<wire x1="2.6" y1="-1.95" x2="-2.6" y2="-1.95" width="0.127" layer="21"/>
+<wire x1="-2.6" y1="-1.95" x2="-2.6" y2="1.95" width="0.127" layer="21"/>
+</package>
+<package name="TO263-5">
+<smd name="6" x="0" y="0" dx="10.9" dy="9.1" layer="1"/>
+<smd name="1" x="-3.4" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
+<smd name="2" x="-1.7" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
+<smd name="3" x="0" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
+<smd name="4" x="1.7" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
+<smd name="5" x="3.4" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
+<circle x="-5" y="-7" radius="1" width="0.2032" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -2939,35 +2953,46 @@ Switches electronic signals</description>
 <pin name="2" x="0" y="-2.54" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
 </symbol>
 <symbol name="AZ1117E">
-<wire x1="0" y1="0" x2="25.4" y2="0" width="0.254" layer="94"/>
-<wire x1="25.4" y1="0" x2="25.4" y2="12.7" width="0.254" layer="94"/>
-<wire x1="25.4" y1="12.7" x2="0" y2="12.7" width="0.254" layer="94"/>
-<wire x1="0" y1="12.7" x2="0" y2="0" width="0.254" layer="94"/>
-<pin name="ADJ" x="12.7" y="-2.54" length="short" rot="R90"/>
-<pin name="OUTPUT" x="27.94" y="10.16" length="short" rot="R180"/>
-<pin name="INPUT" x="-2.54" y="10.16" length="short"/>
+<wire x1="-12.7" y1="-5.08" x2="12.7" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-5.08" x2="12.7" y2="7.62" width="0.254" layer="94"/>
+<wire x1="12.7" y1="7.62" x2="-12.7" y2="7.62" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="7.62" x2="-12.7" y2="-5.08" width="0.254" layer="94"/>
+<pin name="ADJ" x="0" y="-7.62" length="short" rot="R90"/>
+<pin name="OUTPUT" x="15.24" y="5.08" length="short" rot="R180"/>
+<pin name="INPUT" x="-15.24" y="5.08" length="short"/>
 </symbol>
 <symbol name="DRV8833C">
-<wire x1="22.86" y1="0" x2="22.86" y2="22.86" width="0.254" layer="94"/>
-<wire x1="22.86" y1="22.86" x2="0" y2="22.86" width="0.254" layer="94"/>
-<pin name="NSLEEP" x="-5.08" y="20.32" length="middle" function="dot"/>
-<pin name="AOUT1" x="-5.08" y="17.78" length="middle"/>
-<pin name="AISEN" x="-5.08" y="15.24" length="middle"/>
-<pin name="AOUT2" x="-5.08" y="12.7" length="middle"/>
-<pin name="BOUT2" x="-5.08" y="10.16" length="middle"/>
-<pin name="BISEN" x="-5.08" y="7.62" length="middle"/>
-<pin name="BOUT1" x="-5.08" y="5.08" length="middle"/>
-<pin name="NFAULT" x="-5.08" y="2.54" length="middle" function="dot"/>
-<pin name="BIN1" x="27.94" y="2.54" length="middle" rot="R180"/>
-<wire x1="0" y1="22.86" x2="0" y2="0" width="0.254" layer="94"/>
-<wire x1="0" y1="0" x2="22.86" y2="0" width="0.254" layer="94"/>
-<pin name="BIN2" x="27.94" y="5.08" length="middle" rot="R180"/>
-<pin name="NC" x="27.94" y="7.62" length="middle" direction="nc" rot="R180"/>
-<pin name="VM" x="27.94" y="10.16" length="middle" rot="R180"/>
-<pin name="GND" x="27.94" y="12.7" length="middle" rot="R180"/>
-<pin name="VINT" x="27.94" y="15.24" length="middle" rot="R180"/>
-<pin name="AIN2" x="27.94" y="17.78" length="middle" rot="R180"/>
-<pin name="AIN1" x="27.94" y="20.32" length="middle" rot="R180"/>
+<wire x1="10.16" y1="-10.16" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="12.7" x2="-10.16" y2="12.7" width="0.254" layer="94"/>
+<pin name="NSLEEP" x="-15.24" y="10.16" length="middle" function="dot"/>
+<pin name="AOUT1" x="-15.24" y="7.62" length="middle"/>
+<pin name="AISEN" x="-15.24" y="5.08" length="middle"/>
+<pin name="AOUT2" x="-15.24" y="2.54" length="middle"/>
+<pin name="BOUT2" x="-15.24" y="0" length="middle"/>
+<pin name="BISEN" x="-15.24" y="-2.54" length="middle"/>
+<pin name="BOUT1" x="-15.24" y="-5.08" length="middle"/>
+<pin name="NFAULT" x="-15.24" y="-7.62" length="middle" function="dot"/>
+<pin name="BIN1" x="15.24" y="-7.62" length="middle" rot="R180"/>
+<wire x1="-10.16" y1="12.7" x2="-10.16" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-10.16" x2="10.16" y2="-10.16" width="0.254" layer="94"/>
+<pin name="BIN2" x="15.24" y="-5.08" length="middle" rot="R180"/>
+<pin name="NC" x="15.24" y="-2.54" length="middle" direction="nc" rot="R180"/>
+<pin name="VM" x="15.24" y="0" length="middle" rot="R180"/>
+<pin name="GND" x="15.24" y="2.54" length="middle" rot="R180"/>
+<pin name="VINT" x="15.24" y="5.08" length="middle" rot="R180"/>
+<pin name="AIN2" x="15.24" y="7.62" length="middle" rot="R180"/>
+<pin name="AIN1" x="15.24" y="10.16" length="middle" rot="R180"/>
+</symbol>
+<symbol name="AP1506">
+<wire x1="-10.16" y1="-7.62" x2="-10.16" y2="7.62" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="7.62" x2="10.16" y2="7.62" width="0.254" layer="94"/>
+<wire x1="10.16" y1="7.62" x2="10.16" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-7.62" x2="-10.16" y2="-7.62" width="0.254" layer="94"/>
+<pin name="VIN" x="-12.7" y="0" length="short"/>
+<pin name="OUTPUT" x="12.7" y="0" length="short" rot="R180"/>
+<pin name="GND" x="5.08" y="-10.16" length="short" rot="R90"/>
+<pin name="FB" x="0" y="10.16" length="short" rot="R270"/>
+<pin name="SD" x="-5.08" y="-10.16" length="short" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -4470,6 +4495,55 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <connect gate="G$1" pin="ADJ" pad="1"/>
 <connect gate="G$1" pin="INPUT" pad="3"/>
 <connect gate="G$1" pin="OUTPUT" pad="2 4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="DRV8833C">
+<gates>
+<gate name="G$1" symbol="DRV8833C" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="HTSSOP-16">
+<connects>
+<connect gate="G$1" pin="AIN1" pad="16"/>
+<connect gate="G$1" pin="AIN2" pad="15"/>
+<connect gate="G$1" pin="AISEN" pad="3"/>
+<connect gate="G$1" pin="AOUT1" pad="2"/>
+<connect gate="G$1" pin="AOUT2" pad="4"/>
+<connect gate="G$1" pin="BIN1" pad="9"/>
+<connect gate="G$1" pin="BIN2" pad="10"/>
+<connect gate="G$1" pin="BISEN" pad="6"/>
+<connect gate="G$1" pin="BOUT1" pad="7"/>
+<connect gate="G$1" pin="BOUT2" pad="5"/>
+<connect gate="G$1" pin="GND" pad="13 17"/>
+<connect gate="G$1" pin="NC" pad="11"/>
+<connect gate="G$1" pin="NFAULT" pad="8"/>
+<connect gate="G$1" pin="NSLEEP" pad="1"/>
+<connect gate="G$1" pin="VINT" pad="14"/>
+<connect gate="G$1" pin="VM" pad="12"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="AP1506">
+<gates>
+<gate name="G$1" symbol="AP1506" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="TO263-5">
+<connects>
+<connect gate="G$1" pin="FB" pad="4"/>
+<connect gate="G$1" pin="GND" pad="3 6"/>
+<connect gate="G$1" pin="OUTPUT" pad="2"/>
+<connect gate="G$1" pin="SD" pad="5"/>
+<connect gate="G$1" pin="VIN" pad="1"/>
 </connects>
 <technologies>
 <technology name=""/>
