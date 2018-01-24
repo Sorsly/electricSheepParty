@@ -4000,14 +4000,14 @@ Source: &lt;a href="http://www.ftdichip.com/Support/Documents/DataSheets/ICs/DS_
 <instance part="U$1" gate="G$1" x="1074.42" y="20.32">
 <attribute name="COMM" x="1054.1" y="35.56" size="1.778" layer="96"/>
 </instance>
-<instance part="U$2" gate="G$1" x="1242.06" y="81.28">
-<attribute name="COMM" x="1231.9" y="96.52" size="1.778" layer="96"/>
+<instance part="U$2" gate="G$1" x="1244.6" y="116.84">
+<attribute name="COMM" x="1234.44" y="132.08" size="1.778" layer="96"/>
 </instance>
-<instance part="U$3" gate="G$1" x="1122.68" y="38.1">
-<attribute name="COMM" x="1102.36" y="48.26" size="1.778" layer="96"/>
+<instance part="U$3" gate="G$1" x="1076.96" y="-15.24">
+<attribute name="COMM" x="1056.64" y="-5.08" size="1.778" layer="96"/>
 </instance>
-<instance part="IC1" gate="G$1" x="1244.6" y="38.1">
-<attribute name="COMM" x="1224.28" y="53.34" size="1.778" layer="96"/>
+<instance part="IC1" gate="G$1" x="1244.6" y="73.66">
+<attribute name="COMM" x="1224.28" y="88.9" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
