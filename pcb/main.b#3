@@ -1896,6 +1896,9 @@ design rules under a new name.</description>
 <element name="D3" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOT23" package3d_urn="urn:adsk.eagle:package:43389/2" value="BAT54" x="-48.8696" y="-74.5236"/>
 <element name="C6" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="22uF" x="-49.276" y="-81.3308"/>
 <element name="C7" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="10uF" x="-49.276" y="-86.9696"/>
+<element name="C8" library="electricSheepParty" package="0603" value="0.1uF" x="-48.6156" y="-91.694">
+<attribute name="PROD_ID" value="CAP-00810" x="-48.6156" y="-91.694" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="VCCIO">
@@ -2069,6 +2072,8 @@ design rules under a new name.</description>
 <contactref element="U$3" pad="5"/>
 <contactref element="C7" pad="2"/>
 <contactref element="C6" pad="2"/>
+<contactref element="C8" pad="2"/>
+<wire x1="-48.326" y1="-86.9696" x2="-47.7656" y2="-91.694" width="0" layer="19" extent="1-1"/>
 <wire x1="-48.326" y1="-81.3308" x2="-48.326" y2="-86.9696" width="0" layer="19" extent="1-1"/>
 <wire x1="-49.8196" y1="-75.6236" x2="-48.326" y2="-81.3308" width="0" layer="19" extent="1-1"/>
 <wire x1="-21.59" y1="23.12" x2="-49.8196" y2="-75.6236" width="0" layer="19" extent="1-1"/>
@@ -2081,6 +2086,8 @@ design rules under a new name.</description>
 <contactref element="C7" pad="1"/>
 <contactref element="U$3" pad="1"/>
 <contactref element="C6" pad="1"/>
+<contactref element="C8" pad="1"/>
+<wire x1="-50.226" y1="-86.9696" x2="-49.4656" y2="-91.694" width="0" layer="19" extent="1-1"/>
 <wire x1="-50.226" y1="-81.3308" x2="-50.226" y2="-86.9696" width="0" layer="19" extent="1-1"/>
 <wire x1="-24.99" y1="23.12" x2="-50.226" y2="-81.3308" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.4686" y1="40.0812" x2="-24.99" y2="23.12" width="0" layer="19" extent="1-1"/>

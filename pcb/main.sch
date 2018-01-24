@@ -16550,6 +16550,170 @@ Source: Fairchild .. BAT54.pdf</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="SparkFun-Sensors" urn="urn:adsk.eagle:library:534">
+<description>&lt;h3&gt;SparkFun Sensors&lt;/h3&gt;
+This library contains sensors- accelerometers, gyros, compasses, magnetometers, light sensors, imagers, temp sensors, etc.
+&lt;br&gt;
+&lt;br&gt;
+We've spent an enormous amount of time creating and checking these footprints and parts, but it is &lt;b&gt; the end user's responsibility&lt;/b&gt; to ensure correctness and suitablity for a given componet or application. 
+&lt;br&gt;
+&lt;br&gt;If you enjoy using this library, please buy one of our products at &lt;a href=" www.sparkfun.com"&gt;SparkFun.com&lt;/a&gt;.
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Licensing:&lt;/b&gt; Creative Commons ShareAlike 4.0 International - https://creativecommons.org/licenses/by-sa/4.0/ 
+&lt;br&gt;
+&lt;br&gt;
+You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
+<packages>
+<package name="LGA-12" urn="urn:adsk.eagle:footprint:39901/1" library_version="1">
+<description>&lt;h3&gt;LGA-12 2x2x1 mm 12-lead&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;0.50mm pitch&lt;/li&gt;
+&lt;li&gt;Pads are 0.25x0.275 mm&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Derrived from the following ST PDFs&lt;/h4&gt;
+&lt;ul&gt;&lt;li&gt;http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00089896.pdf&lt;/li&gt;
+&lt;li&gt;http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.pdf&lt;/li&gt;&lt;/ul&gt;</description>
+<wire x1="-0.975" y1="-0.975" x2="-0.975" y2="0.975" width="0.127" layer="51"/>
+<wire x1="-0.975" y1="0.975" x2="0.975" y2="0.975" width="0.127" layer="51"/>
+<wire x1="0.975" y1="0.975" x2="0.975" y2="-0.975" width="0.127" layer="51"/>
+<wire x1="0.975" y1="-0.975" x2="-0.975" y2="-0.975" width="0.127" layer="51"/>
+<wire x1="-1.175" y1="0.775" x2="-0.775" y2="1.175" width="0.127" layer="21"/>
+<wire x1="1.1" y1="1.1" x2="0.7" y2="1.1" width="0.127" layer="21"/>
+<wire x1="1.1" y1="1.1" x2="1.1" y2="0.7" width="0.127" layer="21"/>
+<wire x1="1.1" y1="-1.1" x2="0.7" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="1.1" y1="-1.1" x2="1.1" y2="-0.7" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="-1.1" x2="-0.7" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="-1.1" x2="-1.1" y2="-0.7" width="0.127" layer="21"/>
+<wire x1="1.406" y1="-0.355" x2="1.406" y2="0.526" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="1.406" y2="0.526" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="2.248" y2="0.376" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="2.248" y2="0.676" width="0.0762" layer="51"/>
+<wire x1="2.254" y1="-0.072" x2="1.894" y2="-0.262" width="0.0762" layer="51" curve="225"/>
+<wire x1="1.894" y1="-0.262" x2="1.754" y2="-0.222" width="0.0762" layer="51"/>
+<wire x1="1.894" y1="-0.262" x2="1.924" y2="-0.142" width="0.0762" layer="51"/>
+<wire x1="1.406" y1="-0.358" x2="1.256" y2="-0.208" width="0.0762" layer="51"/>
+<wire x1="1.406" y1="-0.358" x2="1.556" y2="-0.208" width="0.0762" layer="51"/>
+<wire x1="1.176" y1="0.152" x2="1.536" y2="0.342" width="0.0762" layer="51" curve="225"/>
+<wire x1="1.536" y1="0.342" x2="1.676" y2="0.302" width="0.0762" layer="51"/>
+<wire x1="1.536" y1="0.342" x2="1.506" y2="0.222" width="0.0762" layer="51"/>
+<wire x1="1.9144" y1="0.3026" x2="2.1044" y2="0.6626" width="0.0762" layer="51" curve="-225"/>
+<wire x1="2.1044" y1="0.6626" x2="2.0644" y2="0.8026" width="0.0762" layer="51"/>
+<wire x1="2.1044" y1="0.6626" x2="1.9844" y2="0.6326" width="0.0762" layer="51"/>
+<smd name="12" x="-0.25" y="0.75" dx="0.35" dy="0.375" layer="1"/>
+<smd name="11" x="0.25" y="0.75" dx="0.35" dy="0.375" layer="1"/>
+<smd name="10" x="0.75" y="0.75" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="9" x="0.75" y="0.25" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="8" x="0.75" y="-0.25" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="7" x="0.75" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="6" x="0.25" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R180"/>
+<smd name="5" x="-0.25" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R180"/>
+<smd name="4" x="-0.75" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="3" x="-0.75" y="-0.25" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="2" x="-0.75" y="0.25" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="1" x="-0.75" y="0.75" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<rectangle x1="0.125" y1="0.6125" x2="0.375" y2="0.8875" layer="51"/>
+<rectangle x1="-0.375" y1="0.6125" x2="-0.125" y2="0.8875" layer="51"/>
+<rectangle x1="-0.875" y1="0.1125" x2="-0.625" y2="0.3875" layer="51" rot="R90"/>
+<rectangle x1="-0.875" y1="-0.3875" x2="-0.625" y2="-0.1125" layer="51" rot="R90"/>
+<rectangle x1="-0.875" y1="-0.8875" x2="-0.625" y2="-0.6125" layer="51" rot="R90"/>
+<rectangle x1="-0.375" y1="-0.8875" x2="-0.125" y2="-0.6125" layer="51" rot="R180"/>
+<rectangle x1="0.125" y1="-0.8875" x2="0.375" y2="-0.6125" layer="51" rot="R180"/>
+<rectangle x1="0.625" y1="-0.8875" x2="0.875" y2="-0.6125" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="-0.3875" x2="0.875" y2="-0.1125" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="0.1125" x2="0.875" y2="0.3875" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="0.6125" x2="0.875" y2="0.8875" layer="51" rot="R270"/>
+<rectangle x1="-0.55" y1="-0.55" x2="0.55" y2="0.55" layer="39"/>
+<polygon width="0" layer="51">
+<vertex x="-0.8875" y="0.625"/>
+<vertex x="-0.8875" y="0.875"/>
+<vertex x="-0.6125" y="0.875"/>
+<vertex x="-0.6125" y="0.7"/>
+<vertex x="-0.6875" y="0.625"/>
+</polygon>
+<text x="2.585" y="0.516" size="0.3" layer="51" ratio="15" rot="MR0" align="center">X</text>
+<text x="1.42" y="-0.59" size="0.3" layer="51" ratio="15" rot="MR0" align="center">Y</text>
+<text x="2.248" y="-0.299" size="0.3" layer="51" ratio="15" align="center">Z</text>
+<text x="0" y="1.905" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-2.54" size="0.6096" layer="27" font="vector" ratio="20" align="bottom-center">&gt;VALUE</text>
+<circle x="2.058" y="-0.089" radius="0.02828125" width="0.0762" layer="51"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="LGA-12" urn="urn:adsk.eagle:package:39983/1" type="box" library_version="1">
+<description>LGA-12 2x2x1 mm 12-lead
+0.50mm pitch
+Pads are 0.25x0.275 mm
+
+Derrived from the following ST PDFs
+http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00089896.pdf
+http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.pdf</description>
+</package3d>
+</packages3d>
+<symbols>
+<symbol name="LSM303C" urn="urn:adsk.eagle:symbol:39900/1" library_version="1">
+<pin name="C1" x="-17.78" y="-12.7" length="short"/>
+<pin name="SDA/SDI/SDO" x="-17.78" y="-7.62" length="short"/>
+<pin name="CS_XL" x="-17.78" y="2.54" length="short"/>
+<pin name="CS_MAG" x="-17.78" y="-2.54" length="short"/>
+<pin name="GND@1" x="17.78" y="-12.7" length="short" rot="R180"/>
+<pin name="INT_MAG" x="17.78" y="-7.62" length="short" rot="R180"/>
+<pin name="GND@2" x="17.78" y="-2.54" length="short" rot="R180"/>
+<pin name="VDD" x="17.78" y="2.54" length="short" rot="R180"/>
+<pin name="VDD_IO" x="17.78" y="7.62" length="short" rot="R180"/>
+<pin name="INT_XL" x="-17.78" y="12.7" length="short"/>
+<pin name="SCL/SPC" x="-17.78" y="7.62" length="short"/>
+<pin name="DRDY_MAG" x="17.78" y="12.7" length="short" rot="R180"/>
+<wire x1="-15.24" y1="17.78" x2="-15.24" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="-15.24" y1="-17.78" x2="15.24" y2="-17.78" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-17.78" x2="15.24" y2="17.78" width="0.254" layer="94"/>
+<wire x1="15.24" y1="17.78" x2="-15.24" y2="17.78" width="0.254" layer="94"/>
+<text x="-15.24" y="-19.05" size="1.778" layer="96" font="vector" align="center-left">&gt;Value</text>
+<text x="-15.24" y="19.05" size="1.778" layer="95" font="vector" align="center-left">&gt;Name</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="LSM303C" urn="urn:adsk.eagle:component:40055/1" prefix="U" library_version="1">
+<description>&lt;h3&gt;Ultra-compact high-performance eCompass module&lt;/h3&gt;
+&lt;p&gt;3D accelerometer and 3D magnetometer&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.st.com/web/en/resource/technical/document/datasheet/DM00089896.pdf"&gt;Datasheet&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;SparkFun Products&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.sparkfun.com/products/13303"&gt;SparkFun 6 Degrees of Freedom Breakout - LSM303C&lt;/a&gt; (BOB-13303)&lt;/li&gt;
+&lt;/ul&gt;</description>
+<gates>
+<gate name="G$1" symbol="LSM303C" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="LGA-12">
+<connects>
+<connect gate="G$1" pin="C1" pad="5"/>
+<connect gate="G$1" pin="CS_MAG" pad="3"/>
+<connect gate="G$1" pin="CS_XL" pad="2"/>
+<connect gate="G$1" pin="DRDY_MAG" pad="11"/>
+<connect gate="G$1" pin="GND@1" pad="6"/>
+<connect gate="G$1" pin="GND@2" pad="8"/>
+<connect gate="G$1" pin="INT_MAG" pad="7"/>
+<connect gate="G$1" pin="INT_XL" pad="12"/>
+<connect gate="G$1" pin="SCL/SPC" pad="1"/>
+<connect gate="G$1" pin="SDA/SDI/SDO" pad="4"/>
+<connect gate="G$1" pin="VDD" pad="9"/>
+<connect gate="G$1" pin="VDD_IO" pad="10"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:39983/1"/>
+</package3dinstances>
+<technologies>
+<technology name="">
+<attribute name="PROD_ID" value="IC-12557" constant="no"/>
+<attribute name="VALUE" value="LSM303C" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -16638,6 +16802,7 @@ Source: Fairchild .. BAT54.pdf</description>
 <part name="C10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="B/3528-21R" package3d_urn="urn:adsk.eagle:package:23409/2" value="220uF"/>
 <part name="C11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="10uF"/>
 <part name="R5" library="electricSheepParty" deviceset="RESISTOR" device="0603" value=" "/>
+<part name="U1" library="SparkFun-Sensors" library_urn="urn:adsk.eagle:library:534" deviceset="LSM303C" device="" package3d_urn="urn:adsk.eagle:package:39983/1" value="LSM303C"/>
 </parts>
 <sheets>
 <sheet>
@@ -16731,6 +16896,7 @@ Source: Fairchild .. BAT54.pdf</description>
 <instance part="C10" gate="G$1" x="1130.3" y="-20.32"/>
 <instance part="C11" gate="G$1" x="1140.46" y="-20.32"/>
 <instance part="R5" gate="G$1" x="1209.04" y="114.3" rot="R180"/>
+<instance part="U1" gate="G$1" x="1244.6" y="27.94"/>
 </instances>
 <busses>
 </busses>
@@ -17128,6 +17294,20 @@ Source: Fairchild .. BAT54.pdf</description>
 <pinref part="U$2" gate="G$1" pin="NFAULT"/>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="1216.66" y1="114.3" x2="1214.12" y2="114.3" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="SCL" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="SCL/SPC"/>
+<wire x1="1226.82" y1="35.56" x2="1216.66" y2="35.56" width="0.1524" layer="91"/>
+<label x="1219.2" y="35.56" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SDA" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="SDA/SDI/SDO"/>
+<wire x1="1226.82" y1="20.32" x2="1216.66" y2="20.32" width="0.1524" layer="91"/>
+<label x="1219.2" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

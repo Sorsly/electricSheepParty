@@ -16637,6 +16637,7 @@ Source: Fairchild .. BAT54.pdf</description>
 <part name="C9" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="B/3528-21R" package3d_urn="urn:adsk.eagle:package:23409/2" value="220uF"/>
 <part name="C10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="B/3528-21R" package3d_urn="urn:adsk.eagle:package:23409/2" value="220uF"/>
 <part name="C11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="10uF"/>
+<part name="R5" library="electricSheepParty" deviceset="RESISTOR" device="0603" value=" "/>
 </parts>
 <sheets>
 <sheet>
@@ -16716,7 +16717,7 @@ Source: Fairchild .. BAT54.pdf</description>
 <attribute name="NAME" x="1251.204" y="118.745" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="1258.824" y="118.491" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="GND9" gate="G$1" x="1201.42" y="106.68"/>
+<instance part="GND9" gate="G$1" x="1191.26" y="106.68"/>
 <instance part="J6" gate="G$1" x="1107.44" y="91.44"/>
 <instance part="J7" gate="G$1" x="1107.44" y="76.2"/>
 <instance part="U$4" gate="G$1" x="1107.44" y="-15.24"/>
@@ -16729,6 +16730,7 @@ Source: Fairchild .. BAT54.pdf</description>
 <instance part="C9" gate="G$1" x="1120.14" y="-20.32"/>
 <instance part="C10" gate="G$1" x="1130.3" y="-20.32"/>
 <instance part="C11" gate="G$1" x="1140.46" y="-20.32"/>
+<instance part="R5" gate="G$1" x="1209.04" y="114.3" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -16813,13 +16815,13 @@ Source: Fairchild .. BAT54.pdf</description>
 </segment>
 <segment>
 <pinref part="U$2" gate="G$1" pin="BISEN"/>
-<wire x1="1216.66" y1="119.38" x2="1201.42" y2="119.38" width="0.1524" layer="91"/>
-<wire x1="1201.42" y1="119.38" x2="1201.42" y2="127" width="0.1524" layer="91"/>
+<wire x1="1216.66" y1="119.38" x2="1191.26" y2="119.38" width="0.1524" layer="91"/>
+<wire x1="1191.26" y1="119.38" x2="1191.26" y2="127" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="AISEN"/>
-<wire x1="1201.42" y1="127" x2="1216.66" y2="127" width="0.1524" layer="91"/>
+<wire x1="1191.26" y1="127" x2="1216.66" y2="127" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="G$1" pin="3.3V"/>
-<wire x1="1201.42" y1="109.22" x2="1201.42" y2="119.38" width="0.1524" layer="91"/>
-<junction x="1201.42" y="119.38"/>
+<wire x1="1191.26" y1="109.22" x2="1191.26" y2="119.38" width="0.1524" layer="91"/>
+<junction x="1191.26" y="119.38"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -16942,6 +16944,16 @@ Source: Fairchild .. BAT54.pdf</description>
 <wire x1="1140.46" y1="-15.24" x2="1130.3" y2="-15.24" width="0.1524" layer="91"/>
 <junction x="1130.3" y="-15.24"/>
 </segment>
+<segment>
+<pinref part="R5" gate="G$1" pin="2"/>
+<wire x1="1203.96" y1="114.3" x2="1196.34" y2="114.3" width="0.1524" layer="91"/>
+<label x="1196.34" y="114.3" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="NSLEEP"/>
+<wire x1="1216.66" y1="132.08" x2="1206.5" y2="132.08" width="0.1524" layer="91"/>
+<label x="1206.5" y="132.08" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="N$8" class="0">
 <segment>
@@ -16986,13 +16998,6 @@ Source: Fairchild .. BAT54.pdf</description>
 <wire x1="1249.68" y1="116.84" x2="1249.68" y2="109.22" width="0.1524" layer="91"/>
 <wire x1="1249.68" y1="109.22" x2="1259.84" y2="109.22" width="0.1524" layer="91"/>
 <label x="1249.68" y="109.22" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="MOTOR_EN" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="NSLEEP"/>
-<wire x1="1216.66" y1="132.08" x2="1206.5" y2="132.08" width="0.1524" layer="91"/>
-<label x="1201.42" y="132.08" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M1+" class="0">
@@ -17116,6 +17121,13 @@ Source: Fairchild .. BAT54.pdf</description>
 <pinref part="C8" gate="G$1" pin="1"/>
 <wire x1="1061.72" y1="-17.78" x2="1061.72" y2="-15.24" width="0.1524" layer="91"/>
 <junction x="1061.72" y="-15.24"/>
+</segment>
+</net>
+<net name="N$13" class="0">
+<segment>
+<pinref part="U$2" gate="G$1" pin="NFAULT"/>
+<pinref part="R5" gate="G$1" pin="1"/>
+<wire x1="1216.66" y1="114.3" x2="1214.12" y2="114.3" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
