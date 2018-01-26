@@ -1649,6 +1649,106 @@ Based on the following sources:
 </package3d>
 </packages3d>
 </library>
+<library name="SparkFun-Sensors" urn="urn:adsk.eagle:library:534">
+<description>&lt;h3&gt;SparkFun Sensors&lt;/h3&gt;
+This library contains sensors- accelerometers, gyros, compasses, magnetometers, light sensors, imagers, temp sensors, etc.
+&lt;br&gt;
+&lt;br&gt;
+We've spent an enormous amount of time creating and checking these footprints and parts, but it is &lt;b&gt; the end user's responsibility&lt;/b&gt; to ensure correctness and suitablity for a given componet or application. 
+&lt;br&gt;
+&lt;br&gt;If you enjoy using this library, please buy one of our products at &lt;a href=" www.sparkfun.com"&gt;SparkFun.com&lt;/a&gt;.
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Licensing:&lt;/b&gt; Creative Commons ShareAlike 4.0 International - https://creativecommons.org/licenses/by-sa/4.0/ 
+&lt;br&gt;
+&lt;br&gt;
+You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
+<packages>
+<package name="LGA-12" urn="urn:adsk.eagle:footprint:39901/1" library_version="1">
+<description>&lt;h3&gt;LGA-12 2x2x1 mm 12-lead&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;0.50mm pitch&lt;/li&gt;
+&lt;li&gt;Pads are 0.25x0.275 mm&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Derrived from the following ST PDFs&lt;/h4&gt;
+&lt;ul&gt;&lt;li&gt;http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00089896.pdf&lt;/li&gt;
+&lt;li&gt;http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.pdf&lt;/li&gt;&lt;/ul&gt;</description>
+<wire x1="-0.975" y1="-0.975" x2="-0.975" y2="0.975" width="0.127" layer="51"/>
+<wire x1="-0.975" y1="0.975" x2="0.975" y2="0.975" width="0.127" layer="51"/>
+<wire x1="0.975" y1="0.975" x2="0.975" y2="-0.975" width="0.127" layer="51"/>
+<wire x1="0.975" y1="-0.975" x2="-0.975" y2="-0.975" width="0.127" layer="51"/>
+<wire x1="-1.175" y1="0.775" x2="-0.775" y2="1.175" width="0.127" layer="21"/>
+<wire x1="1.1" y1="1.1" x2="0.7" y2="1.1" width="0.127" layer="21"/>
+<wire x1="1.1" y1="1.1" x2="1.1" y2="0.7" width="0.127" layer="21"/>
+<wire x1="1.1" y1="-1.1" x2="0.7" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="1.1" y1="-1.1" x2="1.1" y2="-0.7" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="-1.1" x2="-0.7" y2="-1.1" width="0.127" layer="21"/>
+<wire x1="-1.1" y1="-1.1" x2="-1.1" y2="-0.7" width="0.127" layer="21"/>
+<wire x1="1.406" y1="-0.355" x2="1.406" y2="0.526" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="1.406" y2="0.526" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="2.248" y2="0.376" width="0.0762" layer="51"/>
+<wire x1="2.398" y1="0.526" x2="2.248" y2="0.676" width="0.0762" layer="51"/>
+<wire x1="2.254" y1="-0.072" x2="1.894" y2="-0.262" width="0.0762" layer="51" curve="225"/>
+<wire x1="1.894" y1="-0.262" x2="1.754" y2="-0.222" width="0.0762" layer="51"/>
+<wire x1="1.894" y1="-0.262" x2="1.924" y2="-0.142" width="0.0762" layer="51"/>
+<wire x1="1.406" y1="-0.358" x2="1.256" y2="-0.208" width="0.0762" layer="51"/>
+<wire x1="1.406" y1="-0.358" x2="1.556" y2="-0.208" width="0.0762" layer="51"/>
+<wire x1="1.176" y1="0.152" x2="1.536" y2="0.342" width="0.0762" layer="51" curve="225"/>
+<wire x1="1.536" y1="0.342" x2="1.676" y2="0.302" width="0.0762" layer="51"/>
+<wire x1="1.536" y1="0.342" x2="1.506" y2="0.222" width="0.0762" layer="51"/>
+<wire x1="1.9144" y1="0.3026" x2="2.1044" y2="0.6626" width="0.0762" layer="51" curve="-225"/>
+<wire x1="2.1044" y1="0.6626" x2="2.0644" y2="0.8026" width="0.0762" layer="51"/>
+<wire x1="2.1044" y1="0.6626" x2="1.9844" y2="0.6326" width="0.0762" layer="51"/>
+<smd name="12" x="-0.25" y="0.75" dx="0.35" dy="0.375" layer="1"/>
+<smd name="11" x="0.25" y="0.75" dx="0.35" dy="0.375" layer="1"/>
+<smd name="10" x="0.75" y="0.75" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="9" x="0.75" y="0.25" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="8" x="0.75" y="-0.25" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="7" x="0.75" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R270"/>
+<smd name="6" x="0.25" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R180"/>
+<smd name="5" x="-0.25" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R180"/>
+<smd name="4" x="-0.75" y="-0.75" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="3" x="-0.75" y="-0.25" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="2" x="-0.75" y="0.25" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<smd name="1" x="-0.75" y="0.75" dx="0.35" dy="0.375" layer="1" rot="R90"/>
+<rectangle x1="0.125" y1="0.6125" x2="0.375" y2="0.8875" layer="51"/>
+<rectangle x1="-0.375" y1="0.6125" x2="-0.125" y2="0.8875" layer="51"/>
+<rectangle x1="-0.875" y1="0.1125" x2="-0.625" y2="0.3875" layer="51" rot="R90"/>
+<rectangle x1="-0.875" y1="-0.3875" x2="-0.625" y2="-0.1125" layer="51" rot="R90"/>
+<rectangle x1="-0.875" y1="-0.8875" x2="-0.625" y2="-0.6125" layer="51" rot="R90"/>
+<rectangle x1="-0.375" y1="-0.8875" x2="-0.125" y2="-0.6125" layer="51" rot="R180"/>
+<rectangle x1="0.125" y1="-0.8875" x2="0.375" y2="-0.6125" layer="51" rot="R180"/>
+<rectangle x1="0.625" y1="-0.8875" x2="0.875" y2="-0.6125" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="-0.3875" x2="0.875" y2="-0.1125" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="0.1125" x2="0.875" y2="0.3875" layer="51" rot="R270"/>
+<rectangle x1="0.625" y1="0.6125" x2="0.875" y2="0.8875" layer="51" rot="R270"/>
+<rectangle x1="-0.55" y1="-0.55" x2="0.55" y2="0.55" layer="39"/>
+<polygon width="0" layer="51">
+<vertex x="-0.8875" y="0.625"/>
+<vertex x="-0.8875" y="0.875"/>
+<vertex x="-0.6125" y="0.875"/>
+<vertex x="-0.6125" y="0.7"/>
+<vertex x="-0.6875" y="0.625"/>
+</polygon>
+<text x="2.585" y="0.516" size="0.3" layer="51" ratio="15" rot="MR0" align="center">X</text>
+<text x="1.42" y="-0.59" size="0.3" layer="51" ratio="15" rot="MR0" align="center">Y</text>
+<text x="2.248" y="-0.299" size="0.3" layer="51" ratio="15" align="center">Z</text>
+<text x="0" y="1.905" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-2.54" size="0.6096" layer="27" font="vector" ratio="20" align="bottom-center">&gt;VALUE</text>
+<circle x="2.058" y="-0.089" radius="0.02828125" width="0.0762" layer="51"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="LGA-12" urn="urn:adsk.eagle:package:39983/1" type="box" library_version="1">
+<description>LGA-12 2x2x1 mm 12-lead
+0.50mm pitch
+Pads are 0.25x0.275 mm
+
+Derrived from the following ST PDFs
+http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00089896.pdf
+http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.pdf</description>
+</package3d>
+</packages3d>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1919,6 +2019,12 @@ design rules under a new name.</description>
 <element name="C9" library="rcl" library_urn="urn:adsk.eagle:library:334" package="B/3528-21R" package3d_urn="urn:adsk.eagle:package:23409/2" value="220uF" x="-56.4388" y="-89.0524"/>
 <element name="C10" library="rcl" library_urn="urn:adsk.eagle:library:334" package="B/3528-21R" package3d_urn="urn:adsk.eagle:package:23409/2" value="220uF" x="-64.1604" y="-89.0524"/>
 <element name="C11" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="10uF" x="-64.7192" y="-96.3676"/>
+<element name="R5" library="electricSheepParty" package="0603" value=" " x="-64.0588" y="-101.092">
+<attribute name="PROD_ID" value=" " x="-64.0588" y="-101.092" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U1" library="SparkFun-Sensors" library_urn="urn:adsk.eagle:library:534" package="LGA-12" package3d_urn="urn:adsk.eagle:package:39983/1" value="LSM303C" x="-69.9008" y="-99.6188">
+<attribute name="PROD_ID" value="IC-12557" x="-69.9008" y="-99.6188" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="VCCIO">
@@ -2030,13 +2136,17 @@ design rules under a new name.</description>
 <contactref element="C9" pad="+"/>
 <contactref element="C10" pad="+"/>
 <contactref element="C11" pad="1"/>
+<contactref element="R5" pad="2"/>
+<contactref element="U$2" pad="1"/>
+<wire x1="-65.6692" y1="-96.3676" x2="-63.2088" y2="-101.092" width="0" layer="19" extent="1-1"/>
 <wire x1="-62.6354" y1="-89.0524" x2="-65.6692" y2="-96.3676" width="0" layer="19" extent="1-1"/>
 <wire x1="-54.9138" y1="-89.0524" x2="-62.6354" y2="-89.0524" width="0" layer="19" extent="1-1"/>
 <wire x1="-46.1264" y1="-69.4436" x2="-54.9138" y2="-89.0524" width="0" layer="19" extent="1-1"/>
 <wire x1="-47.41" y1="-17.78" x2="-46.1264" y2="-69.4436" width="0" layer="19" extent="1-1"/>
 <wire x1="-49.11" y1="-7.62" x2="-47.41" y2="-17.78" width="0" layer="19" extent="1-1"/>
 <wire x1="-19.89" y1="23.12" x2="-49.11" y2="-7.62" width="0" layer="19" extent="1-1"/>
-<wire x1="-31.425" y1="44.835" x2="-19.89" y2="23.12" width="0" layer="19" extent="1-1"/>
+<wire x1="-34.025" y1="38.985" x2="-19.89" y2="23.12" width="0" layer="19" extent="1-1"/>
+<wire x1="-31.425" y1="44.835" x2="-34.025" y2="38.985" width="0" layer="19" extent="1-1"/>
 <wire x1="-25.82" y1="54.61" x2="-31.425" y2="44.835" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$8">
@@ -2060,9 +2170,6 @@ design rules under a new name.</description>
 </signal>
 <signal name="PWM_M2B">
 <contactref element="U$2" pad="10"/>
-</signal>
-<signal name="MOTOR_EN">
-<contactref element="U$2" pad="1"/>
 </signal>
 <signal name="M1+">
 <contactref element="U$2" pad="2"/>
@@ -2124,6 +2231,17 @@ design rules under a new name.</description>
 <wire x1="-24.99" y1="23.12" x2="-50.226" y2="-81.3308" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.4686" y1="40.0812" x2="-24.99" y2="23.12" width="0" layer="19" extent="1-1"/>
 <wire x1="-47.84" y1="49.53" x2="-15.4686" y2="40.0812" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$13">
+<contactref element="U$2" pad="8"/>
+<contactref element="R5" pad="1"/>
+<wire x1="-29.475" y1="38.985" x2="-64.9088" y2="-101.092" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="SCL">
+<contactref element="U1" pad="1"/>
+</signal>
+<signal name="SDA">
+<contactref element="U1" pad="4"/>
 </signal>
 </signals>
 </board>
