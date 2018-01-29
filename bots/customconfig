@@ -1,5 +1,6 @@
-#define CONFIG_PIN_SDA 21
-#define CONFIG_PIN_SCL 22
+#define PIN_SDA 21
+#define PIN_SCL 22
+#define PIN_SERVO 20
 #define V_REF 1100
 #define PIN1_MOTOR_1 15
 #define PIN2_MOTOR_1 16

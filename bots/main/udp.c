@@ -9,7 +9,7 @@
 #include "wifi.h"
 #include "i2c.h"
 #include "adc.h"
-#include "motor.h"
+#include "turret.h"
 
 static const char *TAG = "MAIN";
 
@@ -28,11 +28,7 @@ void app_main()
         nvsret = nvs_flash_init();
     }
 
-    init_motors();
-    init_i2c();
-    esp_adc_cal_characteristics_t char1 = init_adc();
-    init_wifi();
+    init_turret();
+    set_angle(100);
 
-    i2c_comm();
-    readadc(PIN_RECEP,char1);
 }
