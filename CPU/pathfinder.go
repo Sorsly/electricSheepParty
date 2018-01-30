@@ -137,10 +137,10 @@ func (t * tree)addnode(newN * treenode, existN * treenode, near [] * treenode, s
 		}
 	}
 	sp.add(newN)
-	pltNode(plt,*newN,fmt.Sprintf("N%v",newN.nodeid))
+	pltNode(plt,*newN,fmt.Sprintf("N%v",t.totnodes))
 	newN.prevToRoot = xmin
 	t.connect(xmin,newN)
-	pltEdge(plt,xmin,newN,fmt.Sprintf("E%v",xmin.nodeid))
+	pltEdge(plt,xmin,newN,fmt.Sprintf("E%v",t.totnodes))
 	t.totnodes += 1
 }
 
@@ -240,6 +240,9 @@ func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r int)([]
 	return ret[:nodecnt]
 
 }
+func rewirerand(t * tree,q * queue.Queue, near [] * treenode,stop <-chan time.Time){
+
+}
 func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Queue, rmax int, ngoal * treenode, space * Xspace, stop <-chan time.Time,plt * glot.Plot){
 	i := 0
 	for {
@@ -248,15 +251,21 @@ func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Que
 			return
 		default:
 			log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
+			var near = [] * treenode{nil}
 
 			xrand := genRandNode(space,ngoal,t)
 			i +=1
 			xs := Xs(xrand,space)
 			nclose := findclosest(xrand,xs)
 			if lineisfree(xrand,*nclose,space,obs){
-				near := findnodesnear(xrand,xs, space,t,rmax)
+				near = findnodesnear(xrand,xs, space,t,rmax)
 				t.addnode(xrand,nclose,near,space,obs,plt)
+				qr.Add(xrand)
+			}else{
+				qr.Add(nclose)
 			}
+			rewirerand(t,qr,near,stop)
+			log.Println(xrand)
 		}
 	}
 	return
@@ -432,6 +441,7 @@ func main() {
 	xa := Initnode(0,0)
 	space.add(xa)
 	Tau := Inittree(2000,xa,maxKpath)
+	Tau.addnode(xgoal,xa,nil,&space,obsCirc,plot)
 
 	Qr := queue.New()
 	Qs := queue.New()
