@@ -80,6 +80,9 @@ func Initnode(xpos int, ypos int)(*treenode){
 func Inittree(nnodes int, rtnode * treenode,maxK int)(newtree tree){
 	newtree.numnodes = nnodes
 	newtree.nodeConnections = make([]int,nnodes*nnodes)
+	for i := 0 ; i< nnodes*nnodes; i ++ {
+		newtree.nodeConnections[i] = math.MaxInt64
+	}
 	newtree.totnodes = 1
 	newtree.root = rtnode
 	newtree.closest = rtnode
@@ -115,6 +118,16 @@ func (t * tree )connect(n1 * treenode, n2 * treenode){
 	dist := nodedist(*n1,*n2)
 	t.nodeConnections[t.numnodes*n1.nodeid + n2.nodeid] = int(dist)
 	t.nodeConnections[t.numnodes*n2.nodeid + n1.nodeid] = int(dist)// Poor memory usage, optimize later
+
+	return
+}
+
+func (t * tree )disconnect(n1 * treenode, n2 * treenode){
+	if t.nodeConnections[t.numnodes*n1.nodeid + n2.nodeid] == math.MaxInt64{
+		panic("NODES WERE ALREADY DISCONNECTED")
+	}
+	t.nodeConnections[t.numnodes*n1.nodeid + n2.nodeid] = math.MaxInt64
+	t.nodeConnections[t.numnodes*n2.nodeid + n1.nodeid] = math.MaxInt64// Poor memory usage, optimize later
 
 	return
 }
@@ -217,7 +230,7 @@ func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node * treenode){
 	return
 }
 
-func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r int)([] * treenode){
+func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r float64)([] * treenode, int){
 	e := math.Sqrt(float64(space.maxX)*float64(space.maxY)*float64(space.maxK)/math.Pi/float64(t.totnodes))
 	ret := make([] * treenode,space.maxK*2)
 	nodecnt := 0
@@ -237,10 +250,10 @@ func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r int)([]
 			checknode = checknode.next
 		}
 	}
-	return ret[:nodecnt]
+	return ret[:nodecnt], nodecnt
 
 }
-func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r int, obs []circleObs){
+func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r float64, obs []circleObs){
 	for {
 		var val interface{}
 		select{
@@ -254,12 +267,14 @@ func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r
 			switch xr := val.(type) {
 			case * treenode:
 				xs := Xs(xr,space)
-				near := findnodesnear(xr,xs,space,t,r)
-				for _,node := range near{
+				near, _ := findnodesnear(xr,xs,space,t,r)
+				for _, node := range near{
 					cold := node.cost(t)
 					cnew := xr.cost(t) + nodedist(*node,*xr)
 					if cnew < cold && lineisfree(xr,node,space,obs){
-
+						t.disconnect(node,node.prevToRoot)
+						t.connect(xr,node)
+						node.prevToRoot = xr
 					}
 
 				}
@@ -269,30 +284,25 @@ func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r
 		}
 	}
 }
-func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Queue, rmax int, ngoal * treenode, space * Xspace, stop <-chan time.Time,plt * glot.Plot){
+func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Queue, rmax float64, ngoal * treenode, space * Xspace, stop <-chan time.Time,plt * glot.Plot){
 	i := 0
-	for {
-		select {
-		case <-stop:
-			return
-		default:
-			log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
-			var near = [] * treenode{nil}
+	log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
 
-			xrand := genRandNode(space,ngoal,t)
-			i +=1
-			xs := Xs(xrand,space)
-			nclose := findclosest(xrand,xs)
-			if lineisfree(xrand,nclose,space,obs){
-				near = findnodesnear(xrand,xs, space,t,rmax)
-				t.addnode(xrand,nclose,near,space,obs,plt)
-				qr.Add(xrand)
-			}else{
-				qr.Add(nclose)
-			}
-			rewirerand(t,qr,space,stop,rmax,obs)
+	xrand := genRandNode(space,ngoal,t)
+	i +=1
+	xs := Xs(xrand,space)
+	nclose := findclosest(xrand,xs)
+	if lineisfree(xrand,nclose,space,obs){
+		near,cntnear := findnodesnear(xrand,xs, space,t,rmax)
+		if cntnear < space.maxK || nodedist(*nclose,*xrand)> rmax{
+			t.addnode(xrand,nclose,near,space,obs,plt)
+			qr.Add(xrand)
+		} else{
+			qr.Add(nclose)
 		}
+		rewirerand(t,qr,space,stop,rmax,obs)
 	}
+
 	return
 }
 
@@ -472,14 +482,14 @@ func main() {
 	Qs := queue.New()
 	pltNode(plot,*xa,"Start")
 	pltNode(plot,*xgoal,"Goal")
-	//for {
+	for {
 		//updateCObs(obsCirc)
 		//xa = updateGoal()
 		//xgoal = updateAgent()
 		wait := time.After(time.Second*30)
 		expandAndRewrite(&Tau, obsCirc,Qr,Qs,10, xgoal, &space, wait,plot)
 		fmt.Println("Rewrote")
-	//}
+	}
 	plot.SetTitle("Example Plot")
 	// Optional: Setting the title of the plot
 	plot.SetXLabel("X-Axis")
@@ -487,6 +497,4 @@ func main() {
 	// Optional: Setting label for X and Y axis
 	plot.SetXrange(0, MAXX)
 	plot.SetYrange(0, MAXY)
-	wait = time.After(time.Second * 60)
-	<-wait
 }
