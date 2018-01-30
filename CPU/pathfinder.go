@@ -131,7 +131,7 @@ func (t * tree)addnode(newN * treenode, existN * treenode, near [] * treenode, s
 	var cnew float64
 	for _,node := range near{
 		cnew = node.cost(t) + nodedist(*newN,*node)
-		if cnew < cmin && lineisfree(newN,*node,sp,obs){
+		if cnew < cmin && lineisfree(newN,node,sp,obs){
 			cmin = cnew
 			xmin = node
 		}
@@ -240,8 +240,34 @@ func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r int)([]
 	return ret[:nodecnt]
 
 }
-func rewirerand(t * tree,q * queue.Queue, near [] * treenode,stop <-chan time.Time){
+func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r int, obs []circleObs){
+	for {
+		var val interface{}
+		select{
+		case <-stop:
+			return
+		default:
+			if q.Length()  < 1 {
+				return
+			}
+			val = q.Remove()
+			switch xr := val.(type) {
+			case * treenode:
+				xs := Xs(xr,space)
+				near := findnodesnear(xr,xs,space,t,r)
+				for _,node := range near{
+					cold := node.cost(t)
+					cnew := xr.cost(t) + nodedist(*node,*xr)
+					if cnew < cold && lineisfree(xr,node,space,obs){
 
+					}
+
+				}
+			default:
+				panic("QUEIUE HAS NON TREENODEs")
+			}
+		}
+	}
 }
 func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Queue, rmax int, ngoal * treenode, space * Xspace, stop <-chan time.Time,plt * glot.Plot){
 	i := 0
@@ -257,15 +283,14 @@ func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Que
 			i +=1
 			xs := Xs(xrand,space)
 			nclose := findclosest(xrand,xs)
-			if lineisfree(xrand,*nclose,space,obs){
+			if lineisfree(xrand,nclose,space,obs){
 				near = findnodesnear(xrand,xs, space,t,rmax)
 				t.addnode(xrand,nclose,near,space,obs,plt)
 				qr.Add(xrand)
 			}else{
 				qr.Add(nclose)
 			}
-			rewirerand(t,qr,near,stop)
-			log.Println(xrand)
+			rewirerand(t,qr,space,stop,rmax,obs)
 		}
 	}
 	return
@@ -387,7 +412,7 @@ func findclosest(n * treenode,xs  [] * bin)(closenode * treenode){
 	return clos
 }
 
-func lineisfree (n1 *treenode, n2 treenode,sp * Xspace, obs [] circleObs)(bool){
+func lineisfree (n1 *treenode, n2 * treenode,sp * Xspace, obs [] circleObs)(bool){
 	xLine := float64(n2.xpos - n1.xpos)
 	yLine := float64(n2.ypos - n1.ypos)
 	for _, circ := range obs {
