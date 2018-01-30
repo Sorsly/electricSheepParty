@@ -59,20 +59,20 @@ type treenode struct{
 	nodeid int
 	xpos int
 	ypos int
+	prevToRoot * treenode
 }
 
 func (n treenode) String() string {
 	return fmt.Sprintf("\nX: %v Y: %v \n",n.xpos,n.ypos)
 }
 
-func Initnode(xpos int, ypos int, sp * Xspace)(treenode){
-	var newnode treenode
-	newnode.nodeid = sp.idToAssign
-	sp.idToAssign += 1
+func Initnode(xpos int, ypos int)(*treenode){
+	newnode := new(treenode)
+	newnode.prevToRoot = nil
+	newnode.nodeid = 0
 	newnode.xpos = xpos
 	newnode.ypos = ypos
 
-	sp.add(&newnode)
 
 	return newnode
 }
@@ -94,7 +94,7 @@ func Inittree(nnodes int, rtnode * treenode,maxK int)(newtree tree){
 }
 
 func Initspace(maxx int, maxy int, maxk int,rows int,cols int)(space Xspace){
-	space.idToAssign = 0
+	space.idToAssign = 1
 	space.maxX = maxx
 	space.maxY = maxy
 	space.maxK = maxk
@@ -111,24 +111,51 @@ func nodedist(n1 treenode, n2 treenode)(dist float64){
 	return math.Hypot(float64(n1.ypos-n2.ypos),float64(n1.xpos-n2.xpos))
 }
 
-func (t * tree )connect(n1 treenode, n2 treenode){
-	dist := nodedist(n1,n2)
+func (t * tree )connect(n1 * treenode, n2 * treenode){
+	dist := nodedist(*n1,*n2)
 	t.nodeConnections[t.numnodes*n1.nodeid + n2.nodeid] = int(dist)
 	t.nodeConnections[t.numnodes*n2.nodeid + n1.nodeid] = int(dist)// Poor memory usage, optimize later
 
 	return
 }
 
-func (t * tree)add(n1 treenode, n2 treenode){
-
+func ( n * treenode)cost(t * tree) (float64){
+	if n.nodeid == t.root.nodeid {
+		return 0
+	}
+	return n.prevToRoot.cost(t) + float64(t.nodeConnections[t.numnodes*n.nodeid + n.prevToRoot.nodeid])
+}
+func (t * tree)addnode(newN * treenode, existN * treenode, near [] * treenode, sp * Xspace, obs [] circleObs,plt * glot.Plot){
+	xmin := existN
+	cmin := existN.cost(t) + nodedist(*newN,*existN)
+	var cnew float64
+	for _,node := range near{
+		cnew = node.cost(t) + nodedist(*newN,*node)
+		if cnew < cmin && lineisfree(newN,*node,sp,obs){
+			cmin = cnew
+			xmin = node
+		}
+	}
+	sp.add(newN)
+	pltNode(plt,*newN,fmt.Sprintf("N%v",newN.nodeid))
+	newN.prevToRoot = xmin
+	t.connect(xmin,newN)
+	pltEdge(plt,xmin,newN,fmt.Sprintf("E%v",xmin.nodeid))
+	t.totnodes += 1
 }
 
-func (space Xspace) add(n1 * treenode){
+func (space * Xspace) add(n1 * treenode){
 	colin := n1.xpos/space.xStep
 	rowin := n1.ypos/space.yStep
+	if n1.nodeid == 0 {
+		n1.nodeid = space.idToAssign
+		space.idToAssign += 1
+	}else{
+		panic("ADDING NODE AGAIN")
+	}
 	bintoplace := &space.bins[int(space.cols)*int(rowin) + int(colin)]
 	bintoplace.hasnode = true
-	newnode := &adjlistnode{n1,nil}
+	newnode := new(adjlistnode)
 	if bintoplace.end == nil {
 		bintoplace.end = newnode
 		bintoplace.inside = newnode
@@ -136,6 +163,7 @@ func (space Xspace) add(n1 * treenode){
 		bintoplace.end.next = newnode
 		bintoplace.end = newnode
 	}
+	bintoplace.end.node = n1
 
 	return
 }
@@ -152,7 +180,7 @@ func updateAgent() (n1 treenode){
 	return
 }
 
-func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node treenode){
+func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node * treenode){
 	rn := rand.Float64()
 	alpha := 0.1
 	beta := 2.0
@@ -163,10 +191,10 @@ func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node treenode){
 		rho := math.Atan(dy/dx)
 		x := linern*math.Cos(rho)
 		y := linern*math.Sin(rho)
-		node = Initnode(int(x),int(y),space)
+		node = Initnode(int(x),int(y))
 
 	}else if rn <= (1-alpha)/beta || !t.pa.togoal {
-		node = Initnode(rand.Intn(space.maxX),rand.Intn(space.maxY),space)
+		node = Initnode(rand.Intn(space.maxX),rand.Intn(space.maxY))
 	}else{
 		cmin := nodedist(*t.root,*ngoal)
 		cbest := t.pa.goalcost
@@ -183,13 +211,13 @@ func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node treenode){
 		y = x*math.Sin(transangle) + y*math.Cos(transangle)
 		x = x + float64(t.root.xpos + ngoal.xpos)/2
 		y = y + float64(t.root.ypos + ngoal.ypos)/2
-		node = Initnode(int(x),int(y),space)
+		node = Initnode(int(x),int(y))
 	}
 
 	return
 }
 
-func findnodesnear(n treenode, xs [] * bin, space * Xspace, t * tree,r int)([] * treenode){
+func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r int)([] * treenode){
 	e := math.Sqrt(float64(space.maxX)*float64(space.maxY)*float64(space.maxK)/math.Pi/float64(t.totnodes))
 	ret := make([] * treenode,space.maxK*2)
 	nodecnt := 0
@@ -200,7 +228,7 @@ func findnodesnear(n treenode, xs [] * bin, space * Xspace, t * tree,r int)([] *
 		checknode := bin.inside
 		for checknode != nil {
 			if checknode.node.nodeid != n.nodeid {
-				dist := nodedist(*(checknode.node), n)
+				dist := nodedist(*(checknode.node), *n)
 				if dist < e{
 					ret[nodecnt] = checknode.node
 					nodecnt += 1
@@ -222,28 +250,22 @@ func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Que
 			log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
 
 			xrand := genRandNode(space,ngoal,t)
-			pltNode(plt,xrand,fmt.Sprintf("rand%v",i))
 			i +=1
 			xs := Xs(xrand,space)
 			nclose := findclosest(xrand,xs)
 			if lineisfree(xrand,*nclose,space,obs){
-				pltEdge(plt,xrand,*nclose,fmt.Sprintf("line%v",i))
 				near := findnodesnear(xrand,xs, space,t,rmax)
-				log.Println(xrand)
-				log.Println(near)
+				t.addnode(xrand,nclose,near,space,obs,plt)
 			}
-			time.Sleep(time.Millisecond*20)
 		}
 	}
 	return
 }
 
-func Xs(n treenode, space * Xspace)(bins [] * bin) {
+func Xs(n *treenode, space * Xspace)(bins [] * bin) {
 	colin := n.xpos / space.xStep
 	rowin := n.ypos / space.yStep
 
-	scanq := queue.New()
-	scanq.Add([]int{colin, rowin})
 	allclear := true
 	r := 1
 	for allclear {
@@ -333,7 +355,7 @@ func Xs(n treenode, space * Xspace)(bins [] * bin) {
 	return bins[:bincnt]
 }
 
-func findclosest(n treenode,xs  [] * bin)(closenode * treenode){
+func findclosest(n * treenode,xs  [] * bin)(closenode * treenode){
 	cmin := math.MaxFloat64
 	var dist float64
 	var clos * treenode = nil
@@ -341,7 +363,7 @@ func findclosest(n treenode,xs  [] * bin)(closenode * treenode){
 		checknode := bin.inside
 		for checknode != nil {
 			if checknode.node.nodeid != n.nodeid {
-				dist = nodedist(*(checknode.node), n)
+				dist = nodedist(*(checknode.node), *n)
 				if cmin > dist {
 					cmin = dist
 					clos = checknode.node
@@ -356,7 +378,7 @@ func findclosest(n treenode,xs  [] * bin)(closenode * treenode){
 	return clos
 }
 
-func lineisfree (n1 treenode, n2 treenode,sp * Xspace, obs [] circleObs)(bool){
+func lineisfree (n1 *treenode, n2 treenode,sp * Xspace, obs [] circleObs)(bool){
 	xLine := float64(n2.xpos - n1.xpos)
 	yLine := float64(n2.ypos - n1.ypos)
 	for _, circ := range obs {
@@ -382,7 +404,7 @@ func pltNode(plt * glot.Plot,n1 treenode,name string){
 	plt.AddPointGroup(name, "circle", points)
 	return
 }
-func pltEdge(plt * glot.Plot,n1 treenode,n2 treenode,name string){
+func pltEdge(plt * glot.Plot,n1 * treenode,n2 * treenode,name string){
 	points := [][]int{{n1.xpos,n2.xpos}, {n1.ypos,n2.ypos}}
 	plt.AddPointGroup(name, "lines", points)
 	return
@@ -399,27 +421,28 @@ func main() {
 	var maxKpath = 100
 	var kmax = 10
 	obsCirc := make([]circleObs,10)
-	obsCirc[0] = circleObs{radi:100,xpos:500,ypos:500}
+	obsCirc[0] = circleObs{radi:200,xpos:500,ypos:500}
+	obsCirc[1] = circleObs{radi:100,xpos:700,ypos:700}
 	rand.Seed( time.Now().UnixNano())
 	//T := 0
 
 	space := Initspace(MAXX,MAXY,kmax,10,10)
 
-	xgoal := Initnode(MAXX-1,MAXY-1,&space)
-	xa := Initnode(0,0, &space)
-
-	Tau := Inittree(2000,&xa,maxKpath)
+	xgoal := Initnode(MAXX-1,MAXY-1)
+	xa := Initnode(0,0)
+	space.add(xa)
+	Tau := Inittree(2000,xa,maxKpath)
 
 	Qr := queue.New()
 	Qs := queue.New()
-	pltNode(plot,xa,"Start")
-	pltNode(plot,xgoal,"Goal")
+	pltNode(plot,*xa,"Start")
+	pltNode(plot,*xgoal,"Goal")
 	//for {
-		updateCObs(obsCirc)
-		xa = updateGoal()
+		//updateCObs(obsCirc)
+		//xa = updateGoal()
 		//xgoal = updateAgent()
-		wait := time.After(time.Second * 1000)
-		expandAndRewrite(&Tau, obsCirc,Qr,Qs,10, &xgoal, &space, wait,plot)
+		wait := time.After(time.Second*30)
+		expandAndRewrite(&Tau, obsCirc,Qr,Qs,10, xgoal, &space, wait,plot)
 		fmt.Println("Rewrote")
 	//}
 	plot.SetTitle("Example Plot")
