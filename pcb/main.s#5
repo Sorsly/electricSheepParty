@@ -16952,6 +16952,9 @@ http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.p
 <part name="GND5" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
 <part name="GND7" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
 <part name="GND10" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
+<part name="GND12" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
+<part name="GND13" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
+<part name="SUPPLY10" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="3V3"/>
 </parts>
 <sheets>
 <sheet>
@@ -17048,6 +17051,9 @@ http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.p
 <instance part="GND5" gate="1" x="38.1" y="45.72"/>
 <instance part="GND7" gate="1" x="10.16" y="5.08"/>
 <instance part="GND10" gate="1" x="149.86" y="119.38" rot="R90"/>
+<instance part="GND12" gate="1" x="149.86" y="104.14" rot="R90"/>
+<instance part="GND13" gate="1" x="104.14" y="81.28" rot="R270"/>
+<instance part="SUPPLY10" gate="G$1" x="101.6" y="116.84" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -17073,6 +17079,11 @@ http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.p
 <segment>
 <pinref part="S1" gate="1" pin="P"/>
 <pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="U2" gate="G$1" pin="3V3"/>
+<pinref part="SUPPLY10" gate="G$1" pin="VCC"/>
+<wire x1="101.6" y1="116.84" x2="109.22" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="PWM_LASER" class="0">
@@ -17197,6 +17208,16 @@ http://www.st.com/web/en/resource/technical/document/technical_note/CD00134799.p
 <junction x="93.98" y="7.62"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 <junction x="10.16" y="7.62"/>
+</segment>
+<segment>
+<pinref part="U2" gate="G$1" pin="GND@4"/>
+<pinref part="GND12" gate="1" pin="GND"/>
+<wire x1="147.32" y1="104.14" x2="144.78" y2="104.14" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U2" gate="G$1" pin="GND@2"/>
+<pinref part="GND13" gate="1" pin="GND"/>
+<wire x1="106.68" y1="81.28" x2="109.22" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="5V" class="0">
