@@ -1,0 +1,84 @@
+#!/usr/bin/python3.6
+import os
+import re
+import sys
+import subprocess
+dir_path = os.path.dirname(os.path.realpath(__file__))
+proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
+ipfile = "ips.txt"
+
+
+def getIPS(*args):
+    cpuip = subprocess.check_output(["hostname", "-I"]).decode()
+    rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
+
+    query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"
+    found = re.findall(query, rawdata, re.DOTALL)
+    camIps = [ip[0] for ip in found if "Raspberry" in ip[1]]
+    botIps = [ip[0] for ip in found if "Espressif" in ip[1]]
+
+    query = r"\d+\.\d+.\d+\.\d+"
+    allIps = set(re.findall(query, rawdata))
+    comIps = [ip for ip in allIps if ip not in camIps and ip not in botIps]
+    print("All IPs:", list(allIps))
+
+    with open(ipfile, "w") as fh:
+        fh.write("CPU {}".format(cpuip))
+        for ip in camIps:
+            fh.write("CAM {}\n".format(ip))
+
+        for ip in botIps:
+            fh.write("BOT {}\n".format(ip))
+
+        for ip in comIps:
+            fh.write("FES {}\n".format(ip))
+
+
+def burnJTAG(*args):
+    os.chdir("bots/")
+    os.system("make app")
+    os.chdir("openocd-esp32/")
+    os.system("bin/openocd -s share/openocd/scripts -f share/openocd/scripts/interface/jlink.cfg -f share/openocd/scripts/board/esp-wroom-32.cfg -c \"program_esp32 ../build/{}.bin 0x10000 verify exit\"".format(proj_name))
+
+
+def burnUART(*args):
+    os.chdir("bots/")
+    os.system("make flash")
+
+
+def monitorUART(*args):
+    os.chdir("bots/")
+    os.system("make monitor")
+
+
+def launchdebug(*args):
+    os.chdir("bots/openocd-esp32/")
+    os.system("bin/openocd -s share/openocd/scripts -f share/openocd/scripts/interface/jlink.cfg -f share/openocd/scripts/board/esp-wroom-32.cfg")
+
+
+def debug(*args):
+    os.chdir("bots/")
+    os.system("xtensa-esp32-elf-gdb -ex 'target remote localhost:333{}' ./build/{}.elf".format(['3', '4'][int(args[0])], proj_name))
+
+
+def main():
+    available_builds = {
+        "burnJTAG": burnJTAG,
+        "burnUART": burnUART,
+        "monitorUART": monitorUART,
+        "launchdebug": launchdebug,
+        "debug": debug,
+        "getIP": getIPS
+    }
+    if len(sys.argv) == 1 or sys.argv[1] not in available_builds:
+        print("Commands")
+        for key in available_builds:
+            print(key)
+    elif len(sys.argv) == 2:
+        available_builds[sys.argv[1]]()
+    elif len(sys.argv) == 3:
+        available_builds[sys.argv[1]](sys.argv[2])
+
+
+if __name__ == "__main__":
+    main()
