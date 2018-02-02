@@ -5,7 +5,6 @@ import(
 	"fmt"
 	"math"
 	"math/rand"
-	"github.com/Arafatk/glot"
 	"./queue"
 )
 
@@ -17,10 +16,15 @@ type Xspace struct {
 	maxX int
 	maxY int
 	maxK int
+	binvol float64
 	idToAssign int
 	bins []bin
 }
 
+type agent struct {
+	xpos float64
+	ypos float64
+}
 type bin struct {
 	hasnode bool
 	inside * adjlistnode
@@ -31,16 +35,10 @@ type tree struct{
 	nodeConnections []int
 	root * treenode
 	closest * treenode
+	pathexists bool
 	totnodes int
 	numnodes int
-	pa path
-}
-
-type path struct {
-	k int
-	togoal bool
 	goalcost float64
-	steps [] * treenode
 }
 
 type circleObs struct{
@@ -49,7 +47,10 @@ type circleObs struct{
 	radi int
 }
 
-
+type treenodeQ struct {
+	q * queue.Queue
+	beenPushed [] bool
+}
 type adjlistnode struct{
 	node * treenode
 	next * adjlistnode
@@ -63,9 +64,15 @@ type treenode struct{
 }
 
 func (n treenode) String() string {
-	return fmt.Sprintf("\nX: %v Y: %v \n",n.xpos,n.ypos)
+	return fmt.Sprintf("N%v(%v,%v)",n.nodeid,n.xpos,n.ypos)
 }
 
+func Initqueue(nnodes int)(* treenodeQ){
+	newq := new(treenodeQ)
+	newq.q = queue.New()
+	newq.beenPushed = make([]bool,nnodes)
+	return newq
+}
 func Initnode(xpos int, ypos int)(*treenode){
 	newnode := new(treenode)
 	newnode.prevToRoot = nil
@@ -80,18 +87,14 @@ func Initnode(xpos int, ypos int)(*treenode){
 func Inittree(nnodes int, rtnode * treenode,maxK int)(newtree tree){
 	newtree.numnodes = nnodes
 	newtree.nodeConnections = make([]int,nnodes*nnodes)
+	newtree.pathexists = false
+	newtree.goalcost = math.MaxInt64
 	for i := 0 ; i< nnodes*nnodes; i ++ {
 		newtree.nodeConnections[i] = math.MaxInt64
 	}
 	newtree.totnodes = 1
 	newtree.root = rtnode
 	newtree.closest = rtnode
-	newtree.pa = path{
-		k: maxK	,
-		togoal:false,
-		steps:make([]*treenode,maxK),
-		goalcost:0,
-	}
 
 	return
 }
@@ -103,6 +106,7 @@ func Initspace(maxx int, maxy int, maxk int,rows int,cols int)(space Xspace){
 	space.maxK = maxk
 	space.rows = rows
 	space.cols = cols
+	space.binvol = float64(maxx*maxy)/float64(rows*cols)
 	space.bins = make([]bin,rows*cols)
 	space.yStep = int(maxy/rows)
 	space.xStep = int(maxx/cols)
@@ -110,12 +114,12 @@ func Initspace(maxx int, maxy int, maxk int,rows int,cols int)(space Xspace){
 	return
 }
 
-func nodedist(n1 treenode, n2 treenode)(dist float64){
+func nodedist(n1 * treenode, n2 * treenode)(dist float64){
 	return math.Hypot(float64(n1.ypos-n2.ypos),float64(n1.xpos-n2.xpos))
 }
 
 func (t * tree )connect(n1 * treenode, n2 * treenode){
-	dist := nodedist(*n1,*n2)
+	dist := nodedist(n1,n2)
 	t.nodeConnections[t.numnodes*n1.nodeid + n2.nodeid] = int(dist)
 	t.nodeConnections[t.numnodes*n2.nodeid + n1.nodeid] = int(dist)// Poor memory usage, optimize later
 
@@ -133,28 +137,48 @@ func (t * tree )disconnect(n1 * treenode, n2 * treenode){
 }
 
 func ( n * treenode)cost(t * tree) (float64){
+	if n.prevToRoot == nil{
+		return math.MaxFloat64/2
+	}
 	if n.nodeid == t.root.nodeid {
 		return 0
 	}
 	return n.prevToRoot.cost(t) + float64(t.nodeConnections[t.numnodes*n.nodeid + n.prevToRoot.nodeid])
 }
-func (t * tree)addnode(newN * treenode, existN * treenode, near [] * treenode, sp * Xspace, obs [] circleObs,plt * glot.Plot){
+
+func (t * tree)addgoal(xPos int,yPos int,sp *Xspace,obs [] circleObs)(* treenode){
+	goalnode := Initnode(xPos, yPos)
+	goalnode.prevToRoot = nil
+	if lineisfree(t.root,goalnode,sp,obs){
+		t.connect(goalnode, t.root)
+		goalnode.prevToRoot = t.root
+	}
+	sp.add(goalnode)
+	t.totnodes += 1
+	return goalnode
+}
+
+func (t * tree)addnode(newN * treenode, existN * treenode, near [] * treenode, sp * Xspace, obs [] circleObs, ngoal * treenode){
+	if t.totnodes >= t.numnodes || sp.idToAssign >= t.numnodes{
+		panic("TOO MANY NODES")
+	}
 	xmin := existN
-	cmin := existN.cost(t) + nodedist(*newN,*existN)
+	cmin := existN.cost(t) + nodedist(newN, existN)
 	var cnew float64
 	for _,node := range near{
-		cnew = node.cost(t) + nodedist(*newN,*node)
+		cnew = node.cost(t) + nodedist(newN,node)
 		if cnew < cmin && lineisfree(newN,node,sp,obs){
 			cmin = cnew
 			xmin = node
 		}
 	}
 	sp.add(newN)
-	pltNode(plt,*newN,fmt.Sprintf("N%v",t.totnodes))
 	newN.prevToRoot = xmin
 	t.connect(xmin,newN)
-	pltEdge(plt,xmin,newN,fmt.Sprintf("E%v",t.totnodes))
 	t.totnodes += 1
+	if (xmin.nodeid != ngoal.nodeid)&&(nodedist(xmin,ngoal) < nodedist(t.closest,ngoal)){
+		t.closest = xmin
+	}
 }
 
 func (space * Xspace) add(n1 * treenode){
@@ -206,11 +230,11 @@ func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node * treenode){
 		y := linern*math.Sin(rho)
 		node = Initnode(int(x),int(y))
 
-	}else if rn <= (1-alpha)/beta || !t.pa.togoal {
+	}else if rn <= (1-alpha)/beta || !t.pathexists {
 		node = Initnode(rand.Intn(space.maxX),rand.Intn(space.maxY))
 	}else{
-		cmin := nodedist(*t.root,*ngoal)
-		cbest := t.pa.goalcost
+		cmin := nodedist(t.root,ngoal)
+		cbest := t.goalcost
 		semimajor := cbest/2
 		semiminor := math.Sqrt(math.Pow(cbest,2)-math.Pow(cmin,2))/2
 		rho := rand.Float64()*2*math.Pi
@@ -231,8 +255,9 @@ func genRandNode(space * Xspace, ngoal * treenode, t * tree) ( node * treenode){
 }
 
 func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r float64)([] * treenode, int){
+	//searchSpace := float64(len(xs))*space.binvol
 	e := math.Sqrt(float64(space.maxX)*float64(space.maxY)*float64(space.maxK)/math.Pi/float64(t.totnodes))
-	ret := make([] * treenode,space.maxK*2)
+	ret := make([] * treenode,space.maxK*10)
 	nodecnt := 0
 	if e < float64(r) {
 		e = float64(r)
@@ -241,7 +266,7 @@ func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r float64
 		checknode := bin.inside
 		for checknode != nil {
 			if checknode.node.nodeid != n.nodeid {
-				dist := nodedist(*(checknode.node), *n)
+				dist := nodedist(checknode.node, n)
 				if dist < e{
 					ret[nodecnt] = checknode.node
 					nodecnt += 1
@@ -253,24 +278,25 @@ func findnodesnear(n * treenode, xs [] * bin, space * Xspace, t * tree,r float64
 	return ret[:nodecnt], nodecnt
 
 }
-func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r float64, obs []circleObs){
+
+func rewirerand(t * tree,q * treenodeQ, space * Xspace,stop <-chan time.Time,r float64, obs []circleObs){
 	for {
 		var val interface{}
 		select{
 		case <-stop:
 			return
 		default:
-			if q.Length()  < 1 {
+			if q.q.Length()  < 1 {
 				return
 			}
-			val = q.Remove()
+			val = q.q.Remove()
 			switch xr := val.(type) {
 			case * treenode:
 				xs := Xs(xr,space)
 				near, _ := findnodesnear(xr,xs,space,t,r)
 				for _, node := range near{
 					cold := node.cost(t)
-					cnew := xr.cost(t) + nodedist(*node,*xr)
+					cnew := xr.cost(t) + nodedist(node,xr)
 					if cnew < cold && lineisfree(xr,node,space,obs){
 						t.disconnect(node,node.prevToRoot)
 						t.connect(xr,node)
@@ -279,14 +305,127 @@ func rewirerand(t * tree,q * queue.Queue, space * Xspace,stop <-chan time.Time,r
 
 				}
 			default:
-				panic("QUEIUE HAS NON TREENODEs")
+				panic("QUEUE HAS NON TREENODE")
 			}
 		}
 	}
 }
-func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Queue, rmax float64, ngoal * treenode, space * Xspace, stop <-chan time.Time,plt * glot.Plot){
+
+func rewireroot(q * treenodeQ, t * tree, space * Xspace, stop <-chan time.Time, r float64, obs [] circleObs){
+	if q.q.Length() == 0 {
+		q.q.Add(t.root)
+		q.beenPushed[t.root.nodeid] = true
+	}
+	for {
+		var val interface{}
+		select{
+		case <-stop:
+			return
+		default:
+			if q.q.Length()  < 1 {
+				return
+			}
+			val = q.q.Remove()
+			switch xr := val.(type) {
+			case * treenode:
+				xs := Xs(xr,space)
+				near, _ := findnodesnear(xr,xs,space,t,r)
+				for _, node := range near{
+					cold := node.cost(t)
+					cnew := xr.cost(t) + nodedist(node,xr)
+					if cnew < cold && lineisfree(xr,node,space,obs){
+						t.disconnect(node,node.prevToRoot)
+						t.connect(xr,node)
+						node.prevToRoot = xr
+					}
+					if !q.beenPushed[node.nodeid]{
+						q.q.Add(node)
+						q.beenPushed[node.nodeid] = true
+					}
+
+				}
+			default:
+				panic("QUEUE HAS NON TREENODE")
+			}
+		}
+	}
+
+}
+type stack [] * treenode
+
+func (s stack) Push(v * treenode) stack {
+	return append(s, v)
+}
+
+func (s stack) Pop() (stack, * treenode) {
+	// FIXME: What do we do if the stack is empty, though?
+
+	l := len(s)
+	if l == 0{
+		return s, nil
+	}
+	return  s[:l-1], s[l-1]
+}
+
+func goalconnected(ngoal * treenode, t * tree)(stack){
+	if ngoal.prevToRoot != nil {
+		var cost float64 = float64(t.nodeConnections[t.numnodes*ngoal.nodeid+ngoal.prevToRoot.nodeid])
+		path := make(stack, 0)
+		path.Push(ngoal)
+		for toroot := ngoal.prevToRoot; toroot != nil; toroot = toroot.prevToRoot {
+			path.Push(toroot)
+			if toroot == t.root {
+				t.pathexists = true
+				t.goalcost = cost
+				return path
+			}
+			cost += float64(t.nodeConnections[t.numnodes*ngoal.nodeid+ngoal.prevToRoot.nodeid])
+		}
+	}
+	t.pathexists = false
+	t.goalcost = math.MaxInt64
+	return nil
+}
+func plan(t * tree, ngoal * treenode) (steps int, route [] * treenode){
+	path := goalconnected(ngoal,t)
+	if t.pathexists{
+		route := make([] * treenode,len(path))
+		i := 0
+		for _, E := path.Pop(); E != nil ; _, E = path.Pop(){
+			route[i] = E
+			i += 1
+		}
+		return i, route
+	}else if t.closest == t.root {
+		return 0, nil
+	}else{
+		path := make(stack,0)
+		path.Push(t.closest)
+		var toroot * treenode
+		for toroot = t.closest.prevToRoot; toroot != nil; toroot = toroot.prevToRoot {
+			path.Push(toroot)
+		}
+		route := make([] * treenode,len(path))
+		i := 0
+		for _, E := path.Pop(); E != nil ; _, E = path.Pop(){
+			route[i] = E
+			i += 1
+		}
+		return i, route
+	}
+}
+func moveagent(t * tree, ag * agent){
+	dx := float64(t.root.xpos)-ag.xpos
+	dy := float64(t.root.ypos)-ag.ypos
+	linemove := 0.1
+	rho := math.Atan(dy/dx)
+	x := linemove*math.Cos(rho)
+	y := linemove*math.Sin(rho)
+	ag.xpos = x
+	ag.ypos = y
+}
+func expandAndRewrite(t * tree,obs []circleObs, qr * treenodeQ, qs * treenodeQ, rmax float64, ngoal * treenode, space * Xspace, stop <-chan time.Time,ag * agent){
 	i := 0
-	log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
 
 	xrand := genRandNode(space,ngoal,t)
 	i +=1
@@ -294,14 +433,20 @@ func expandAndRewrite(t * tree,obs []circleObs, qr * queue.Queue, qs * queue.Que
 	nclose := findclosest(xrand,xs)
 	if lineisfree(xrand,nclose,space,obs){
 		near,cntnear := findnodesnear(xrand,xs, space,t,rmax)
-		if cntnear < space.maxK || nodedist(*nclose,*xrand)> rmax{
-			t.addnode(xrand,nclose,near,space,obs,plt)
-			qr.Add(xrand)
+		if cntnear < space.maxK || nodedist(nclose,xrand)> rmax{
+			t.addnode(xrand,nclose,near,space,obs,ngoal)
+			qr.q.Add(xrand)
 		} else{
-			qr.Add(nclose)
+			qr.q.Add(nclose)
 		}
 		rewirerand(t,qr,space,stop,rmax,obs)
 	}
+	rewireroot(qs,t,space,stop,rmax,obs)
+	numstep, path := plan(t, ngoal)
+	if math.Hypot(ag.ypos-float64(t.root.ypos),ag.xpos-float64(t.root.xpos)) < 10 && numstep > 0{
+		t.root = path[1]
+	}
+	moveagent(t,ag)
 
 	return
 }
@@ -407,7 +552,7 @@ func findclosest(n * treenode,xs  [] * bin)(closenode * treenode){
 		checknode := bin.inside
 		for checknode != nil {
 			if checknode.node.nodeid != n.nodeid {
-				dist = nodedist(*(checknode.node), *n)
+				dist = nodedist(checknode.node, n)
 				if cmin > dist {
 					cmin = dist
 					clos = checknode.node
@@ -443,58 +588,66 @@ func lineisfree (n1 *treenode, n2 * treenode,sp * Xspace, obs [] circleObs)(bool
 
 }
 
-func pltNode(plt * glot.Plot,n1 treenode,name string){
-	points := [][]int{{n1.xpos}, {n1.ypos}}
-	plt.AddPointGroup(name, "circle", points)
-	return
+func dump(t * tree, sp * Xspace,frn int){
+	fmt.Printf("F%v\n",frn)
+	for _, bin := range sp.bins{
+		checknode := bin.inside
+		for checknode != nil {
+			fmt.Printf("N%v(%v,%v)\n",checknode.node.nodeid,checknode.node.xpos,checknode.node.ypos)
+			checknode = checknode.next
+		}
+	}
+	for i, edge := range t.nodeConnections {
+		if edge != math.MaxInt64{
+			fmt.Printf("E(%v,%v)\n",i/t.numnodes,i%t.numnodes)
+		}
+	}
 }
-func pltEdge(plt * glot.Plot,n1 * treenode,n2 * treenode,name string){
-	points := [][]int{{n1.xpos,n2.xpos}, {n1.ypos,n2.ypos}}
-	plt.AddPointGroup(name, "lines", points)
-	return
-}
-
 func main() {
 	//plotting
-	plot, _ := glot.NewPlot(2,false,false)
 
-	// Adding a point group
-
+	//Config Variables
 	var MAXX = 1000
 	var MAXY = 1000
 	var maxKpath = 100
-	var kmax = 10
+	var kmax = 2
+	var nnodes = 7000
+
+	//Initalizing obstacles
 	obsCirc := make([]circleObs,10)
 	obsCirc[0] = circleObs{radi:200,xpos:500,ypos:500}
 	obsCirc[1] = circleObs{radi:100,xpos:700,ypos:700}
 	rand.Seed( time.Now().UnixNano())
-	//T := 0
 
-	space := Initspace(MAXX,MAXY,kmax,10,10)
+	//Initialize Space
+	space := Initspace(MAXX,MAXY,kmax,25,25)
 
-	xgoal := Initnode(MAXX-1,MAXY-1)
+	//Initialize Starting Node
 	xa := Initnode(0,0)
+	ag := new(agent)
+	ag.xpos = 1
+	ag.ypos = 1
 	space.add(xa)
-	Tau := Inittree(2000,xa,maxKpath)
-	Tau.addnode(xgoal,xa,nil,&space,obsCirc,plot)
 
-	Qr := queue.New()
-	Qs := queue.New()
-	pltNode(plot,*xa,"Start")
-	pltNode(plot,*xgoal,"Goal")
+	//Initialize Tree
+	Tau := Inittree(nnodes,xa,maxKpath)
+
+	//Initialize Goal
+	xgoal := Initnode(MAXX-1, MAXY-1) //Tau.addgoal(MAXX-1,MAXY-1,&space,obsCirc)
+
+	//Initialize Queues
+	Qr := Initqueue(nnodes)
+	Qs := Initqueue(nnodes)
+
+	framenum := 0
 	for {
 		//updateCObs(obsCirc)
 		//xa = updateGoal()
 		//xgoal = updateAgent()
-		wait := time.After(time.Second*30)
-		expandAndRewrite(&Tau, obsCirc,Qr,Qs,10, xgoal, &space, wait,plot)
-		fmt.Println("Rewrote")
+		log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
+		wait := time.After(time.Millisecond*30)
+		expandAndRewrite(&Tau, obsCirc,Qr,Qs,250, xgoal, &space, wait,ag)
+		dump(&Tau,&space,framenum)
+		framenum += 1
 	}
-	plot.SetTitle("Example Plot")
-	// Optional: Setting the title of the plot
-	plot.SetXLabel("X-Axis")
-	plot.SetYLabel("Y-Axis")
-	// Optional: Setting label for X and Y axis
-	plot.SetXrange(0, MAXX)
-	plot.SetYrange(0, MAXY)
 }

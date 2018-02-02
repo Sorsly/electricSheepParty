@@ -2,10 +2,8 @@
 
 static const char *TAG = "TURRET";
 
-#define PIN_LASER 16
-#define PIN_RECEP 17
 void init_turret(){
-	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, PIN_SERVO));
+	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, 15));
 	mcpwm_config_t conf0;
 	conf0.frequency = 50;
 	conf0.cmpr_a = 15;
@@ -19,16 +17,10 @@ void init_turret(){
 	return;
 }
 
-void set_angle(int angle){
-	float actangle = (float)angle;
+void set_angle(uint32_t angle){
 	uint32_t dutycycle;
-	if(actangle > 180){
-		actangle = 180.0;
-	} else if (actangle < 0){
-		actangle = 0.0;
-	}
-	dutycycle = (uint32_t)(actangle * (14000.0/180.0) + 1000.0);
-	mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, dutycycle);
+	dutycycle = (uint32_t)(angle *3000/360 + 1000.0);
+	mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A,dutycycle);
 	return;
 }
 

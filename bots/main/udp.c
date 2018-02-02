@@ -29,6 +29,8 @@ void app_main()
     }
 
     init_turret();
-    set_angle(100);
+
+    set_angle(20);
+
 
 }
