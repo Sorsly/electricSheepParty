@@ -2226,7 +2226,7 @@ design rules under a new name.</description>
 <attribute name="VERSION" value="v01" x="-95.4024" y="-118.9228" size="1.778" layer="27" display="off"/>
 </element>
 <element name="J8" library="electricSheepParty" package="1X02" value="" x="-87.0204" y="-129.3368">
-<attribute name="COMM" value="Photo Receptor" x="-87.0204" y="-129.3368" size="1.778" layer="27" display="off"/>
+<attribute name="COMM" value="IMU Interrupt Header" x="-87.0204" y="-129.3368" size="1.778" layer="27" display="off"/>
 </element>
 <element name="CN1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="USB-MINIB" value="" x="-101.9556" y="-131.8768"/>
 <element name="RESET" library="DiscreteComponents" package="SW_2512" value="" x="-103.4288" y="-144.0688"/>
@@ -2327,6 +2327,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="PWM_LASER">
 <contactref element="Q2" pad="1"/>
+<contactref element="U2" pad="24"/>
+<wire x1="-105.9536" y1="-154.262" x2="-77.9376" y2="-98.7276" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="5V">
 <contactref element="J3" pad="2"/>
@@ -2341,6 +2343,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="PWM_SERVO">
 <contactref element="J3" pad="1"/>
+<contactref element="U2" pad="12"/>
+<wire x1="-41.91" y1="40.64" x2="-92.9176" y2="-94.4476" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$1">
 <contactref element="R1" pad="2"/>
@@ -2359,10 +2363,12 @@ design rules under a new name.</description>
 <contactref element="D2" pad="A"/>
 <wire x1="-35.167" y1="53.34" x2="-23.71" y2="54.61" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="N$4">
+<signal name="ADC_PHOTO">
 <contactref element="J4" pad="2"/>
 <contactref element="R3" pad="1"/>
-<wire x1="-27.94" y1="49.53" x2="-27.52" y2="54.61" width="0" layer="19" extent="1-1"/>
+<contactref element="U2" pad="35"/>
+<wire x1="-27.94" y1="49.53" x2="-74.4176" y2="-84.2876" width="0" layer="19" extent="1-1"/>
+<wire x1="-27.52" y1="54.61" x2="-27.94" y2="49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$5">
 <contactref element="J5" pad="2"/>
@@ -2371,6 +2377,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="PWM_LED">
 <contactref element="R4" pad="2"/>
+<contactref element="U2" pad="34"/>
+<wire x1="-29.63" y1="54.61" x2="-74.4176" y2="-85.5576" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="3V3">
 <contactref element="R3" pad="2"/>
@@ -2440,21 +2448,29 @@ design rules under a new name.</description>
 <signal name="M1+">
 <contactref element="U$2" pad="2"/>
 <contactref element="J6" pad="2"/>
+<contactref element="U2" pad="8"/>
+<wire x1="-39.37" y1="-30.48" x2="-92.9176" y2="-89.3676" width="0" layer="19" extent="1-1"/>
 <wire x1="-33.375" y1="38.985" x2="-39.37" y2="-30.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1-">
 <contactref element="U$2" pad="4"/>
 <contactref element="J6" pad="1"/>
+<contactref element="U2" pad="9"/>
+<wire x1="-41.91" y1="-30.48" x2="-92.9176" y2="-90.6376" width="0" layer="19" extent="1-1"/>
 <wire x1="-32.075" y1="38.985" x2="-41.91" y2="-30.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2+">
 <contactref element="U$2" pad="7"/>
 <contactref element="J7" pad="2"/>
+<contactref element="U2" pad="10"/>
+<wire x1="-39.37" y1="-49.53" x2="-92.9176" y2="-91.9076" width="0" layer="19" extent="1-1"/>
 <wire x1="-30.125" y1="38.985" x2="-39.37" y2="-49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2-">
 <contactref element="U$2" pad="5"/>
 <contactref element="J7" pad="1"/>
+<contactref element="U2" pad="11"/>
+<wire x1="-41.91" y1="-49.53" x2="-92.9176" y2="-93.1776" width="0" layer="19" extent="1-1"/>
 <wire x1="-31.425" y1="38.985" x2="-41.91" y2="-49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$7">
@@ -2563,11 +2579,14 @@ design rules under a new name.</description>
 <signal name="TCK">
 <contactref element="U2" pad="16"/>
 </signal>
-<signal name="N$11">
-<contactref element="U2" pad="24"/>
-</signal>
 <signal name="RST">
 <contactref element="U2" pad="3"/>
+</signal>
+<signal name="N$16">
+<contactref element="U2" pad="26"/>
+</signal>
+<signal name="N$4">
+<contactref element="U2" pad="25"/>
 </signal>
 </signals>
 </board>

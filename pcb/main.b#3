@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.6.0">
+<eagle version="8.3.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -2013,11 +2013,10 @@ design rules under a new name.</description>
 <param name="slThermalsForVias" value="0"/>
 <param name="dpMaxLengthDifference" value="10mm"/>
 <param name="dpGapFactor" value="2.5"/>
+<param name="checkGrid" value="0"/>
 <param name="checkAngle" value="0"/>
 <param name="checkFont" value="1"/>
 <param name="checkRestrict" value="1"/>
-<param name="checkStop" value="0"/>
-<param name="checkValues" value="0"/>
 <param name="useDiameter" value="13"/>
 <param name="maxErrors" value="50"/>
 </designrules>
@@ -2124,8 +2123,8 @@ design rules under a new name.</description>
 <element name="C2" library="electricSheepParty" package="0603" value="0.1uF" x="-15.24" y="54.61">
 <attribute name="PROD_ID" value="CAP-00810" x="-15.24" y="54.61" size="1.778" layer="27" display="off"/>
 </element>
-<element name="D1" library="electricSheepParty" package="SOD-323" value="250mA/100V" x="-41.91" y="49.53">
-<attribute name="PROD_ID" value="DIO-09646" x="-41.91" y="49.53" size="1.778" layer="27" display="off"/>
+<element name="D1" library="electricSheepParty" package="SOD-323" value="250mA/100V" x="16.4592" y="11.938" rot="R90">
+<attribute name="PROD_ID" value="DIO-09646" x="16.4592" y="11.938" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="D2" library="electricSheepParty" package="LED-0603" value="" x="-34.29" y="53.34">
 <attribute name="COMMENT" value="Power LED" x="-34.29" y="53.34" size="1.778" layer="27" display="off"/>
@@ -2137,8 +2136,8 @@ design rules under a new name.</description>
 <element name="IC1" library="electricSheepParty" package="SSOP16" value="FT230XS" x="-36.83" y="27.94">
 <attribute name="COMM" value="USB UART" x="-36.83" y="27.94" size="1.778" layer="27" display="off"/>
 </element>
-<element name="J1" library="electricSheepParty" package="1X02" value="" x="-17.78" y="49.53">
-<attribute name="COMM" value="Battery Connector" x="-17.78" y="49.53" size="1.778" layer="27" display="off"/>
+<element name="J1" library="electricSheepParty" package="1X02" value="" x="12.3952" y="13.1064" rot="R270">
+<attribute name="COMM" value="Battery Connector" x="12.3952" y="13.1064" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="J2" library="electricSheepParty" package="1X02" value="" x="-24.13" y="49.53">
 <attribute name="COMM" value="Laser Connector" x="-24.13" y="49.53" size="1.778" layer="27" display="off"/>
@@ -2153,11 +2152,11 @@ design rules under a new name.</description>
 <element name="J5" library="electricSheepParty" package="1X02" value="" x="-36.83" y="49.53">
 <attribute name="COMM" value="LED Connector" x="-36.83" y="49.53" size="1.778" layer="27" display="off"/>
 </element>
-<element name="Q1" library="electricSheepParty" package="SOT23-3" value="2.5A/30V/105mΩ" x="-25.4" y="41.91">
-<attribute name="PROD_ID" value="TRANS-11308" x="-25.4" y="41.91" size="1.778" layer="27" display="off"/>
+<element name="Q1" library="electricSheepParty" package="SOT23-3" value="2.5A/30V/105mΩ" x="20.1676" y="11.684" rot="R270">
+<attribute name="PROD_ID" value="TRANS-11308" x="20.1676" y="11.684" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="R1" library="electricSheepParty" package="0603" value="100k" x="-19.05" y="54.61">
-<attribute name="PROD_ID" value=" " x="-19.05" y="54.61" size="1.778" layer="27" display="off"/>
+<element name="R1" library="electricSheepParty" package="0603" value="100k" x="15.9004" y="20.7772">
+<attribute name="PROD_ID" value=" " x="15.9004" y="20.7772" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R2" library="electricSheepParty" package="0603" value="330" x="-22.86" y="54.61">
 <attribute name="PROD_ID" value=" " x="-22.86" y="54.61" size="1.778" layer="27" display="off"/>
@@ -2168,8 +2167,8 @@ design rules under a new name.</description>
 <element name="R4" library="electricSheepParty" package="0603" value=" " x="-30.48" y="54.61">
 <attribute name="PROD_ID" value=" " x="-30.48" y="54.61" size="1.778" layer="27" display="off"/>
 </element>
-<element name="S1" library="electricSheepParty" package="L102021ML04Q" value="" x="-29.21" y="11.43">
-<attribute name="COMM" value="ON/OFF Switch" x="-29.21" y="11.43" size="1.778" layer="27" display="off"/>
+<element name="S1" library="electricSheepParty" package="L102021ML04Q" value="" x="16.4592" y="4.2672" rot="R270">
+<attribute name="COMM" value="ON/OFF Switch" x="16.4592" y="4.2672" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="U$1" library="electricSheepParty" package="SOT223" value="AZ1117E" x="-17.78" y="43.18">
 <attribute name="COMM" value="5-6V Lin Reg" x="-17.78" y="43.18" size="1.778" layer="27" display="off"/>
@@ -2226,11 +2225,17 @@ design rules under a new name.</description>
 <attribute name="VERSION" value="v01" x="-95.4024" y="-118.9228" size="1.778" layer="27" display="off"/>
 </element>
 <element name="J8" library="electricSheepParty" package="1X02" value="" x="-87.0204" y="-129.3368">
-<attribute name="COMM" value="Photo Receptor" x="-87.0204" y="-129.3368" size="1.778" layer="27" display="off"/>
+<attribute name="COMM" value="IMU Interrupt Header" x="-87.0204" y="-129.3368" size="1.778" layer="27" display="off"/>
 </element>
 <element name="CN1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="USB-MINIB" value="" x="-101.9556" y="-131.8768"/>
 <element name="RESET" library="DiscreteComponents" package="SW_2512" value="" x="-103.4288" y="-144.0688"/>
 <element name="Q2" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="SOT23" value="" x="-105.0036" y="-153.162"/>
+<element name="R8" library="electricSheepParty" package="0603" value="20k" x="-104.7496" y="-158.2928">
+<attribute name="PROD_ID" value=" " x="-104.7496" y="-158.2928" size="1.778" layer="27" display="off"/>
+</element>
+<element name="R9" library="electricSheepParty" package="0603" value="10k" x="-104.7496" y="-161.544">
+<attribute name="PROD_ID" value=" " x="-104.7496" y="-161.544" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -2274,7 +2279,9 @@ design rules under a new name.</description>
 <contactref element="CN1" pad="GND"/>
 <contactref element="RESET" pad="2"/>
 <contactref element="Q2" pad="2"/>
+<contactref element="R9" pad="1"/>
 <wire x1="-104.0536" y1="-154.262" x2="-100.6288" y2="-144.0688" width="0" layer="19" extent="1-1"/>
+<wire x1="-105.5996" y1="-161.544" x2="-104.0536" y2="-154.262" width="0" layer="19" extent="1-1"/>
 <wire x1="-100.3556" y1="-127.8128" x2="-100.6288" y2="-144.0688" width="0" layer="19" extent="1-1"/>
 <wire x1="-91.86" y1="-117.348" x2="-100.3556" y2="-127.8128" width="0" layer="19" extent="1-1"/>
 <wire x1="-91.86" y1="-114.0968" x2="-91.86" y2="-117.348" width="0" layer="19" extent="1-1"/>
@@ -2308,22 +2315,11 @@ design rules under a new name.</description>
 <wire x1="-46.14" y1="49.53" x2="-36.83" y2="49.53" width="0" layer="19" extent="1-1"/>
 <wire x1="-20.0914" y1="40.0812" x2="-30.775" y2="38.985" width="0" layer="19" extent="1-1"/>
 <wire x1="-21.59" y1="33.02" x2="-20.0914" y2="40.0812" width="0" layer="19" extent="1-1"/>
-<wire x1="-17.78" y1="49.53" x2="-20.0914" y2="40.0812" width="0" layer="19" extent="1-1"/>
-<wire x1="-19.9" y1="54.61" x2="-17.78" y2="49.53" width="0" layer="19" extent="1-1"/>
-<wire x1="-14.39" y1="54.61" x2="-19.9" y2="54.61" width="0" layer="19" extent="1-1"/>
 <wire x1="-21.59" y1="23.12" x2="-21.59" y2="33.02" width="0" layer="19" extent="1-1"/>
 <wire x1="-18.19" y1="23.12" x2="-21.59" y2="23.12" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="VCC">
-<contactref element="J1" pad="2"/>
-<contactref element="D1" pad="C"/>
-<contactref element="R2" pad="2"/>
-<contactref element="Q1" pad="2"/>
-<contactref element="S1" pad="P$2"/>
-<wire x1="-22.01" y1="54.61" x2="-15.24" y2="49.53" width="0" layer="19" extent="1-1"/>
-<wire x1="-24.45" y1="40.91" x2="-15.24" y2="49.53" width="0" layer="19" extent="1-1"/>
-<wire x1="-43.06" y1="49.53" x2="-24.45" y2="40.91" width="0" layer="19" extent="1-1"/>
-<wire x1="-29.21" y1="11.43" x2="-24.45" y2="40.91" width="0" layer="19" extent="1-1"/>
+<wire x1="-14.39" y1="54.61" x2="-20.0914" y2="40.0812" width="0" layer="19" extent="1-1"/>
+<wire x1="12.3952" y1="13.1064" x2="-18.19" y2="23.12" width="0" layer="19" extent="1-1"/>
+<wire x1="15.0504" y1="20.7772" x2="12.3952" y2="13.1064" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="PWM_LASER">
 <contactref element="Q2" pad="1"/>
@@ -2343,18 +2339,20 @@ design rules under a new name.</description>
 </signal>
 <signal name="PWM_SERVO">
 <contactref element="J3" pad="1"/>
+<contactref element="U2" pad="12"/>
+<wire x1="-41.91" y1="40.64" x2="-92.9176" y2="-94.4476" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$1">
 <contactref element="R1" pad="2"/>
 <contactref element="D1" pad="A"/>
 <contactref element="Q1" pad="1"/>
-<wire x1="-26.35" y1="40.91" x2="-18.2" y2="54.61" width="0" layer="19" extent="1-1"/>
-<wire x1="-40.76" y1="49.53" x2="-26.35" y2="40.91" width="0" layer="19" extent="1-1"/>
+<wire x1="16.4592" y1="13.088" x2="16.7504" y2="20.7772" width="0" layer="19" extent="1-1"/>
+<wire x1="19.1676" y1="12.634" x2="16.4592" y2="13.088" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$3">
 <contactref element="Q1" pad="3"/>
 <contactref element="S1" pad="P$3"/>
-<wire x1="-29.21" y1="16.1798" x2="-25.4" y2="43.01" width="0" layer="19" extent="1-1"/>
+<wire x1="21.209" y1="4.2672" x2="21.2676" y2="11.684" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$2">
 <contactref element="R2" pad="1"/>
@@ -2364,7 +2362,9 @@ design rules under a new name.</description>
 <signal name="ADC_PHOTO">
 <contactref element="J4" pad="2"/>
 <contactref element="R3" pad="1"/>
-<wire x1="-27.94" y1="49.53" x2="-27.52" y2="54.61" width="0" layer="19" extent="1-1"/>
+<contactref element="U2" pad="35"/>
+<wire x1="-27.94" y1="49.53" x2="-74.4176" y2="-84.2876" width="0" layer="19" extent="1-1"/>
+<wire x1="-27.52" y1="54.61" x2="-27.94" y2="49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$5">
 <contactref element="J5" pad="2"/>
@@ -2444,21 +2444,29 @@ design rules under a new name.</description>
 <signal name="M1+">
 <contactref element="U$2" pad="2"/>
 <contactref element="J6" pad="2"/>
+<contactref element="U2" pad="8"/>
+<wire x1="-39.37" y1="-30.48" x2="-92.9176" y2="-89.3676" width="0" layer="19" extent="1-1"/>
 <wire x1="-33.375" y1="38.985" x2="-39.37" y2="-30.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1-">
 <contactref element="U$2" pad="4"/>
 <contactref element="J6" pad="1"/>
+<contactref element="U2" pad="9"/>
+<wire x1="-41.91" y1="-30.48" x2="-92.9176" y2="-90.6376" width="0" layer="19" extent="1-1"/>
 <wire x1="-32.075" y1="38.985" x2="-41.91" y2="-30.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2+">
 <contactref element="U$2" pad="7"/>
 <contactref element="J7" pad="2"/>
+<contactref element="U2" pad="10"/>
+<wire x1="-39.37" y1="-49.53" x2="-92.9176" y2="-91.9076" width="0" layer="19" extent="1-1"/>
 <wire x1="-30.125" y1="38.985" x2="-39.37" y2="-49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2-">
 <contactref element="U$2" pad="5"/>
 <contactref element="J7" pad="1"/>
+<contactref element="U2" pad="11"/>
+<wire x1="-41.91" y1="-49.53" x2="-92.9176" y2="-93.1776" width="0" layer="19" extent="1-1"/>
 <wire x1="-31.425" y1="38.985" x2="-41.91" y2="-49.53" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$7">
@@ -2475,11 +2483,19 @@ design rules under a new name.</description>
 <contactref element="U$3" pad="1"/>
 <contactref element="C6" pad="1"/>
 <contactref element="C8" pad="1"/>
+<contactref element="D1" pad="C"/>
+<contactref element="R2" pad="2"/>
+<contactref element="Q1" pad="2"/>
+<contactref element="R8" pad="2"/>
 <wire x1="-50.226" y1="-86.9696" x2="-49.4656" y2="-91.694" width="0" layer="19" extent="1-1"/>
 <wire x1="-50.226" y1="-81.3308" x2="-50.226" y2="-86.9696" width="0" layer="19" extent="1-1"/>
+<wire x1="-103.8996" y1="-158.2928" x2="-49.4656" y2="-91.694" width="0" layer="19" extent="1-1"/>
 <wire x1="-24.99" y1="23.12" x2="-50.226" y2="-81.3308" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.4686" y1="40.0812" x2="-24.99" y2="23.12" width="0" layer="19" extent="1-1"/>
-<wire x1="-47.84" y1="49.53" x2="-15.4686" y2="40.0812" width="0" layer="19" extent="1-1"/>
+<wire x1="-22.01" y1="54.61" x2="-15.4686" y2="40.0812" width="0" layer="19" extent="1-1"/>
+<wire x1="-47.84" y1="49.53" x2="-22.01" y2="54.61" width="0" layer="19" extent="1-1"/>
+<wire x1="16.4592" y1="10.788" x2="-24.99" y2="23.12" width="0" layer="19" extent="1-1"/>
+<wire x1="19.1676" y1="10.734" x2="16.4592" y2="10.788" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$13">
 <contactref element="U$2" pad="8"/>
@@ -2570,11 +2586,36 @@ design rules under a new name.</description>
 <signal name="RST">
 <contactref element="U2" pad="3"/>
 </signal>
-<signal name="N$14">
-<contactref element="U2" pad="35"/>
-</signal>
 <signal name="N$16">
 <contactref element="U2" pad="26"/>
+</signal>
+<signal name="N$4">
+<contactref element="U2" pad="25"/>
+</signal>
+<signal name="6V_RAW">
+<contactref element="S1" pad="P$2"/>
+<contactref element="J1" pad="2"/>
+<polygon width="0.508" layer="1">
+<vertex x="9.8552" y="11.7856"/>
+<vertex x="14.9352" y="11.7856"/>
+<vertex x="14.9352" y="9.5504"/>
+<vertex x="15.9512" y="8.4836"/>
+<vertex x="17.1704" y="7.4168"/>
+<vertex x="18.796" y="5.7912"/>
+<vertex x="18.796" y="2.1336"/>
+<vertex x="18.8468" y="2.0828"/>
+<vertex x="13.9192" y="2.0828"/>
+<vertex x="13.9192" y="4.3688"/>
+<vertex x="11.43" y="6.858"/>
+<vertex x="9.8552" y="8.382"/>
+<vertex x="9.8044" y="9.8552"/>
+<vertex x="9.8044" y="11.7348"/>
+</polygon>
+</signal>
+<signal name="1/3_BAT">
+<contactref element="R8" pad="1"/>
+<contactref element="R9" pad="2"/>
+<wire x1="-103.8996" y1="-161.544" x2="-105.5996" y2="-158.2928" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
