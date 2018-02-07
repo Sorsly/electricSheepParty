@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.3.2">
+<eagle version="8.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -2391,6 +2391,80 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <smd name="38" x="9.25" y="7" dx="1.5" dy="1" layer="1"/>
 <smd name="GND" x="0.3" y="-0.7" dx="6" dy="6" layer="1"/>
 </package>
+<package name="SOT23-5">
+<description>&lt;b&gt;Small Outline Transistor&lt;/b&gt;&lt;p&gt;
+SOT753 - Philips Semiconductors&lt;br&gt;
+Source: http://www.semiconductors.philips.com/acrobat_download/datasheets/74HC_HCT1G66_3.pdf</description>
+<wire x1="0" y1="-1.29" x2="0" y2="-1.3" width="0.01" layer="21"/>
+<wire x1="1.42" y1="0.8" x2="1.42" y2="-0.8" width="0.127" layer="21"/>
+<wire x1="1.42" y1="-0.8" x2="-1.42" y2="-0.8" width="0.127" layer="51"/>
+<wire x1="-1.42" y1="-0.8" x2="-1.42" y2="0.8" width="0.127" layer="21"/>
+<wire x1="-1.42" y1="0.8" x2="1.42" y2="0.8" width="0.127" layer="51"/>
+<wire x1="-1.27" y1="0.65" x2="1.28" y2="0.65" width="0.075" layer="21"/>
+<wire x1="1.28" y1="0.65" x2="1.28" y2="-0.66" width="0.075" layer="21"/>
+<wire x1="1.28" y1="-0.66" x2="-1.27" y2="-0.66" width="0.075" layer="21"/>
+<wire x1="-1.27" y1="-0.66" x2="-1.27" y2="0.65" width="0.075" layer="21"/>
+<wire x1="-1.75" y1="2.25" x2="1.75" y2="2.25" width="0.254" layer="39"/>
+<wire x1="1.75" y1="2.25" x2="1.75" y2="-2.25" width="0.254" layer="39"/>
+<wire x1="1.75" y1="-2.25" x2="-1.75" y2="-2.25" width="0.254" layer="39"/>
+<wire x1="-1.75" y1="-2.25" x2="-1.75" y2="2.25" width="0.254" layer="39"/>
+<smd name="1" x="-0.95" y="-1.29" dx="0.69" dy="0.99" layer="1"/>
+<smd name="2" x="0" y="-1.29" dx="0.69" dy="0.99" layer="1"/>
+<smd name="3" x="0.95" y="-1.29" dx="0.69" dy="0.99" layer="1"/>
+<smd name="4" x="0.95" y="1.3" dx="0.69" dy="0.99" layer="1"/>
+<smd name="5" x="-0.95" y="1.3" dx="0.69" dy="0.99" layer="1"/>
+<text x="-2.54" y="2.54" size="1.27" layer="25">&gt;NAME</text>
+<text x="-2.54" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-1.11" y1="0.68" x2="-0.78" y2="1.43" layer="51"/>
+<rectangle x1="0.79" y1="0.67" x2="1.12" y2="1.42" layer="51"/>
+<rectangle x1="-1.11" y1="-1.42" x2="-0.78" y2="-0.67" layer="51"/>
+<rectangle x1="-0.16" y1="-1.42" x2="0.17" y2="-0.67" layer="51"/>
+<rectangle x1="0.79" y1="-1.42" x2="1.12" y2="-0.67" layer="51"/>
+</package>
+<package name="SC70-5">
+<description>&lt;b&gt;SMT SC70-5&lt;/b&gt;&lt;p&gt;
+SOT353 - Philips Semiconductors&lt;br&gt;
+Source: http://www.semiconductors.philips.com/acrobat_download/datasheets/74HC_HCT1G66_3.pdf</description>
+<wire x1="1" y1="0.55" x2="-1" y2="0.55" width="0.127" layer="51"/>
+<wire x1="-1" y1="0.55" x2="-1" y2="-0.55" width="0.127" layer="21"/>
+<wire x1="-1" y1="-0.55" x2="1" y2="-0.55" width="0.127" layer="51"/>
+<wire x1="1" y1="-0.55" x2="1" y2="0.55" width="0.127" layer="21"/>
+<smd name="1" x="-0.65" y="-0.85" dx="0.4" dy="0.7" layer="1"/>
+<smd name="2" x="0" y="-0.85" dx="0.4" dy="0.7" layer="1"/>
+<smd name="3" x="0.65" y="-0.85" dx="0.4" dy="0.7" layer="1"/>
+<smd name="4" x="0.65" y="0.85" dx="0.4" dy="0.7" layer="1"/>
+<smd name="5" x="-0.65" y="0.85" dx="0.4" dy="0.7" layer="1"/>
+<text x="-2.54" y="1.27" size="1.27" layer="25">&gt;NAME</text>
+<text x="-2.54" y="-2.54" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-0.125" y1="-1.05" x2="0.125" y2="-0.6" layer="51"/>
+<rectangle x1="-0.775" y1="-1.05" x2="-0.525" y2="-0.6" layer="51"/>
+<rectangle x1="0.525" y1="-1.05" x2="0.775" y2="-0.6" layer="51"/>
+<rectangle x1="-0.775" y1="0.6" x2="-0.525" y2="1.05" layer="51"/>
+<rectangle x1="0.525" y1="0.6" x2="0.775" y2="1.05" layer="51"/>
+</package>
+<package name="MAC06A">
+<description>&lt;b&gt;6-Lead MicroPak, 1.0mm Wide&lt;/b&gt;&lt;p&gt;
+Source: http://www.fairchildsemi.com/ds/NC/NC7SZ14.pdf</description>
+<wire x1="-0.675" y1="0.45" x2="0.675" y2="0.45" width="0.1016" layer="51"/>
+<wire x1="0.675" y1="0.45" x2="0.675" y2="-0.45" width="0.1016" layer="51"/>
+<wire x1="0.675" y1="-0.45" x2="-0.675" y2="-0.45" width="0.1016" layer="51"/>
+<wire x1="-0.675" y1="-0.45" x2="-0.675" y2="0.45" width="0.1016" layer="51"/>
+<smd name="1" x="-0.5" y="-0.375" dx="0.3" dy="0.52" layer="1" stop="no"/>
+<smd name="2" x="0" y="-0.375" dx="0.3" dy="0.49" layer="1" stop="no"/>
+<smd name="3" x="0.5" y="-0.375" dx="0.3" dy="0.49" layer="1" stop="no"/>
+<smd name="4" x="0.5" y="0.375" dx="0.3" dy="0.49" layer="1" rot="R180" stop="no"/>
+<smd name="5" x="0" y="0.375" dx="0.3" dy="0.49" layer="1" rot="R180" stop="no"/>
+<smd name="6" x="-0.5" y="0.375" dx="0.3" dy="0.49" layer="1" rot="R180" stop="no"/>
+<text x="-1" y="1" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1" y="-2" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-0.675" y1="0.0875" x2="-0.325" y2="0.6625" layer="29"/>
+<rectangle x1="-0.175" y1="0.0875" x2="0.175" y2="0.6625" layer="29"/>
+<rectangle x1="0.325" y1="0.0875" x2="0.675" y2="0.6625" layer="29"/>
+<rectangle x1="0.325" y1="-0.6625" x2="0.675" y2="-0.0875" layer="29" rot="R180"/>
+<rectangle x1="-0.175" y1="-0.6625" x2="0.175" y2="-0.0875" layer="29" rot="R180"/>
+<rectangle x1="-0.675" y1="-0.6625" x2="-0.325" y2="-0.0875" layer="29" rot="R180"/>
+<rectangle x1="-0.6375" y1="-0.4125" x2="-0.425" y2="-0.2" layer="51"/>
+</package>
 </packages>
 <symbols>
 <symbol name="CONN_02">
@@ -2633,6 +2707,28 @@ Switches electrical signals</description>
 <pin name="SD1" x="17.78" y="-17.78" length="middle" rot="R180"/>
 <pin name="SD0" x="17.78" y="-20.32" length="middle" rot="R180"/>
 <pin name="GND@4" x="17.78" y="10.16" length="middle" direction="pwr" rot="R180"/>
+</symbol>
+<symbol name="7414">
+<wire x1="-5.08" y1="5.08" x2="5.08" y2="0" width="0.4064" layer="94"/>
+<wire x1="5.08" y1="0" x2="-5.08" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-5.08" y1="-5.08" x2="-5.08" y2="5.08" width="0.4064" layer="94"/>
+<wire x1="-0.762" y1="-1.27" x2="-1.778" y2="1.27" width="0.1524" layer="94"/>
+<wire x1="-2.032" y1="-1.27" x2="-3.048" y2="1.27" width="0.1524" layer="94"/>
+<wire x1="-2.032" y1="-1.27" x2="-0.762" y2="-1.27" width="0.1524" layer="94"/>
+<wire x1="-0.762" y1="-1.27" x2="0.127" y2="-1.27" width="0.1524" layer="94"/>
+<wire x1="-3.937" y1="1.27" x2="-3.048" y2="1.27" width="0.1524" layer="94"/>
+<wire x1="-3.048" y1="1.27" x2="-1.778" y2="1.27" width="0.1524" layer="94"/>
+<text x="1.27" y="3.175" size="1.778" layer="95">&gt;NAME</text>
+<text x="1.27" y="-5.08" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="I" x="-10.16" y="0" visible="pad" length="middle" direction="in"/>
+<pin name="O" x="10.16" y="0" visible="pad" length="middle" direction="out" function="dot" rot="R180"/>
+</symbol>
+<symbol name="PWRN">
+<text x="-0.635" y="-0.635" size="1.778" layer="95">&gt;NAME</text>
+<text x="1.905" y="-6.35" size="1.27" layer="95" rot="R90">GND</text>
+<text x="1.905" y="2.54" size="1.27" layer="95" rot="R90">VCC</text>
+<pin name="GND" x="0" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
+<pin name="VCC" x="0" y="7.62" visible="pad" length="middle" direction="pwr" rot="R270"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3822,6 +3918,49 @@ Switches electrical signals</description>
 <connect gate="G$1" pin="SENSOR_VN" pad="5"/>
 <connect gate="G$1" pin="SENSOR_VP" pad="4"/>
 <connect gate="G$1" pin="TXD0" pad="35"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="NC7SZ14" prefix="IC">
+<description>&lt;b&gt;TinyLogic(R) UHS Inverter with Schmitt Trigger Input&lt;/b&gt;&lt;p&gt;
+Source: http://www.fairchildsemi.com/ds/NC/NC7SZ14.pdf</description>
+<gates>
+<gate name="Q" symbol="7414" x="0" y="0"/>
+<gate name="P" symbol="PWRN" x="20.32" y="0" addlevel="request"/>
+</gates>
+<devices>
+<device name="M5X" package="SOT23-5">
+<connects>
+<connect gate="P" pin="GND" pad="3"/>
+<connect gate="P" pin="VCC" pad="5"/>
+<connect gate="Q" pin="I" pad="2"/>
+<connect gate="Q" pin="O" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="P5X" package="SC70-5">
+<connects>
+<connect gate="P" pin="GND" pad="3"/>
+<connect gate="P" pin="VCC" pad="5"/>
+<connect gate="Q" pin="I" pad="2"/>
+<connect gate="Q" pin="O" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="L6X" package="MAC06A">
+<connects>
+<connect gate="P" pin="GND" pad="3"/>
+<connect gate="P" pin="VCC" pad="6"/>
+<connect gate="Q" pin="I" pad="2"/>
+<connect gate="Q" pin="O" pad="4"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -20552,7 +20691,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="COMM" value="LED Connector"/>
 </part>
 <part name="SUPPLY4" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="3V3"/>
-<part name="R3" library="electricSheepParty" deviceset="RESISTOR" device="0603" value="10k"/>
+<part name="R3" library="electricSheepParty" deviceset="RESISTOR" device="0603" value="8.2k"/>
 <part name="C1" library="electricSheepParty" deviceset="0.1UF" device="-0603-25V-(+80/-20%)" value="0.1uF"/>
 <part name="C2" library="electricSheepParty" deviceset="0.1UF" device="-0603-25V-(+80/-20%)" value="0.1uF"/>
 <part name="SUPPLY5" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="6V"/>
@@ -20632,6 +20771,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="SUPPLY20" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="AGND" device=""/>
 <part name="SUPPLY21" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="AGND" device=""/>
 <part name="C20" library="eagle-ltspice" library_urn="urn:adsk.eagle:library:217" deviceset="C" device="C1206" package3d_urn="urn:adsk.eagle:package:13279/1" value="100uF"/>
+<part name="IC1" library="electricSheepParty" deviceset="NC7SZ14" device="M5X"/>
+<part name="GND4" library="SparkFun-PowerSymbols" deviceset="GND" device=""/>
+<part name="SUPPLY22" library="SparkFun-PowerSymbols" deviceset="VCC" device="" value="3V3"/>
 </parts>
 <sheets>
 <sheet>
@@ -20759,6 +20901,10 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="SUPPLY20" gate="G$1" x="220.98" y="144.78"/>
 <instance part="SUPPLY21" gate="G$1" x="142.24" y="147.32"/>
 <instance part="C20" gate="G$1" x="236.22" y="165.1"/>
+<instance part="IC1" gate="Q" x="205.74" y="76.2"/>
+<instance part="IC1" gate="P" x="205.74" y="76.2"/>
+<instance part="GND4" gate="1" x="205.74" y="63.5"/>
+<instance part="SUPPLY22" gate="G$1" x="205.74" y="86.36"/>
 </instances>
 <busses>
 </busses>
@@ -20861,6 +21007,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="119.38" y1="7.62" x2="124.46" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 </segment>
+<segment>
+<pinref part="IC1" gate="P" pin="GND"/>
+<wire x1="205.74" y1="68.58" x2="205.74" y2="66.04" width="0.1524" layer="91"/>
+<pinref part="GND4" gate="1" pin="GND"/>
+</segment>
 </net>
 <net name="5V" class="0">
 <segment>
@@ -20929,6 +21080,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="116.84" y1="162.56" x2="119.38" y2="162.56" width="0.1524" layer="91"/>
 <junction x="116.84" y="162.56"/>
 <label x="119.38" y="162.56" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="Q" pin="I"/>
+<wire x1="195.58" y1="76.2" x2="190.5" y2="76.2" width="0.1524" layer="91"/>
+<label x="180.34" y="76.2" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PWM_LED" class="0">
@@ -21369,6 +21525,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="91.44" y1="99.06" x2="91.44" y2="101.6" width="0.1524" layer="91"/>
 <junction x="91.44" y="101.6"/>
 </segment>
+<segment>
+<pinref part="IC1" gate="P" pin="VCC"/>
+<wire x1="205.74" y1="83.82" x2="205.74" y2="86.36" width="0.1524" layer="91"/>
+<pinref part="SUPPLY22" gate="G$1" pin="VCC"/>
+</segment>
 </net>
 <net name="EN" class="0">
 <segment>
@@ -21458,6 +21619,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="U5" gate="G$1" pin="TXD0"/>
 <wire x1="147.32" y1="96.52" x2="149.86" y2="96.52" width="0.1524" layer="91"/>
 <label x="149.86" y="96.52" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="Q" pin="O"/>
+<wire x1="215.9" y1="76.2" x2="220.98" y2="76.2" width="0.1524" layer="91"/>
+<label x="218.44" y="76.2" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="AGND" class="0">
