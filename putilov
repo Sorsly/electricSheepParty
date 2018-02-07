@@ -45,10 +45,9 @@ def getIPS(*args):
 
 
 def burnJTAG(*args):
-    os.chdir("bots/")
+    os.chdir("bots")
     os.system("make app")
-    os.chdir("openocd-esp32/")
-    os.system("bin/openocd -s share/openocd/scripts -f share/openocd/scripts/interface/jlink.cfg -f share/openocd/scripts/board/esp-wroom-32.cfg -c \"program_esp32 ../build/{}.bin 0x10000 verify exit\"".format(proj_name))
+    os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg -c \"program_esp32 build/{}.bin 0x10000 verify exit\"".format(proj_name))
 
 
 def burnUART(*args):
