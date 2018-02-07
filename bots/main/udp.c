@@ -28,9 +28,11 @@ void app_main()
         nvsret = nvs_flash_init();
     }
 
-    init_turret();
+    //init_turret();
 
-    set_angle(20);
+    //set_angle(20);
+    init_i2c();
+    i2c_comm();
 
 
 }

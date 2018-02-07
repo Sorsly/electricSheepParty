@@ -7,6 +7,16 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
 ipfile = "ips.txt"
 
+def CCCP(*args):
+    os.chdir("CPU/")
+    os.system("go run pathfinder.go> log.txt")
+    os.chdir("plots/")
+    os.system("rm *")
+    os.chdir("../")
+    os.system("mv log.txt plotstuff/")
+    os.chdir("plotstuff/")
+    os.system("python pltclass.py")
+    os.system("./genplots.sh")
 
 def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode()
@@ -52,13 +62,12 @@ def monitorUART(*args):
 
 
 def launchdebug(*args):
-    os.chdir("bots/openocd-esp32/")
-    os.system("bin/openocd -s share/openocd/scripts -f share/openocd/scripts/interface/jlink.cfg -f share/openocd/scripts/board/esp-wroom-32.cfg")
+    os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg")
 
 
 def debug(*args):
     os.chdir("bots/")
-    os.system("xtensa-esp32-elf-gdb -ex 'target remote localhost:333{}' ./build/{}.elf".format(['3', '4'][int(args[0])], proj_name))
+    os.system("xtensa-esp32-elf-gdb -x .gdbinit build/{}.elf".format(proj_name))
 
 
 def main():
@@ -68,10 +77,11 @@ def main():
         "monitorUART": monitorUART,
         "launchdebug": launchdebug,
         "debug": debug,
-        "getIP": getIPS
+        "getIP": getIPS,
+        "cccp": CCCP
     }
     if len(sys.argv) == 1 or sys.argv[1] not in available_builds:
-        print("Commands")
+        print("Commands:")
         for key in available_builds:
             print(key)
     elif len(sys.argv) == 2:

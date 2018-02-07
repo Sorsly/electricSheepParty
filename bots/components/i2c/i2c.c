@@ -5,9 +5,9 @@ static const char *TAG = "I2C";
 void init_i2c(void){
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = PIN_SDA;
+    conf.sda_io_num = 18;
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = PIN_SCL;
+    conf.scl_io_num = 19;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = 100000;
 

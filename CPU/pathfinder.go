@@ -312,6 +312,9 @@ func rewirerand(t * tree,q * treenodeQ, space * Xspace,stop <-chan time.Time,r f
 }
 
 func rewireroot(q * treenodeQ, t * tree, space * Xspace, stop <-chan time.Time, r float64, obs [] circleObs){
+	if t.totnodes == 1{
+		return
+	}
 	if q.q.Length() == 0 {
 		q.q.Add(t.root)
 		q.beenPushed[t.root.nodeid] = true
@@ -322,31 +325,28 @@ func rewireroot(q * treenodeQ, t * tree, space * Xspace, stop <-chan time.Time, 
 		case <-stop:
 			return
 		default:
-			log.Println("HIT1_REWIREROOT")
 			if q.q.Length()  < 1 {
 				return
 			}
 			val = q.q.Remove()
 			switch xr := val.(type) {
 			case * treenode:
-				log.Println("HIT2_REWIREROOT")
 				xs := Xs(xr,space)
-				log.Println("HIT2.5_REWIREROOT")
 				near, _ := findnodesnear(xr,xs,space,t,r)
-				log.Println("HIT3_REWIREROOT")
 				for _, node := range near{
-					cold := node.cost(t)
-					cnew := xr.cost(t) + nodedist(node,xr)
-					if cnew < cold && lineisfree(xr,node,space,obs){
-						t.disconnect(node,node.prevToRoot)
-						t.connect(xr,node)
-						node.prevToRoot = xr
+					if node.nodeid != t.root.nodeid {
+						cold := node.cost(t)
+						cnew := xr.cost(t) + nodedist(node, xr)
+						if cnew < cold && lineisfree(xr, node, space, obs) {
+							t.disconnect(node, node.prevToRoot)
+							t.connect(xr, node)
+							node.prevToRoot = xr
+						}
+						if !q.beenPushed[node.nodeid] {
+							q.q.Add(node)
+							q.beenPushed[node.nodeid] = true
+						}
 					}
-					if !q.beenPushed[node.nodeid]{
-						q.q.Add(node)
-						q.beenPushed[node.nodeid] = true
-					}
-
 				}
 			default:
 				panic("QUEUE HAS NON TREENODE")
@@ -434,16 +434,11 @@ func moveagent(t * tree, ag * agent){
 func expandAndRewrite(t * tree,obs []circleObs, qr * treenodeQ, qs * treenodeQ, rmax float64, ngoal * treenode, space * Xspace, stop <-chan time.Time,ag * agent){
 	i := 0
 
-	log.Println("HIT1")
 	xrand := genRandNode(space,ngoal,t)
-	log.Println("HIT2")
 	i +=1
 	xs := Xs(xrand,space)
-	log.Println("HIT3")
 	nclose := findclosest(xrand,xs)
-	log.Println("HIT4")
 	if lineisfree(xrand,nclose,space,obs){
-		log.Println("HIT5")
 		near,cntnear := findnodesnear(xrand,xs, space,t,rmax)
 		if cntnear < space.maxK || nodedist(nclose,xrand)> rmax{
 			t.addnode(xrand,nclose,near,space,obs,ngoal)
@@ -452,13 +447,12 @@ func expandAndRewrite(t * tree,obs []circleObs, qr * treenodeQ, qs * treenodeQ, 
 			qr.q.Add(nclose)
 		}
 		rewirerand(t,qr,space,stop,rmax,obs)
-		log.Println("HIT6")
 	}
-	log.Println("HIT7")
 	rewireroot(qs,t,space,stop,rmax,obs)
-	log.Println("HIT8")
 	numstep, path := plan(t, ngoal)
 	if math.Hypot(ag.ypos-float64(t.root.ypos),ag.xpos-float64(t.root.xpos)) < 10 && numstep > 0 {
+		path[1].prevToRoot = nil
+		t.root.prevToRoot = path[1]
 		t.root = path[1]
 		for i := 0; i < t.numnodes; i ++ {
 			qs.beenPushed[i]=false
@@ -477,10 +471,9 @@ func Xs(n *treenode, space * Xspace)(bins [] * bin) {
 	r := 1
 	for allclear {
 		if r > space.cols {
+			log.Println("Issue Node:",n)
 			panic("R GOING CRAXZY")
 		}
-		log.Println("HIT1_Xs")
-		log.Println(n,colin,rowin,"R: ",r)
 		for cx := colin - r; cx <= colin + r; cx ++ {
 			if cx < 0{
 				cx = 0
@@ -591,25 +584,26 @@ func findclosest(n * treenode,xs  [] * bin)(closenode * treenode){
 }
 
 func lineisfree (n1 *treenode, n2 * treenode,sp * Xspace, obs [] circleObs)(bool){
-	xLine := float64(n2.xpos - n1.xpos)
-	yLine := float64(n2.ypos - n1.ypos)
+	xLine := float64(n1.xpos - n2.xpos)
+	yLine := float64(n1.ypos - n2.ypos)
+	linemag := math.Hypot(xLine,yLine)
 	for _, circ := range obs {
-		log.Println("HIT1_LINEISFREE")
 		if circ.radi == 0{
 			break
 		}
 		xcLine := float64(circ.xpos - n1.xpos)
 		ycLine := float64(circ.ypos - n1.ypos)
-		rho := -math.Atan(yLine/xLine)
-		yp := xcLine*math.Sin(rho) + ycLine*math.Cos(rho)
-		if math.Abs(yp) < float64(circ.radi) {
-			log.Println("HIT4_LINEISFREE")
+		linecmag := math.Hypot(xcLine,ycLine)
+		rho := math.Acos((xcLine*xLine + yLine*ycLine)/(linemag*linecmag))
+		// angle correction
+		proj := linecmag*math.Cos(rho)
+
+		if proj < float64(circ.radi) {
 			return false
 		}
 
 	}
 
-	log.Println("HIT3_LINEISFREE")
 	return true
 
 }
@@ -643,7 +637,7 @@ func main() {
 	//Initalizing obstacles
 	obsCirc := make([]circleObs,10)
 	obsCirc[0] = circleObs{radi:200,xpos:500,ypos:500}
-	obsCirc[1] = circleObs{radi:100,xpos:700,ypos:700}
+	obsCirc[0] = circleObs{radi:100,xpos:700,ypos:700}
 	rand.Seed( time.Now().UnixNano())
 
 	//Initialize Space
@@ -672,8 +666,8 @@ func main() {
 		//xa = updateGoal()
 		//xgoal = updateAgent()
 		log.Println("XXXXXXXXXXXXXXXXXXXXXXXRunningXXXXXXXXXXXXXXXXXXXXXXX")
-		wait := time.After(time.Millisecond*30)
-		expandAndRewrite(&Tau, obsCirc,Qr,Qs,250, xgoal, &space, wait,ag)
+		wait := time.After(time.Millisecond*5)
+		expandAndRewrite(&Tau, obsCirc,Qr,Qs,50, xgoal, &space, wait,ag)
 		dump(&Tau,&space,framenum,ag)
 		framenum += 1
 	}

@@ -1,2 +1,0 @@
-PIN_SDA = 21
-PIN_SCL = 22
