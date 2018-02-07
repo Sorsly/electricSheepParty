@@ -21081,6 +21081,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <junction x="116.84" y="162.56"/>
 <label x="119.38" y="162.56" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="IC1" gate="Q" pin="I"/>
+<wire x1="182.88" y1="88.9" x2="177.8" y2="88.9" width="0.1524" layer="91"/>
+<label x="167.64" y="88.9" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="PWM_LED" class="0">
 <segment>
@@ -21614,6 +21619,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="U5" gate="G$1" pin="TXD0"/>
 <wire x1="147.32" y1="96.52" x2="149.86" y2="96.52" width="0.1524" layer="91"/>
 <label x="149.86" y="96.52" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="Q" pin="O"/>
+<wire x1="203.2" y1="88.9" x2="208.28" y2="88.9" width="0.1524" layer="91"/>
+<label x="205.74" y="88.9" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="AGND" class="0">

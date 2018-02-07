@@ -2585,6 +2585,9 @@ design rules under a new name.</description>
 <signal name="N$16">
 <contactref element="U2" pad="26"/>
 </signal>
+<signal name="N$4">
+<contactref element="U2" pad="25"/>
+</signal>
 </signals>
 </board>
 </drawing>
