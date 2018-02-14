@@ -624,7 +624,7 @@ func dump(t * tree, sp * Xspace,frn int, ag * agent){
 		}
 	}
 }
-func main() {
+func path() {
 	//plotting
 
 	//Config Variables

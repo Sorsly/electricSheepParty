@@ -26,6 +26,6 @@
 
 uint32_t get_usec();
 void init_wifi(void);
-void send_thread(void *pvParameters);
-void receive_thread(void *pvParameters);
+void send_thread();
+void receive_thread();
 esp_err_t esp32_wifi_eventHandler(void *ctx, system_event_t *event);

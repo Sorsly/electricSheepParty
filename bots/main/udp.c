@@ -1,10 +1,7 @@
 #include <string.h>
 #include <esp_system.h>
-#include <esp_log.h>
-#include <esp_err.h>
 #include <nvs_flash.h>
 
-#include <esp_system.h>
 
 #include "wifi.h"
 #include "i2c.h"
@@ -27,12 +24,10 @@ void app_main()
         ESP_ERROR_CHECK(nvs_flash_erase());
         nvsret = nvs_flash_init();
     }
-
-    //init_turret();
-
-    //set_angle(20);
-    init_i2c();
-    i2c_comm();
-
-
+    init_wifi();
+    while(true){
+            receive_thread();
+            move();
+            send_thread();
+    }
 }

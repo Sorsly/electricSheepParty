@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import subprocess
+from json import dumps
 dir_path = os.path.dirname(os.path.realpath(__file__))
 proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
 ipfile = "ips.txt"
@@ -19,7 +20,7 @@ def CCCP(*args):
     os.system("./genplots.sh")
 
 def getIPS(*args):
-    cpuip = subprocess.check_output(["hostname", "-I"]).decode()
+    cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
     rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
 
     query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"
@@ -30,18 +31,15 @@ def getIPS(*args):
     query = r"\d+\.\d+.\d+\.\d+"
     allIps = set(re.findall(query, rawdata))
     comIps = [ip for ip in allIps if ip not in camIps and ip not in botIps]
-    print("All IPs:", list(allIps))
+    finalip = {}
+    finalip['all'] = list(allIps)
+    finalip['cpu'] = cpuip
+    finalip['cam'] = camIps
+    finalip['bot'] = botIps
+    finalip['fes'] = comIps
 
     with open(ipfile, "w") as fh:
-        fh.write("CPU {}".format(cpuip))
-        for ip in camIps:
-            fh.write("CAM {}\n".format(ip))
-
-        for ip in botIps:
-            fh.write("BOT {}\n".format(ip))
-
-        for ip in comIps:
-            fh.write("FES {}\n".format(ip))
+        fh.write(dumps(finalip))
 
 
 def burnJTAG(*args):

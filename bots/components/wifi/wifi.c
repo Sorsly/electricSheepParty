@@ -9,7 +9,7 @@ static const char *TAG = "WIFI";
 char my_ip[32];
 //
 
-void send_thread(void *pvParameters)
+void send_thread()
 {
 
     int socket_fd;
@@ -49,7 +49,7 @@ void send_thread(void *pvParameters)
     close(socket_fd); 
 }
 
-void receive_thread(void *pvParameters)
+void receive_thread()
 {
 
     int socket_fd;
