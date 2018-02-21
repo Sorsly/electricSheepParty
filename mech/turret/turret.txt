@@ -1,0 +1,17 @@
+﻿"acryllic"= 2.85mm
+"D1@Sketch1"="acryllic"*3
+"D2@Sketch1"="acryllic"
+"wall"= 1.5mm
+"laserOD"= 6.34mm + 2 * "wall"
+"tankL"= 7.5cm
+"tankW"= 5cm
+"D3@Sketch1"="tankW"-"edgeClr"
+"D4@Sketch1"="laserOD"
+"edgeClr"= "tankW" / "edgeClr_a"
+"edgeClr_a"= 2'edgeClr_a determines how big turret edge clearance is
+"acryllicSkirt"= .5mm
+"D5@Sketch1"="acryllicSkirt"
+"D6@Sketch1"="wall"
+"D7@Sketch1"="wall"
+"D1@Boss-Extrude1"="wall"
+"D1@Boss-Extrude4"="tankL"/3
