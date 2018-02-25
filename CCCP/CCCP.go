@@ -55,7 +55,7 @@ func main() {
 	//Initializing sheep connections
 	sheeps := make([] * Sheep, len(ips.Bot))
 	for i,ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, uint16(inportstart+i))
+		sheeps[i] = initsheep(ip, host,uint16(inportstart+i))
 	}
 
 	//IDing process
@@ -92,15 +92,13 @@ func main() {
 		//BREAK PATH INTO COMMANDS
 		commandwg.Add(NUMBOTS)
 		for _,sheep := range sheeps {
-			log.Print("Launching Sheep")
 			go sheep.recState(&commandwg)
 			wait := time.NewTimer(time.Nanosecond * 500)
 			<-wait.C
 			sheep.sendCommands(outServerAddr)
 		}
-		log.Print("Waiting")
 		commandwg.Wait()
-		log.Print("Done Waiting")
+		log.Print(sheeps[0])
 
 	}
 

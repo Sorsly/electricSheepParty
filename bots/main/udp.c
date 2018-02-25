@@ -12,13 +12,13 @@ static const char *TAG = "MAIN";
 ip4_addr_t ip;
 char ip_str[30];
 bool connected_to_ap = false;
-
 void send_thread(resp rsp,commands cmd) {
 
     int socket_fd;
     struct sockaddr_in sa;
 
-    int sent_data; char data_buffer[80];
+    int sent_data;
+    char data_buffer[5];
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -32,11 +32,17 @@ void send_thread(resp rsp,commands cmd) {
     inet_pton(AF_INET, CCCPIP, &(sa.sin_addr.s_addr));
     sa.sin_family = AF_INET;
     sa.sin_port = htons(cmd.portAssign);
-    strcpy(data_buffer,"BOT STATE");
+
+    //Parse State
+    data_buffer[0] = rsp.health;
+    data_buffer[1] = rsp.accelX;
+    data_buffer[2] = rsp.accelY;
+    data_buffer[3] = rsp.orient;
+    data_buffer[4] = rsp.battery;
 
     ESP_LOGI(TAG,"SENDING");
     ESP_LOGI(TAG,"Received packet from %s:%d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
-    sent_data = sendto(socket_fd, data_buffer,sizeof("Hello World"),0,(struct sockaddr*)&sa,sizeof(sa));
+    sent_data = sendto(socket_fd, data_buffer,RESPSIZE,0,(struct sockaddr*)&sa,sizeof(sa));
     if(sent_data < 0){
 	    printf("send failed\n");
 	    close(socket_fd);
@@ -161,6 +167,7 @@ resp move(commands cmd){
     resp accumulatedstate;
 	ESP_LOGI(TAG,"DOING THINGS TO ACHIEVE DESIRED STATE");
     ESP_LOGI(TAG,"DYCLE1 %04X",cmd.sheepf);
+    accumulatedstate.battery=10;
     return accumulatedstate;
 }
 

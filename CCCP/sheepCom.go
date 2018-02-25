@@ -3,14 +3,12 @@ package main
 import (
 	"net"
 	"fmt"
-//	"time"
 	"strconv"
-	"log"
 
 	"sync"
 	"encoding/binary"
-//	"time"
 	"time"
+	"log"
 )
 const SHEEPRST = 0x01
 const SHEEPDIR1 = 0x02
@@ -48,10 +46,10 @@ type Sheep struct {
 }
 
 func (s * Sheep)String() string{
-	return fmt.Sprintf("ID: %v\nAddr: %v Port: %v\n",s.idnum,s.endpoint,s.commands.portAssign)
+	return fmt.Sprintf("ID: %v\nAddr: %v Port: %v\nResp: %v\n",s.idnum,s.endpoint,s.commands.portAssign,s.resp)
 }
 
-func initsheep(ipAdd string, respPort uint16)( * Sheep){
+func initsheep(ipAdd string, hostip string, respPort uint16)( * Sheep){
 //	ipAdd = "localhost"
 	s := new(Sheep)
 	s.idnum = -1
@@ -60,7 +58,7 @@ func initsheep(ipAdd string, respPort uint16)( * Sheep){
 
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,"1917"))
 	CheckError(err)
-	respServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,strconv.Itoa(int(respPort))))
+	respServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(hostip,strconv.Itoa(int(respPort))))
 	CheckError(err)
 
 	s.endpoint = outServerAddr
@@ -81,15 +79,19 @@ func initsheep(ipAdd string, respPort uint16)( * Sheep){
 	s.resp.battery = 0
 	return s
 }
-func (s Sheep)updateState(raw []byte) {
-	log.Println(string(raw))
+func (s *Sheep)updateState(raw []byte) {
+	log.Println()
+	s.resp.health = raw[0]
+	s.resp.accelX = raw[1]
+	s.resp.accelY = raw[2]
+	s.resp.orient = raw[3]
+	s.resp.battery = raw[4]
 }
 
-func (s Sheep)recState(group * sync.WaitGroup){
+func (s * Sheep)recState(group * sync.WaitGroup){
 	defer group.Done()
-	resp := make([]byte,24)
-	add, _ := net.ResolveUDPAddr("udp", net.JoinHostPort("192.168.42.23", "2000"))
-	respConn, err := net.ListenUDP("udp",add )
+	resp := make([]byte,5)
+	respConn, err := net.ListenUDP("udp",s.resppoint)
 	respConn.SetReadDeadline(time.Now().Add(time.Millisecond*10))
 	defer respConn.Close()
 
