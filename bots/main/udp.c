@@ -32,18 +32,18 @@ void send_thread(resp rsp,commands cmd) {
     inet_pton(AF_INET, CCCPIP, &(sa.sin_addr.s_addr));
     sa.sin_family = AF_INET;
     sa.sin_port = htons(cmd.portAssign);
+    strcpy(data_buffer,"BOT STATE");
 
-    strcpy(data_buffer,"Hello World");
-   
     ESP_LOGI(TAG,"SENDING");
+    ESP_LOGI(TAG,"Received packet from %s:%d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
     sent_data = sendto(socket_fd, data_buffer,sizeof("Hello World"),0,(struct sockaddr*)&sa,sizeof(sa));
     if(sent_data < 0){
 	    printf("send failed\n");
 	    close(socket_fd);
-	    exit(2); 
+	    exit(2);
     }
 
-    close(socket_fd); 
+    close(socket_fd);
 }
 
 commands parsecommands(char * raw){
@@ -54,7 +54,7 @@ commands parsecommands(char * raw){
     cmd.duty_cycle2= raw[3];
     cmd.tOn2= raw[4];
     cmd.servoAngle= raw[5];
-    cmd.portAssign= raw[6];
+    cmd.portAssign= (uint16_t)(raw[6] | (raw[7] << 8));
     return cmd;
 }
 commands receive_thread() {

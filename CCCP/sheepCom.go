@@ -3,10 +3,15 @@ package main
 import (
 	"net"
 	"fmt"
-	"time"
+//	"time"
 	"strconv"
-)
+	"log"
 
+	"sync"
+	"encoding/binary"
+//	"time"
+	"time"
+)
 const SHEEPRST = 0x01
 const SHEEPDIR1 = 0x02
 const SHEEPDIR2 = 0x04
@@ -31,7 +36,7 @@ type Sheep struct {
 		duty_cycle2 uint8
 		tOn2 uint8
 		servoAngle uint8
-		portAssign uint8
+		portAssign uint16
 	}
 	resp struct {
 		health uint8
@@ -46,7 +51,8 @@ func (s * Sheep)String() string{
 	return fmt.Sprintf("ID: %v\nAddr: %v Port: %v\n",s.idnum,s.endpoint,s.commands.portAssign)
 }
 
-func initsheep(ipAdd string, respPort uint8)( * Sheep){
+func initsheep(ipAdd string, respPort uint16)( * Sheep){
+//	ipAdd = "localhost"
 	s := new(Sheep)
 	s.idnum = -1
 	s.currX = -1
@@ -75,12 +81,32 @@ func initsheep(ipAdd string, respPort uint8)( * Sheep){
 	s.resp.battery = 0
 	return s
 }
-func ( s Sheep)sendCommands(commout * net.UDPAddr) (int, []byte){
+func (s Sheep)updateState(raw []byte) {
+	log.Println(string(raw))
+}
+
+func (s Sheep)recState(group * sync.WaitGroup){
+	defer group.Done()
 	resp := make([]byte,24)
+	add, _ := net.ResolveUDPAddr("udp", net.JoinHostPort("192.168.42.23", "2000"))
+	respConn, err := net.ListenUDP("udp",add )
+	respConn.SetReadDeadline(time.Now().Add(time.Millisecond*10))
+	defer respConn.Close()
+
+	_,_,err = respConn.ReadFromUDP(resp)
+
+	if err == nil {
+		s.updateState(resp)
+	}
+}
+
+func ( s Sheep)sendCommands(commout * net.UDPAddr) {
 	//commout is the string to send out commands form local address on outport
 	Conn, err := net.DialUDP("udp", nil, s.endpoint)
 	CheckError(err)
 	defer Conn.Close()
+	portsplit := make([]byte, 2)
+	binary.LittleEndian.PutUint16(portsplit, s.commands.portAssign)
 	msg := []byte{
 		s.commands.sheepF,
 		s.commands.duty_cycle1,
@@ -88,20 +114,9 @@ func ( s Sheep)sendCommands(commout * net.UDPAddr) (int, []byte){
 		s.commands.duty_cycle2,
 		s.commands.tOn2,
 		s.commands.servoAngle,
-		s.commands.portAssign,}
+		portsplit[0],
+		portsplit[1]}
 
 	Conn.Write(msg)
 
-	respConn, err := net.DialUDP("udp", nil, s.resppoint)
-	respConn.SetReadDeadline(time.Now().Add(time.Millisecond*10))
-	defer respConn.Close()
-	_,err = respConn.Read(resp)
-	fmt.Print(s.resppoint)
-	fmt.Println(resp)
-
-	if err != nil {
-		return 1, nil
-	}else {
-		return 0, resp
-	}
 }

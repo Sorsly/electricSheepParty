@@ -27,7 +27,7 @@ typedef struct commands {
     char duty_cycle2;
     char tOn2;
     char servoAngle;
-    char portAssign;
+    uint16_t    portAssign;
 } commands;
 typedef struct resp{
     char health;
