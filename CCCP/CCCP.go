@@ -16,7 +16,7 @@ type Config struct {
 	Fes [] string `json:"fes"`
 }
 
-const NUMBOTS = 6
+const NUMBOTS = 1
 const OUTPORT = "1917"
 
 func CheckError(err error) {

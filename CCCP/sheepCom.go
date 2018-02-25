@@ -3,8 +3,8 @@ package main
 import (
 	"net"
 	"fmt"
-	"strconv"
 	"time"
+	"strconv"
 )
 
 const SHEEPRST = 0x01
@@ -16,6 +16,7 @@ const SHEEPLIGHT = 0x10
 type Sheep struct {
 	idnum int
 	endpoint * net.UDPAddr
+	resppoint * net.UDPAddr
 	currX int
 	currY int
 	commands struct {
@@ -51,9 +52,13 @@ func initsheep(ipAdd string, respPort uint8)( * Sheep){
 	s.currX = -1
 	s.currY = -1
 
-	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,strconv.Itoa(int(respPort))))
+	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,"1917"))
 	CheckError(err)
+	respServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,strconv.Itoa(int(respPort))))
+	CheckError(err)
+
 	s.endpoint = outServerAddr
+	s.resppoint = respServerAddr
 
 	s.commands.sheepF = 0
 	s.commands.duty_cycle1 = 0
@@ -73,19 +78,27 @@ func initsheep(ipAdd string, respPort uint8)( * Sheep){
 func ( s Sheep)sendCommands(commout * net.UDPAddr) (int, []byte){
 	resp := make([]byte,24)
 	//commout is the string to send out commands form local address on outport
-	Conn, err := net.DialUDP("udp", commout, s.endpoint)
-	Conn.SetReadDeadline(time.Now().Add(time.Millisecond*10))
+	Conn, err := net.DialUDP("udp", nil, s.endpoint)
 	CheckError(err)
 	defer Conn.Close()
-	msg := []byte{s.commands.portAssign,
-		          s.commands.servoAngle,
-		          s.commands.duty_cycle2,
-				  s.commands.duty_cycle1,
-		          s.commands.tOn1,
-		          s.commands.tOn2,
-		          s.commands.sheepF}
+	msg := []byte{
+		s.commands.sheepF,
+		s.commands.duty_cycle1,
+		s.commands.tOn1,
+		s.commands.duty_cycle2,
+		s.commands.tOn2,
+		s.commands.servoAngle,
+		s.commands.portAssign,}
+
 	Conn.Write(msg)
-	_,err = Conn.Read(resp)
+
+	respConn, err := net.DialUDP("udp", nil, s.resppoint)
+	respConn.SetReadDeadline(time.Now().Add(time.Millisecond*10))
+	defer respConn.Close()
+	_,err = respConn.Read(resp)
+	fmt.Print(s.resppoint)
+	fmt.Println(resp)
+
 	if err != nil {
 		return 1, nil
 	}else {
