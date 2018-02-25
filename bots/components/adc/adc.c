@@ -1,4 +1,5 @@
 #include "adc.h"
+#define V_REF 1100
 static const char *TAG = "ADC";
 
 esp_adc_cal_characteristics_t init_adc(){
