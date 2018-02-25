@@ -27,6 +27,7 @@ func CheckError(err error) {
     }
 }
 
+//Loads the config file
 func getConfig(file string) Config {
 	var config Config
 	configFile, err := os.Open(file)

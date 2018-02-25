@@ -2,6 +2,7 @@
 #include <esp_system.h>
 #include <nvs_flash.h>
 #include "udp.h"
+#include "turret.h"
 
 
 const int CONNECTED_BIT = BIT0;
@@ -167,6 +168,7 @@ resp move(commands cmd){
     resp accumulatedstate;
 	ESP_LOGI(TAG,"DOING THINGS TO ACHIEVE DESIRED STATE");
     ESP_LOGI(TAG,"DYCLE1 %04X",cmd.sheepf);
+    set_angle((uint32_t)cmd.servoAngle);
     accumulatedstate.battery=10;
     return accumulatedstate;
 }
@@ -184,6 +186,7 @@ void app_main() {
         nvsret = nvs_flash_init();
     }
     init_wifi();
+    init_turret();
     while(!connected_to_ap){}
     while(true){
             nextCommands = receive_thread();
