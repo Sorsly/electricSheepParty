@@ -14,7 +14,7 @@
 #include "esp_wifi.h"
 #include "esp_log.h"
 #define CCCPIP "192.168.42.23"
-
+#define RESPSIZE 5
 typedef struct commands {
     char sheepf;
     // sheepF b0 = rst
@@ -27,7 +27,7 @@ typedef struct commands {
     char duty_cycle2;
     char tOn2;
     char servoAngle;
-    char portAssign;
+    uint16_t    portAssign;
 } commands;
 typedef struct resp{
     char health;

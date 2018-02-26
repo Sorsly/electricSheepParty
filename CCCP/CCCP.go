@@ -6,7 +6,9 @@ import (
 	"time"
 	"os"
 	"encoding/json"
+	"runtime"
 	"log"
+	"sync"
 )
 type Config struct {
 	All [] string `json:"all"`
@@ -25,6 +27,7 @@ func CheckError(err error) {
     }
 }
 
+//Loads the config file
 func getConfig(file string) Config {
 	var config Config
 	configFile, err := os.Open(file)
@@ -36,10 +39,12 @@ func getConfig(file string) Config {
 }
 
 func main() {
+	runtime.GOMAXPROCS(10)
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
 	log.Println(host)
-	inportstart := 200
+	inportstart := 2000
+	var commandwg sync.WaitGroup
 
 	// String to communicate out with bots
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, OUTPORT))
@@ -51,7 +56,7 @@ func main() {
 	//Initializing sheep connections
 	sheeps := make([] * Sheep, len(ips.Bot))
 	for i,ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, uint8(inportstart+i))
+		sheeps[i] = initsheep(ip, host,uint16(inportstart+i))
 	}
 
 	//IDing process
@@ -72,13 +77,13 @@ func main() {
 
 	//DO FRONT END COMMUNICATION STUFF
 	gamedone := false
-	for gamedone == false{
+	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
 		ids,xs,ys := cam.getPos()
 		for i,sheep := range sheeps {
 			sheep.currX = xs[i]
 			sheep.currY = ys[i]
-			if sheep.idnum != ids[i]{
+			if sheep.idnum != ids[i] {
 				panic("IDS ARE CHANGING ORDER")
 			}
 		}
@@ -86,10 +91,16 @@ func main() {
 		//FIND OUT THE PATH EVERYONE IS TAKING
 
 		//BREAK PATH INTO COMMANDS
-
+		commandwg.Add(NUMBOTS)
 		for _,sheep := range sheeps {
+			go sheep.recState(&commandwg)
+			wait := time.NewTimer(time.Nanosecond * 500)
+			<-wait.C
 			sheep.sendCommands(outServerAddr)
 		}
+		commandwg.Wait()
+		log.Print(sheeps[0])
+
 	}
 
 	log.Println("GAME COMPLETE")
