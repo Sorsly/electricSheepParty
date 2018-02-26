@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.6.1">
+<eagle version="8.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3824,6 +3824,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="43.6753" y="37.7317" size="0.6096" layer="27"/>
 </element>
 <element name="RESET1" library="DiscreteComponents" package="SW_2512" value="S2" x="53.5432" y="17.526" smashed="yes" rot="R90">
+<attribute name="COMM" value="Reset Switch" x="53.5432" y="17.526" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="NAME" x="51.2953" y="16.0147" size="0.6096" layer="25" rot="R90"/>
 <attribute name="VALUE" x="55.9181" y="17.1196" size="0.6096" layer="27" rot="R90"/>
 </element>

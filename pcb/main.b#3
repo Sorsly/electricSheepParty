@@ -3705,7 +3705,7 @@ design rules under a new name.</description>
 </element>
 <element name="J5" library="electricSheepParty" package="1X02" value="" x="16.6116" y="5.7912" smashed="yes">
 <attribute name="COMM" value="LED Connector" x="16.6116" y="5.7912" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="15.3416" y="7.1882" size="0.6096" layer="25" font="vector" ratio="20"/>
+<attribute name="NAME" x="14.8717" y="5.4737" size="0.6096" layer="25" font="vector" ratio="20" rot="R90"/>
 <attribute name="VALUE" x="15.3416" y="3.7592" size="0.6096" layer="27" font="vector" ratio="20"/>
 </element>
 <element name="Q1" library="electricSheepParty" package="SOT23-3" value="2.5A/30V/105mΩ" x="7.874" y="23.1648" smashed="yes" rot="R90">
@@ -3798,7 +3798,7 @@ design rules under a new name.</description>
 <attribute name="VERSION" value="v01" x="46.7868" y="-0.8128" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="Q2" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="SOT23" value="" x="12.446" y="2.5908" smashed="yes" rot="R90">
-<attribute name="NAME" x="12.954" y="0.9398" size="0.6096" layer="25" rot="R180"/>
+<attribute name="NAME" x="15.6972" y="2.921" size="0.6096" layer="25" rot="R180"/>
 <attribute name="VALUE" x="15.621" y="0.6858" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="R8" library="electricSheepParty" package="0603" value="2k" x="19.558" y="34.5948" smashed="yes" rot="R180">
