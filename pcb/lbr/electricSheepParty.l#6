@@ -2705,6 +2705,8 @@ Commonly used for small ceramic capacitors. Like our 0.1uF (http://www.sparkfun.
 <smd name="4" x="1.7" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
 <smd name="5" x="3.4" y="-9.9" dx="1.05" dy="2.5" layer="1"/>
 <circle x="-5" y="-7" radius="1" width="0.2032" layer="21"/>
+<text x="-6.35" y="-2.54" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="7.62" y="-2.54" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
 </package>
 <package name="SSOP16">
 <description>&lt;b&gt;SSOP-16&lt;/b&gt;&lt;p&gt;
@@ -3087,6 +3089,8 @@ Switches electronic signals</description>
 <pin name="ADJ" x="0" y="-7.62" length="short" rot="R90"/>
 <pin name="OUTPUT" x="15.24" y="5.08" length="short" rot="R180"/>
 <pin name="INPUT" x="-15.24" y="5.08" length="short"/>
+<text x="-12.7" y="7.62" size="1.27" layer="95">&gt;NAME</text>
+<text x="-12.7" y="-7.62" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="DRV8833C">
 <wire x1="10.16" y1="-10.16" x2="10.16" y2="12.7" width="0.254" layer="94"/>
