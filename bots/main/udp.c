@@ -1,15 +1,11 @@
-#include <string.h>
-#include <esp_system.h>
-#include <nvs_flash.h>
+
 #include "udp.h"
-#include "turret.h"
-
-
-const int CONNECTED_BIT = BIT0;
-const int STARTED_BIT = BIT1;
-
 
 static const char *TAG = "MAIN";
+
+static EventGroupHandle_t wifi_event_group;
+
+
 ip4_addr_t ip;
 char ip_str[30];
 bool connected_to_ap = false;
@@ -116,6 +112,7 @@ static esp_err_t cust_wifi_event_handler(void *ctx, system_event_t *event)
             ESP_ERROR_CHECK(esp_wifi_connect());
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
+        	xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
             ESP_LOGI(TAG, "********************************************");
             ESP_LOGI(TAG, "* We are now connected to AP")
@@ -128,6 +125,7 @@ static esp_err_t cust_wifi_event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_DISCONNECTED:
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
             ESP_ERROR_CHECK(esp_wifi_connect());
+            xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
             break;
         default:
             break;
@@ -139,11 +137,12 @@ static esp_err_t cust_wifi_event_handler(void *ctx, system_event_t *event)
 void init_wifi(void)
 {
     tcpip_adapter_init();
+    wifi_event_group = xEventGroupCreate();
     ESP_ERROR_CHECK( esp_event_loop_init(cust_wifi_event_handler, NULL) );
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = CONFIG_WIFI_SSID,
@@ -186,8 +185,10 @@ void app_main() {
         nvsret = nvs_flash_init();
     }
     init_wifi();
-    init_turret();
     while(!connected_to_ap){}
+    ota_example_task(wifi_event_group);
+    init_turret();
+	ESP_LOGI(TAG,"BOT ACTIVE7");
     while(true){
             nextCommands = receive_thread();
             state = move(nextCommands);

@@ -4,9 +4,17 @@ import re
 import sys
 import subprocess
 from json import dumps
+import http.server
+import socketserver
 dir_path = os.path.dirname(os.path.realpath(__file__))
 proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
 ipfile = "ips.txt"
+
+def programserver(*args):
+    os.chdir("bots")
+    os.system("make app")
+    os.chdir("build")
+    os.system("python -m SimpleHTTPServer 1944")
 
 def CCCP(*args):
     os.chdir("CPU/")
@@ -75,7 +83,8 @@ def main():
         "launchdebug": launchdebug,
         "debug": debug,
         "getIP": getIPS,
-        "cccp": CCCP
+        "cccp": CCCP,
+        "serve":programserver
     }
     if len(sys.argv) == 1 or sys.argv[1] not in available_builds:
         print("Commands:")
