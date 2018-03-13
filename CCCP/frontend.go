@@ -63,8 +63,8 @@ func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) 
 		buff.toFE.FEflags &= 0xFD
 	}
 	for _, sheep := range sheeps {
-		buff.toFE.xPos[sheep.idnum] = uint64(sheep.currX)
-		buff.toFE.yPos[sheep.idnum] = uint64(sheep.currY)
+		buff.toFE.xPos[sheep.idnum] = sheep.currX
+		buff.toFE.yPos[sheep.idnum] = sheep.currY
 		buff.toFE.turretPos[sheep.idnum] = uint64(sheep.commands.servoAngle)
 		buff.toFE.orient[sheep.idnum] = uint64(sheep.resp.orient)
 		buff.toFE.health[sheep.idnum] = uint64(sheep.resp.health)
@@ -134,9 +134,10 @@ func numtoportstr(port int) string {
 //Function to serve the data
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+        defer r.Body.Close()
 	rawBody, err := ioutil.ReadAll(r.Body)
+        log.Println(rawBody)
 	check(err)
-	log.Println(rawBody)
 	_, data := ch.FE1.Dump()
 	_, err = w.Write(data)
 	check(err)
@@ -146,14 +147,16 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	datawrite := MkChanDataWrite(100, 1)
+	datawrite := MkChanDataWrite(100, 5)
 	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	//Initializing sheep connections
-	sheeps := make([]*Sheep, 1)
-	sheeps[0] = initsheep("localhost", "localhost", uint16(1000))
-	sheeps[0].idnum = 0
+	sheeps := make([]*Sheep, 5)
+        for i := 0 ; i < 5; i +=1 {
+                sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
+                sheeps[i].idnum = i
+        }
 
 	for {
 		sheeps[0].currX += 1
