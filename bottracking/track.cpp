@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
 
 	//client
 	tcp_client c;
-	string host = "192.168.2.142";
+	string host = "127.0..0.1";
 
 	//Functional Loop
 	for(;;){
@@ -86,14 +86,15 @@ int main(int argc, char *argv[]){
 		printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
 		printBlobs(*(blobHist->begin()));
 		displayBlobs(frame, *(blobHist->begin()));
+        printf("Displaying Frame...");
 		cv::imshow("Output",frame);
 
 		//Send to Server, if they want
-		if(c.conn(host,1917)){
+	/*	if(c.conn(host,1917)){
 			blistToBytes(*(blobHist->begin()),LUT,buffer,buffs);
 			c.send_data(buffer,buffs);
 			c.closeSock();
-		}
+		}*/
 
 		cv::waitKey(time);
 	}
