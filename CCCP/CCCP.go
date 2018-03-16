@@ -50,8 +50,11 @@ func main() {
 		sheep.currY = ys[i]
 	}
 
+        //Initializing Frontend Server
+        datawrite := MkChanDataWrite(100, 5)
+        http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+        go http.ListenAndServe(numtoportstr(80), nil) 
 
-	//DO FRONT END COMMUNICATION STUFF
 	gamedone := false
 	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
@@ -65,6 +68,7 @@ func main() {
 		}
 
 		//FIND OUT THE PATH EVERYONE IS TAKING
+                datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
 		//BREAK PATH INTO COMMANDS
 		commandwg.Add(NUMBOTS)

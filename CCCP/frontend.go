@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,6 +10,20 @@ import (
 	"sync"
 	"time"
 )
+
+type FEPacket struct {
+	Ready       bool
+	Alldead     bool
+	Status      []int
+	Fires       []bool
+	Dturretposs []uint64
+	Ids         []int
+	Paths       [][]struct {
+		X float64
+		Y float64
+		Z float64
+	}
+}
 
 //The CV data buffer
 type FrontEnd struct {
@@ -26,13 +41,15 @@ type FrontEnd struct {
 	}
 	feFEmtx sync.Mutex
 	frFE    struct {
-		//FEret b0 = ready
-		//FEret b1 = alldead
-		FEret     uint8
-		fire      []uint8
-		posReq    []uint64
-		turReq    []uint64
-		orientReq []uint64
+		ready      bool
+		alldead    bool
+                path [][]struct{
+                        X float64
+                        Y float64
+                }
+		pathStatus []int
+		fire       []bool
+		turretReq  []uint64
 	}
 }
 
@@ -109,34 +126,61 @@ func (buff *FrontEnd) Dump() (read int, img []byte) {
 }
 
 //Makes the buffer
-func MkFrontEnd(numbots uint8) (buf FrontEnd) {
+func MkFrontEnd(numbots uint8,pathlength int) (buf FrontEnd) {
 	buf.numbots = numbots
 	buf.toFE.FEflags = 0
-	buf.frFE.FEret = 0
-        buf.toFE.xPos = make([]uint64,numbots)
-        buf.toFE.yPos = make([]uint64,numbots)
-        buf.toFE.turretPos = make([]uint64,numbots)
-        buf.toFE.orient = make([]uint64,numbots)
-        buf.toFE.health = make([]uint64,numbots)
+	buf.toFE.xPos = make([]uint64, numbots)
+	buf.toFE.yPos = make([]uint64, numbots)
+	buf.toFE.turretPos = make([]uint64, numbots)
+	buf.toFE.orient = make([]uint64, numbots)
+	buf.toFE.health = make([]uint64, numbots)
+
+        buf.frFE.pathStatus = make([]int,numbots)
+        buf.frFE.fire = make([]bool,numbots)
+        buf.frFE.turretReq = make([]uint64,numbots)
+        buf.frFE.path = make([][] struct{X float64; Y float64},numbots)
+        for i := 0 ; i < int(numbots); i += 1 {
+                buf.frFE.path[i] = make([]struct{X float64; Y float64}, pathlength)
+        }
 
 	return buf
 }
 
 //Makes the stream
 func MkChanDataWrite(datalen int, botcnt uint8) (writer datawrite) {
-	writer.FE1 = MkFrontEnd(botcnt)
+	writer.FE1 = MkFrontEnd(botcnt,20)
 	return
 }
 func numtoportstr(port int) string {
 	return ":" + strconv.Itoa(port)
 }
 
+func (fe *FrontEnd) loadFERaw(raw []byte) {
+	var decoded FEPacket
+	err := json.Unmarshal(raw, &decoded)
+	check(err)
+	log.Println(decoded)
+        fe.feFEmtx.Lock()
+        defer fe.feFEmtx.Unlock()
+        fe.frFE.ready = decoded.Ready
+        fe.frFE.alldead = decoded.Alldead
+        for idx, id := range decoded.Ids {
+                fe.frFE.pathStatus[id] = decoded.Status[idx]
+                fe.frFE.fire[id] = decoded.Fires[idx]
+                fe.frFE.turretReq[id] = decoded.Dturretposs[idx]
+                for step, node := range decoded.Paths[idx]{
+                        fe.frFE.path[id][step].X = node.X
+                        fe.frFE.path[id][step].Y = node.Z
+                }
+        }
+}
+
 //Function to serve the data
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-        defer r.Body.Close()
+	defer r.Body.Close()
 	rawBody, err := ioutil.ReadAll(r.Body)
-        log.Println(rawBody)
+	go ch.FE1.loadFERaw(rawBody)
 	check(err)
 	_, data := ch.FE1.Dump()
 	_, err = w.Write(data)
@@ -153,10 +197,10 @@ func main() {
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, 5)
-        for i := 0 ; i < 5; i +=1 {
-                sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
-                sheeps[i].idnum = i
-        }
+	for i := 0; i < 5; i += 1 {
+		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
+		sheeps[i].idnum = i
+	}
 
 	for {
 		sheeps[0].currX += 1
