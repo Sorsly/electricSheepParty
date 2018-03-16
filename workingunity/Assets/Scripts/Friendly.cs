@@ -6,8 +6,10 @@ using UnityEngine.AI;
 public class Friendly : MonoBehaviour {
     public GameObject selectionCircle;
     public bool isSelected;
+    public bool fire;
     public int idnum;
     public ulong turretpos;
+    public ulong desiredturretpos;
     public ulong health;
     Camera cam;
     public LayerMask groundLayer;
@@ -34,7 +36,10 @@ public class Friendly : MonoBehaviour {
         }
     }
 #endregion
-
+    public NavMeshPath pathS()
+    {
+        return path;
+    }
     private Vector3 GetPointUnderCursor()
     {
         var ray = cam.ScreenPointToRay(Input.mousePosition);

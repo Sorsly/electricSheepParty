@@ -1,17 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 using System;
+using UnityEngine;
+using UnityEngine.AI;
+using Newtonsoft.Json;
 
 class NetworkInter : MonoBehaviour
 {
     private byte[] results;
     public Friendly[] friends;
     private int numbots;
+    class toCCCP
+    {
+        public bool ready;
+        public bool alldead;
+        public List<Vector3[]> paths;
+        public List<NavMeshPathStatus> status;
+        public List<int> ids;
+        public List<bool> fires;
+        public List<ulong> Dturretposs;
+    }
     void Start()
     {
-
-
+        
 
     }
     private void Update()
@@ -24,9 +37,9 @@ class NetworkInter : MonoBehaviour
         numbots = results[0];
         ulong xPos;
         ulong yPos;
-        ulong turretPos;
         ulong orient;
         ulong health;
+        ulong turretPos;
         foreach (var friend in friends)
         {
             xPos = BitConverter.ToUInt64(results, 2 + friend.idnum * 8);
@@ -37,17 +50,40 @@ class NetworkInter : MonoBehaviour
             health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + friend.idnum * 8);
             friend.transform.position = new Vector3(xPos, friend.transform.position.y, yPos);
             friend.transform.eulerAngles = new Vector3(0, orient);
-            friend.turretpos = turretPos;
             friend.health = health;
         }
     }
-    IEnumerator Upload(Action doLast)
+    private string genJSON()
     {
-        byte[] myData = System.Text.Encoding.UTF8.GetBytes("This is some test data");
+        toCCCP tocccp = new toCCCP();
+        tocccp.ready = true;
+        tocccp.alldead = false;
+        tocccp.paths = new List<Vector3[]>();
+        tocccp.status = new List<NavMeshPathStatus>();
+        tocccp.ids = new List<int>();
+        tocccp.Dturretposs = new List<ulong>();
+        tocccp.fires = new List<bool>();
+
+        NavMeshPath sendpath = new NavMeshPath();
+        string send;
         foreach (var friend in friends)
         {
+            sendpath = friend.pathS();
+            tocccp.paths.Add(sendpath.corners);
+            tocccp.status.Add(sendpath.status);
+            tocccp.ids.Add(friend.idnum);
+            tocccp.fires.Add(friend.fire);
+            tocccp.Dturretposs.Add(friend.desiredturretpos);
         }
-            using (UnityWebRequest www = UnityWebRequest.Put("http://10.186.83.129", myData))
+        send = JsonConvert.SerializeObject(tocccp);
+        return send;
+    }
+    IEnumerator Upload(Action doLast)
+    {
+        string msg = genJSON();
+        Debug.Log(msg);
+        byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
+        using (UnityWebRequest www = UnityWebRequest.Put("http://10.186.83.129", myData))
         {
             yield return www.Send();
 
