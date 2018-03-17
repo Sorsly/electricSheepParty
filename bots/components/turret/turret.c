@@ -3,7 +3,7 @@
 static const char *TAG = "TURRET";
 
 void init_turret(){
-	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, 15));
+	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, 27));
 	mcpwm_config_t conf0;
 	conf0.frequency = 50;
 	conf0.cmpr_a = 15;

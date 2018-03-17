@@ -1,6 +1,7 @@
 
 #include "udp.h"
-
+#include "i2c.h"
+#include "motor.h"
 static const char *TAG = "MAIN";
 
 static EventGroupHandle_t wifi_event_group;
@@ -184,6 +185,7 @@ void app_main() {
         ESP_ERROR_CHECK(nvs_flash_erase());
         nvsret = nvs_flash_init();
     }
+    /*
     init_wifi();
     while(!connected_to_ap){}
     ota_example_task(wifi_event_group);
@@ -193,5 +195,11 @@ void app_main() {
             nextCommands = receive_thread();
             state = move(nextCommands);
             send_thread(state,nextCommands);
+    }
+    init_motors();
+     */
+    init_i2c();
+    while(true) {
+        i2c_comm();
     }
 }
