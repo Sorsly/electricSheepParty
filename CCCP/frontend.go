@@ -41,12 +41,12 @@ type FrontEnd struct {
 	}
 	feFEmtx sync.Mutex
 	frFE    struct {
-		ready      bool
-		alldead    bool
-                path [][]struct{
-                        X float64
-                        Y float64
-                }
+		ready   bool
+		alldead bool
+		path    [][]struct {
+			X float64
+			Y float64
+		}
 		pathStatus []int
 		fire       []bool
 		turretReq  []uint64
@@ -126,7 +126,7 @@ func (buff *FrontEnd) Dump() (read int, img []byte) {
 }
 
 //Makes the buffer
-func MkFrontEnd(numbots uint8,pathlength int) (buf FrontEnd) {
+func MkFrontEnd(numbots uint8, pathlength int) (buf FrontEnd) {
 	buf.numbots = numbots
 	buf.toFE.FEflags = 0
 	buf.toFE.xPos = make([]uint64, numbots)
@@ -135,20 +135,26 @@ func MkFrontEnd(numbots uint8,pathlength int) (buf FrontEnd) {
 	buf.toFE.orient = make([]uint64, numbots)
 	buf.toFE.health = make([]uint64, numbots)
 
-        buf.frFE.pathStatus = make([]int,numbots)
-        buf.frFE.fire = make([]bool,numbots)
-        buf.frFE.turretReq = make([]uint64,numbots)
-        buf.frFE.path = make([][] struct{X float64; Y float64},numbots)
-        for i := 0 ; i < int(numbots); i += 1 {
-                buf.frFE.path[i] = make([]struct{X float64; Y float64}, pathlength)
-        }
+	buf.frFE.pathStatus = make([]int, numbots)
+	buf.frFE.fire = make([]bool, numbots)
+	buf.frFE.turretReq = make([]uint64, numbots)
+	buf.frFE.path = make([][]struct {
+		X float64
+		Y float64
+	}, numbots)
+	for i := 0; i < int(numbots); i += 1 {
+		buf.frFE.path[i] = make([]struct {
+			X float64
+			Y float64
+		}, pathlength)
+	}
 
 	return buf
 }
 
 //Makes the stream
 func MkChanDataWrite(datalen int, botcnt uint8) (writer datawrite) {
-	writer.FE1 = MkFrontEnd(botcnt,20)
+	writer.FE1 = MkFrontEnd(botcnt, 20)
 	return
 }
 func numtoportstr(port int) string {
@@ -160,19 +166,19 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
 	log.Println(decoded)
-        fe.feFEmtx.Lock()
-        defer fe.feFEmtx.Unlock()
-        fe.frFE.ready = decoded.Ready
-        fe.frFE.alldead = decoded.Alldead
-        for idx, id := range decoded.Ids {
-                fe.frFE.pathStatus[id] = decoded.Status[idx]
-                fe.frFE.fire[id] = decoded.Fires[idx]
-                fe.frFE.turretReq[id] = decoded.Dturretposs[idx]
-                for step, node := range decoded.Paths[idx]{
-                        fe.frFE.path[id][step].X = node.X
-                        fe.frFE.path[id][step].Y = node.Z
-                }
-        }
+	fe.feFEmtx.Lock()
+	defer fe.feFEmtx.Unlock()
+	fe.frFE.ready = decoded.Ready
+	fe.frFE.alldead = decoded.Alldead
+	for idx, id := range decoded.Ids {
+		fe.frFE.pathStatus[id] = decoded.Status[idx]
+		fe.frFE.fire[id] = decoded.Fires[idx]
+		fe.frFE.turretReq[id] = decoded.Dturretposs[idx]
+		for step, node := range decoded.Paths[idx] {
+			fe.frFE.path[id][step].X = node.X
+			fe.frFE.path[id][step].Y = node.Z
+		}
+	}
 }
 
 //Function to serve the data

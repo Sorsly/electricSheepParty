@@ -1,20 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
-	"encoding/json"
 )
+
 type Config struct {
-	All [] string `json:"all"`
-	Cpu string `json:"cpu"`
-	Cam [] string `json:"cam"`
-	Bot [] string `json:"bot"`
-	Fes [] string `json:"fes"`
+	All []string `json:"all"`
+	Cpu string   `json:"cpu"`
+	Cam []string `json:"cam"`
+	Bot []string `json:"bot"`
+	Fes []string `json:"fes"`
 }
+
 func CheckError(err error) {
-	if err  != nil {
-		fmt.Println("Error: " , err)
+	if err != nil {
+		fmt.Println("Error: ", err)
 	}
 }
 
