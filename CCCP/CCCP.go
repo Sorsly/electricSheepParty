@@ -1,42 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"time"
-	"os"
-	"encoding/json"
 	"runtime"
 	"log"
 	"sync"
 )
-type Config struct {
-	All [] string `json:"all"`
-	Cpu string `json:"cpu"`
-	Cam [] string `json:"cam"`
-	Bot [] string `json:"bot"`
-	Fes [] string `json:"fes"`
-}
+
 
 const NUMBOTS = 1
 const OUTPORT = "1917"
 
-func CheckError(err error) {
-    if err  != nil {
-	    fmt.Println("Error: " , err)
-    }
-}
 
-//Loads the config file
-func getConfig(file string) Config {
-	var config Config
-	configFile, err := os.Open(file)
-	defer configFile.Close()
-	CheckError(err)
-	jsonParser := json.NewDecoder(configFile)
-	jsonParser.Decode(&config)
-	return config
-}
 
 func main() {
 	runtime.GOMAXPROCS(10)
@@ -74,8 +50,11 @@ func main() {
 		sheep.currY = ys[i]
 	}
 
+        //Initializing Frontend Server
+        datawrite := MkChanDataWrite(100, 5)
+        http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+        go http.ListenAndServe(numtoportstr(80), nil) 
 
-	//DO FRONT END COMMUNICATION STUFF
 	gamedone := false
 	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
@@ -89,6 +68,7 @@ func main() {
 		}
 
 		//FIND OUT THE PATH EVERYONE IS TAKING
+                datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
 		//BREAK PATH INTO COMMANDS
 		commandwg.Add(NUMBOTS)

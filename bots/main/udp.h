@@ -6,15 +6,22 @@
 #include <lwip/sys.h>
 #include <lwip/netdb.h>
 #include <lwip/dns.h>
-#include <emul_ip.h>
 #include <esp_event_loop.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 #include "esp_wifi.h"
 #include "esp_log.h"
+#include "turret.h"
+#include "ota.h"
+#include <esp_system.h>
+#include <nvs_flash.h>
+
 #define CCCPIP "192.168.42.23"
 #define RESPSIZE 5
+#define CONNECTED_BIT BIT0
+
+
 typedef struct commands {
     char sheepf;
     // sheepF b0 = rst

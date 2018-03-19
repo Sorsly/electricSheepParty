@@ -20,8 +20,8 @@ type Sheep struct {
 	idnum int //Sheeps Unique ID
 	endpoint * net.UDPAddr //Address to send Data
 	resppoint * net.UDPAddr //Addres to recieve data
-	currX int //Current position X
-	currY int //Current position Y
+	currX uint64 //Current position X
+	currY uint64 //Current position Y
 	commands struct {
 		sheepF uint8
 		// sheepF b0 = rst
@@ -55,8 +55,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16)( * Sheep){
 //	ipAdd = "localhost"
 	s := new(Sheep)
 	s.idnum = -1
-	s.currX = -1
-	s.currY = -1
+	s.currX = 0
+	s.currY = 0
 
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd,"1917"))
 	CheckError(err)
