@@ -190,7 +190,7 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	<-wait.C
 }
 
-func main() {
+/*func main() {
 	datawrite := MkChanDataWrite(100, 5)
 	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
@@ -210,4 +210,4 @@ func main() {
 		wait := time.NewTimer(time.Second)
 		<-wait.C
 	}
-}
+}*/

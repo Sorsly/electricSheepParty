@@ -17,7 +17,7 @@ const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
 
 type Sheep struct {
-	idnum int //Sheeps Unique ID
+	idnum uint64 //Sheeps Unique ID
 	endpoint * net.UDPAddr //Address to send Data
 	resppoint * net.UDPAddr //Addres to recieve data
 	currX uint64 //Current position X

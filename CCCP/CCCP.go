@@ -6,12 +6,13 @@ import (
 	"runtime"
 	"log"
 	"sync"
+	"net/http"
 )
 
 
 const NUMBOTS = 1
 const OUTPORT = "1917"
-
+const CAMPORT = "1918"
 
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	CheckError(err)
 
 	//Initializing camera
-	cam := initcamera(NUMBOTS)
+	cam := initcamera(NUMBOTS,CAMPORT)
 
 	//Initializing sheep connections
 	sheeps := make([] * Sheep, len(ips.Bot))
@@ -51,24 +52,32 @@ func main() {
 	}
 
         //Initializing Frontend Server
-        datawrite := MkChanDataWrite(100, 5)
-        http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
-        go http.ListenAndServe(numtoportstr(80), nil) 
+	datawrite := MkChanDataWrite(100, 5)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
 	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
 		ids,xs,ys := cam.getPos()
-		for i,sheep := range sheeps {
-			sheep.currX = xs[i]
-			sheep.currY = ys[i]
-			if sheep.idnum != ids[i] {
-				panic("IDS ARE CHANGING ORDER")
+		for _, sheep := range sheeps{
+			found := false
+			for i, id := range ids{
+				if sheep.idnum == id {
+					sheep.currX = xs[i]
+					sheep.currY = ys[i]
+					found = true
+					break
+				}
+			}
+			if !found{
+				log.Println(sheep.idnum,sheep.currX,sheep.currY)
+				panic("WE HAVE LOST A SHEEP!\nLast Position is above")
 			}
 		}
 
 		//FIND OUT THE PATH EVERYONE IS TAKING
-                datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
 		//BREAK PATH INTO COMMANDS
 		commandwg.Add(NUMBOTS)

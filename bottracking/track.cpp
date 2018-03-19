@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
 
 	//client
 	tcp_client c;
-	string host = "127.0..0.1";
+	string host = "127.0.0.1";
 
 	//Functional Loop
 	for(;;){
@@ -90,11 +90,11 @@ int main(int argc, char *argv[]){
 		cv::imshow("Output",frame);
 
 		//Send to Server, if they want
-	/*	if(c.conn(host,1917)){
+		if(c.conn(host,1918)){
 			blistToBytes(*(blobHist->begin()),LUT,buffer,buffs);
 			c.send_data(buffer,buffs);
 			c.closeSock();
-		}*/
+		}
 
 		cv::waitKey(time);
 	}
