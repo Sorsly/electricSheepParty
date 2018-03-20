@@ -1,42 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"net"
-	"time"
-	"os"
-	"encoding/json"
-	"runtime"
 	"log"
+	"net"
+	"net/http"
+	"runtime"
 	"sync"
+	"time"
 )
-type Config struct {
-	All [] string `json:"all"`
-	Cpu string `json:"cpu"`
-	Cam [] string `json:"cam"`
-	Bot [] string `json:"bot"`
-	Fes [] string `json:"fes"`
-}
 
 const NUMBOTS = 1
 const OUTPORT = "1917"
-
-func CheckError(err error) {
-    if err  != nil {
-	    fmt.Println("Error: " , err)
-    }
-}
-
-//Loads the config file
-func getConfig(file string) Config {
-	var config Config
-	configFile, err := os.Open(file)
-	defer configFile.Close()
-	CheckError(err)
-	jsonParser := json.NewDecoder(configFile)
-	jsonParser.Decode(&config)
-	return config
-}
+const CAMPORT = "1918"
 
 func main() {
 	runtime.GOMAXPROCS(10)
@@ -51,16 +26,16 @@ func main() {
 	CheckError(err)
 
 	//Initializing camera
-	cam := initcamera(NUMBOTS)
+	cam := initcamera(NUMBOTS, CAMPORT)
 
 	//Initializing sheep connections
-	sheeps := make([] * Sheep, len(ips.Bot))
-	for i,ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, host,uint16(inportstart+i))
+	sheeps := make([]*Sheep, len(ips.Bot))
+	for i, ip := range ips.Bot {
+		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
 	}
 
 	//IDing process
-	for i,sheep := range sheeps {
+	for i, sheep := range sheeps {
 		sheep.commands.sheepF |= SHEEPRST
 		sheep.commands.sheepF |= SHEEPLIGHT
 		sheep.sendCommands(outServerAddr)
@@ -68,31 +43,43 @@ func main() {
 		wait := time.NewTimer(time.Millisecond * 100)
 		<-wait.C
 
-		ids,xs,ys := cam.getPos()
+		ids, xs, ys := cam.getPos()
 		sheep.idnum = ids[i]
 		sheep.currX = xs[i]
 		sheep.currY = ys[i]
 	}
 
+	//Initializing Frontend Server
+	datawrite := MkChanDataWrite(100, 5)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	go http.ListenAndServe(numtoportstr(80), nil)
 
-	//DO FRONT END COMMUNICATION STUFF
 	gamedone := false
 	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
-		ids,xs,ys := cam.getPos()
-		for i,sheep := range sheeps {
-			sheep.currX = xs[i]
-			sheep.currY = ys[i]
-			if sheep.idnum != ids[i] {
-				panic("IDS ARE CHANGING ORDER")
+		ids, xs, ys := cam.getPos()
+		for _, sheep := range sheeps {
+			found := false
+			for i, id := range ids {
+				if sheep.idnum == id {
+					sheep.currX = xs[i]
+					sheep.currY = ys[i]
+					found = true
+					break
+				}
+			}
+			if !found {
+				log.Println(sheep.idnum, sheep.currX, sheep.currY)
+				panic("WE HAVE LOST A SHEEP!\nLast Position is above")
 			}
 		}
 
 		//FIND OUT THE PATH EVERYONE IS TAKING
+		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
 		//BREAK PATH INTO COMMANDS
 		commandwg.Add(NUMBOTS)
-		for _,sheep := range sheeps {
+		for _, sheep := range sheeps {
 			go sheep.recState(&commandwg)
 			wait := time.NewTimer(time.Nanosecond * 500)
 			<-wait.C

@@ -1,6 +1,6 @@
 # NOTE: This file is only used for configuring CLion, use regular `make` for building.
 
-set (IDF_PATH "/home/zhukov/Projects/seniordesign/esp-idf")
+set (IDF_PATH "/home/zhukov/Projects/senior/esp/esp-idf")
 
 cmake_minimum_required(VERSION 3.6)
 project(esp_idf_template)
@@ -51,6 +51,7 @@ set (INCLUDE_DIRS "")
 foreach (component ${COMPONENTS})
     list (APPEND INCLUDE_DIRS ${IDF_PATH}/components/${component}/include)
 endforeach()
+list (APPEND INCLUDE_DIRS ${IDF_PATH}/components/lwip/include/lwip)
 list(REMOVE_DUPLICATES INCLUDE_DIRS)
 include_directories(${INCLUDE_DIRS})
 include_directories("build/include")
@@ -67,9 +68,8 @@ set(SOURCE_FILES
         components/adc/adc.c
         components/emul_ip/emul_ip.c
         components/turret/turret.c
-        components/wifi/wifi.c
         components/motor/motor.c
     )
 list (APPEND SOURCE_FILES ${SOURCES})
 
-add_executable(esp_dimmer ${SOURCE_FILES})
+add_executable(sheepy ${SOURCE_FILES})

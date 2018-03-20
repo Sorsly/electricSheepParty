@@ -1,0 +1,1 @@
+bool wantPx(uchar b, uchar g, uchar r);
