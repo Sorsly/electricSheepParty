@@ -28,6 +28,9 @@ func main() {
 	//Initializing camera
 	cam := initcamera(NUMBOTS, CAMPORT)
 
+	//Initializing idhash
+	camToIdx :=make(map[uint64]*Sheep)
+
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
@@ -35,7 +38,7 @@ func main() {
 	}
 
 	//IDing process
-	for i, sheep := range sheeps {
+	for _, sheep := range sheeps {
 		sheep.commands.sheepF |= SHEEPRST
 		sheep.commands.sheepF |= SHEEPLIGHT
 		sheep.sendCommands(outServerAddr)
@@ -44,13 +47,19 @@ func main() {
 		<-wait.C
 
 		ids, xs, ys := cam.getPos()
-		sheep.idnum = ids[i]
-		sheep.currX = xs[i]
-		sheep.currY = ys[i]
+		for idx,id := range ids {
+			_, inHash := camToIdx[id]
+			if !inHash {
+				sheep.currX = xs[idx]
+				sheep.currY = ys[idx]
+				camToIdx[id] = sheep
+				break
+			}
+		}
 	}
 
 	//Initializing Frontend Server
-	datawrite := MkChanDataWrite(100, 5)
+	datawrite := MkChanDataWrite(100, 5,sheeps)
 	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 
@@ -58,19 +67,11 @@ func main() {
 	for gamedone == false {
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
 		ids, xs, ys := cam.getPos()
-		for _, sheep := range sheeps {
-			found := false
-			for i, id := range ids {
-				if sheep.idnum == id {
-					sheep.currX = xs[i]
-					sheep.currY = ys[i]
-					found = true
-					break
-				}
-			}
-			if !found {
-				log.Println(sheep.idnum, sheep.currX, sheep.currY)
-				panic("WE HAVE LOST A SHEEP!\nLast Position is above")
+		for i, id := range ids {
+			sheep,found := camToIdx[id]
+			if found {
+				sheep.currX = xs[i]
+				sheep.currY = ys[i]
 			}
 		}
 

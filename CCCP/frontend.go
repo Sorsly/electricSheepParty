@@ -29,6 +29,7 @@ type FEPacket struct {
 type FrontEnd struct {
 	numbots uint8
 	toFEmtx sync.Mutex
+	camToFEID map[*Sheep]int
 	toFE    struct {
 		//FEflags b0 = init
 		//FEflags b1 = gamestart
@@ -80,11 +81,12 @@ func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) 
 		buff.toFE.FEflags &= 0xFD
 	}
 	for _, sheep := range sheeps {
-		buff.toFE.xPos[sheep.idnum] = sheep.currX
-		buff.toFE.yPos[sheep.idnum] = sheep.currY
-		buff.toFE.turretPos[sheep.idnum] = uint64(sheep.commands.servoAngle)
-		buff.toFE.orient[sheep.idnum] = uint64(sheep.resp.orient)
-		buff.toFE.health[sheep.idnum] = uint64(sheep.resp.health)
+		FEidx := buff.camToFEID[sheep]
+		buff.toFE.xPos[FEidx] = sheep.currX
+		buff.toFE.yPos[FEidx] = sheep.currY
+		buff.toFE.turretPos[FEidx] = uint64(sheep.commands.servoAngle)
+		buff.toFE.orient[FEidx] = uint64(sheep.resp.orient)
+		buff.toFE.health[FEidx] = uint64(sheep.resp.health)
 	}
 }
 
@@ -126,8 +128,12 @@ func (buff *FrontEnd) Dump() (read int, img []byte) {
 }
 
 //Makes the buffer
-func MkFrontEnd(numbots uint8, pathlength int) (buf FrontEnd) {
+func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 	buf.numbots = numbots
+	buf.camToFEID = make(map[*Sheep]int)
+	for idx,sheep := range sheeps {
+		buf.camToFEID[sheep] = idx
+	}
 	buf.toFE.FEflags = 0
 	buf.toFE.xPos = make([]uint64, numbots)
 	buf.toFE.yPos = make([]uint64, numbots)
@@ -153,8 +159,8 @@ func MkFrontEnd(numbots uint8, pathlength int) (buf FrontEnd) {
 }
 
 //Makes the stream
-func MkChanDataWrite(datalen int, botcnt uint8) (writer datawrite) {
-	writer.FE1 = MkFrontEnd(botcnt, 20)
+func MkChanDataWrite(datalen int, botcnt uint8, sheeps []*Sheep) (writer datawrite) {
+	writer.FE1 = MkFrontEnd(botcnt, 20,sheeps)
 	return
 }
 func numtoportstr(port int) string {
