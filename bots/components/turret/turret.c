@@ -6,8 +6,8 @@ void init_turret(){
 	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, 27));
 	mcpwm_config_t conf0;
 	conf0.frequency = 50;
-	conf0.cmpr_a = 15;
-	conf0.cmpr_b = 15;
+	conf0.cmpr_a = 0;
+	conf0.cmpr_b = 0;
 	conf0.duty_mode = MCPWM_DUTY_MODE_0;
 	conf0.counter_mode = MCPWM_UP_COUNTER;
 	mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &conf0);

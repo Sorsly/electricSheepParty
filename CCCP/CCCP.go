@@ -14,6 +14,11 @@ const OUTPORT = "1917"
 const CAMPORT = "1918"
 
 func main() {
+	var servoangle uint8
+	var up uint8
+	up = 1
+	servoangle = 1
+
 	runtime.GOMAXPROCS(10)
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
@@ -38,6 +43,7 @@ func main() {
 	}
 
 	//IDing process
+	log.Println("Sheeps:",sheeps)
 	for _, sheep := range sheeps {
 		sheep.commands.sheepF |= SHEEPRST
 		sheep.commands.sheepF |= SHEEPLIGHT
@@ -47,6 +53,7 @@ func main() {
 		<-wait.C
 
 		ids, xs, ys := cam.getPos()
+		log.Println("IDS:",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
@@ -64,7 +71,9 @@ func main() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
+	log.Println("Entering Game")
 	for gamedone == false {
+		log.Println("Game Step")
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
 		ids, xs, ys := cam.getPos()
 		for i, id := range ids {
@@ -79,6 +88,14 @@ func main() {
 		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
 		//BREAK PATH INTO COMMANDS
+		for _,sheep := range sheeps{
+			sheep.commands.servoAngle =servoangle%180
+		}
+		servoangle += up
+		if servoangle %180 == 0 {
+			up = -up
+		}
+
 		commandwg.Add(NUMBOTS)
 		for _, sheep := range sheeps {
 			go sheep.recState(&commandwg)
@@ -87,7 +104,6 @@ func main() {
 			sheep.sendCommands(outServerAddr)
 		}
 		commandwg.Wait()
-		log.Print(sheeps[0])
 
 	}
 

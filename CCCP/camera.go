@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/binary"
-	"log"
 	"net"
 )
 
@@ -24,9 +23,8 @@ func (c *Camera) recvList(portnum string) {
 	for {
 		conn, err := l.Accept()
 		CheckError(err)
-		reqLen, err := conn.Read(c.buffer)
+		_, err = conn.Read(c.buffer)
 		CheckError(err)
-		log.Println(reqLen)
 		select {
 		case c.revraw <- c.buffer:
 		default:
@@ -52,11 +50,11 @@ func (c *Camera) getPos() ([]uint64, []uint64, []uint64) {
 	pos := 1
 	botnum := 0
 	for raw[pos] != 0 {
-		c.camres.ids[botnum] = binary.BigEndian.Uint64(raw[pos : pos+4])
+		c.camres.ids[botnum] = uint64(binary.BigEndian.Uint32(raw[pos : pos+4]))
 		pos += 4
-		c.camres.X[botnum] = binary.BigEndian.Uint64(raw[pos : pos+2])
+		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
 		pos += 2
-		c.camres.Y[botnum] = binary.BigEndian.Uint64(raw[pos : pos+2])
+		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
 		pos += 2
 
 		botnum += 1
@@ -65,9 +63,9 @@ func (c *Camera) getPos() ([]uint64, []uint64, []uint64) {
 	return c.camres.ids, c.camres.X, c.camres.Y
 }
 
-func main() {
+/*func main() {
 	cam := initcamera(5, "1917")
 	for {
 		cam.getPos()
 	}
-}
+}*/

@@ -47,14 +47,13 @@ type Sheep struct {
 
 // Formats print statment
 func (s *Sheep) String() string {
-	return fmt.Sprintf("ID: %v\nAddr: %v Port: %v\nResp: %v\n", s.idnum, s.endpoint, s.commands.portAssign, s.resp)
+	return fmt.Sprintf("Addr: %v Port: %v\nResp: %v\n", s.endpoint, s.commands.portAssign, s.resp)
 }
 
 //Initializes sheep
 func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	//	ipAdd = "localhost"
 	s := new(Sheep)
-	s.idnum = 0
 	s.currX = 0
 	s.currY = 0
 

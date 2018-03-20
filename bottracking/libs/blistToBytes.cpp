@@ -31,7 +31,6 @@ int blistToBytes(std::vector<blob*> * blist, short * lut, unsigned char * buff, 
 
 		xi = (int)floor((*it)->cenX);
 		yi = (int)floor((*it)->cenY);
-
 		p = (unsigned char *)&(lut[xi]);
 
 		buff[pos] = p[1];

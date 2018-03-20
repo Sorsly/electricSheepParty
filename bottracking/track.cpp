@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
 	}
 
 	//Initalize LUT + buffer
-	double scale = 0.1;
+	double scale = 1;
 	int buffs = 150;
 	short * LUT = genlut(frame,scale);
 	unsigned char * buffer = (unsigned char *)malloc(sizeof(unsigned char)*buffs);
@@ -76,7 +76,9 @@ int main(int argc, char *argv[]){
 	for(;;){
 		if(useCam){
 			cap >> frame;
-		}
+		}else {
+			frame = imread(argv[2],CV_LOAD_IMAGE_COLOR);
+                }
 		begin = clock();
 
 		//All the real computation occurs here
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-		cv::waitKey(time);
+//		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);

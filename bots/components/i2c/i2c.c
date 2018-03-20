@@ -62,5 +62,4 @@ void i2c_comm(void){
     writemag(0x02,00);
     uint8_t out = readmag(0x01);
 
-    ESP_LOGE(TAG,out);
 }

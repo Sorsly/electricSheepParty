@@ -50,18 +50,16 @@ void send_thread(resp rsp,commands cmd) {
     close(socket_fd);
 }
 
-commands parsecommands(char * raw){
-    commands cmd;
-    cmd.sheepf = raw[0];
-    cmd.duty_cycle1= raw[1];
-    cmd.tOn1= raw[2];
-    cmd.duty_cycle2= raw[3];
-    cmd.tOn2= raw[4];
-    cmd.servoAngle= raw[5];
-    cmd.portAssign= (uint16_t)(raw[6] | (raw[7] << 8));
-    return cmd;
+void parsecommands(char * raw, commands * cmd){
+    cmd->sheepf = raw[0];
+    cmd->duty_cycle1= raw[1];
+    cmd->tOn1= raw[2];
+    cmd->duty_cycle2= raw[3];
+    cmd->tOn2= raw[4];
+    cmd->servoAngle= raw[5];
+    cmd->portAssign= (uint16_t)(raw[6] | (raw[7] << 8));
 }
-commands receive_thread() {
+void receive_thread(commands *cmd) {
 
     int socket_fd;
     struct sockaddr_in sa,ra;
@@ -99,7 +97,7 @@ commands receive_thread() {
 
     }
     close(socket_fd);
-    return parsecommands(data_buffer);
+    parsecommands(data_buffer,cmd);
 
 }
 
@@ -146,8 +144,8 @@ void init_wifi(void)
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = CONFIG_WIFI_SSID,
-            .password = CONFIG_WIFI_PASSWORD,
+            .ssid = "Sliva",
+            .password = "plumsaretasty",
             .scan_method = WIFI_FAST_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
             .threshold.rssi = CONFIG_FAST_SCAN_MINIMUM_SIGNAL,
@@ -164,19 +162,20 @@ void init_wifi(void)
 
 
 
-resp move(commands cmd){
+resp move(commands * cmd){
     resp accumulatedstate;
 	ESP_LOGI(TAG,"DOING THINGS TO ACHIEVE DESIRED STATE");
-    ESP_LOGI(TAG,"DYCLE1 %04X",cmd.sheepf);
-    set_angle((uint32_t)cmd.servoAngle);
+    ESP_LOGI(TAG,"DYCLE1 %04X",cmd->sheepf);
+    set_angle((uint32_t)cmd->servoAngle);
     accumulatedstate.battery=10;
+    vTaskDelay(10);
     return accumulatedstate;
 }
 
 
 void app_main() {
 
-    commands nextCommands;
+    commands * nextCommands = malloc(sizeof(commands));
     resp state;
     //init nvs_flash
     esp_err_t nvsret = nvs_flash_init();
@@ -185,19 +184,20 @@ void app_main() {
         ESP_ERROR_CHECK(nvs_flash_erase());
         nvsret = nvs_flash_init();
     }
-    /*
+
     init_wifi();
     while(!connected_to_ap){}
-    ota_example_task(wifi_event_group);
-    init_turret();
+   // ota_example_task(wifi_event_group);
+    //init_turret();
 	ESP_LOGI(TAG,"BOT ACTIVE7");
+    init_turret();
     while(true){
-            nextCommands = receive_thread();
+            receive_thread(nextCommands);
             state = move(nextCommands);
-            send_thread(state,nextCommands);
+            send_thread(state,*nextCommands);
     }
+
     init_motors();
-     */
     init_i2c();
     while(true) {
         i2c_comm();

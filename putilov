@@ -46,7 +46,7 @@ def getIPS(*args):
     finalip['bot'] = botIps
     finalip['fes'] = comIps
 
-    with open(ipfile, "w") as fh:
+    with open("CCCP/" + ipfile, "w") as fh:
         fh.write(dumps(finalip))
 
 
@@ -75,7 +75,7 @@ def launchdebug(*args):
 
 def debug(*args):
     os.chdir("bots/")
-    os.system("xtensa-esp32-elf-gdb -x .gdbinit build/{}.elf".format(proj_name))
+    os.system("xtensa-esp32-elf-gdb -x gdbinit build/{}.elf".format(proj_name))
 
 
 def main():
