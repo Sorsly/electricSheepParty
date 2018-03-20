@@ -3797,7 +3797,11 @@ design rules under a new name.</description>
 <attribute name="VERSION" value="v01" x="46.7868" y="-0.8128" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="Q2" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="SOT23" value="" x="12.446" y="2.5908" smashed="yes" rot="R90">
+<<<<<<< HEAD
 <attribute name="NAME" x="14.5288" y="3.0099" size="0.6096" layer="25" rot="R270"/>
+=======
+<attribute name="NAME" x="15.6972" y="2.921" size="0.6096" layer="25" rot="R180"/>
+>>>>>>> origin/master
 <attribute name="VALUE" x="15.621" y="0.6858" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="R8" library="electricSheepParty" package="0603" value="2k" x="19.558" y="34.5948" smashed="yes" rot="R180">

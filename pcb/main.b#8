@@ -164,6 +164,7 @@
 <hole x="55.7276" y="50.1904" drill="1.28"/>
 <hole x="1.9812" y="1.778" drill="1.28"/>
 <hole x="56.134" y="1.6764" drill="1.28"/>
+<<<<<<< HEAD
 <text x="35.10788125" y="34.30778125" size="0.8128" layer="25">Made by Carolyn Lewelling</text>
 <text x="35.130740625" y="32.9184" size="0.8128" layer="25">&amp; Alan Han</text>
 <rectangle x1="54.61635" y1="37.16655" x2="56.86425" y2="37.20465" layer="200" rot="R90"/>
@@ -1661,6 +1662,10 @@
 <rectangle x1="45.1104" y1="36.8808" x2="45.6438" y2="36.9189" layer="200" rot="R90"/>
 <rectangle x1="45.1866" y1="36.8808" x2="45.4914" y2="36.9189" layer="200" rot="R90"/>
 <text x="55.9308" y="34.0233" size="0.0762" layer="200" font="vector" rot="R90">C:/Users/cdlew/Downloads/thick_sheep.bmp</text>
+=======
+<text x="53.48731875" y="36.44138125" size="0.8128" layer="25" rot="R90">Made by Carolyn Lewelling</text>
+<text x="54.9148" y="36.654740625" size="0.8128" layer="25" rot="R90">&amp; Alan Han</text>
+>>>>>>> origin/master
 </plain>
 <libraries>
 <library name="electricSheepParty">

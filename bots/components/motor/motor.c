@@ -1,6 +1,11 @@
 #include "motor.h"
 
 static const char *TAG = "MOTOR";
+#define PIN1_MOTOR_1 15
+#define PIN2_MOTOR_1 16
+#define PIN1_MOTOR_2 17
+#define PIN2_MOTOR_2 18
+
 
 void init_motors(){
 	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, PIN1_MOTOR_1));
