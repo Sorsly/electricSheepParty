@@ -90,8 +90,10 @@ func main() {
 				sheep.commands.sheepF &= ^SHEEPFIRE
 			}
 			log.Printf("Path Status %v\n",patstat)
+			next := getNextPoint(*sheep,pat,10)
 
-			//Going to Need Twiddling for motor movements
+			sheep.commands.relDesY = getTrueMag(next.Y - float64(sheep.currY))
+			sheep.commands.relDesX = getTrueMag(next.X - float64(sheep.currX))
 		}
 
 		//BREAK PATH INTO COMMANDS

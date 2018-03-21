@@ -17,6 +17,8 @@ const SHEEPDIR2 = 0x04
 const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
 
+const MAGFIELDOFFSET = 5
+
 type Sheep struct {
 	endpoint  *net.UDPAddr //Address to send Data
 	resppoint *net.UDPAddr //Addres to recieve data
@@ -83,7 +85,7 @@ func (s *Sheep) updateState(raw []byte) {
 	s.resp.health = raw[0]
 	s.resp.accelX = raw[1]
 	s.resp.accelY = raw[2]
-	s.resp.orient = raw[3]
+	s.resp.orient = shiftOrient(raw[3],MAGFIELDOFFSET)
 	s.resp.battery = raw[4]
 }
 
