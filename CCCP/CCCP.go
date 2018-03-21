@@ -14,11 +14,6 @@ const OUTPORT = "1917"
 const CAMPORT = "1918"
 
 func main() {
-	var servoangle uint8
-	var up uint8
-	up = 1
-	servoangle = 1
-
 	runtime.GOMAXPROCS(10)
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
@@ -83,18 +78,23 @@ func main() {
 				sheep.currY = ys[i]
 			}
 		}
-
-		//FIND OUT THE PATH EVERYONE IS TAKING
 		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
+		//FIND OUT THE PATH EVERYONE IS TAKING
+		for _, sheep := range sheeps{
+			pat, patstat, fire, turretAngl := datawrite.frInfo(sheep)
+			sheep.commands.servoAngle = uint8(turretAngl)
+			if fire {
+				sheep.commands.sheepF |= SHEEPFIRE
+			}else{
+				sheep.commands.sheepF &= ^SHEEPFIRE
+			}
+			log.Printf("Path Status %v\n",patstat)
+
+			//Going to Need Twiddling for motor movements
+		}
+
 		//BREAK PATH INTO COMMANDS
-		for _,sheep := range sheeps{
-			sheep.commands.servoAngle =servoangle%180
-		}
-		servoangle += up
-		if servoangle %180 == 0 {
-			up = -up
-		}
 
 		commandwg.Add(NUMBOTS)
 		for _, sheep := range sheeps {

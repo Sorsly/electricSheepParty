@@ -24,7 +24,10 @@ type FEPacket struct {
 		Z float64
 	}
 }
-
+type Path struct {
+	X float64
+	Y float64
+}
 //The CV data buffer
 type FrontEnd struct {
 	numbots uint8
@@ -44,10 +47,7 @@ type FrontEnd struct {
 	frFE    struct {
 		ready   bool
 		alldead bool
-		path    [][]struct {
-			X float64
-			Y float64
-		}
+		path    [][]Path
 		pathStatus []int
 		fire       []bool
 		turretReq  []uint64
@@ -59,6 +59,12 @@ type datawrite struct {
 	FE1 FrontEnd
 }
 
+func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64){
+	idx := da.FE1.camToFEID[sh]
+	da.FE1.feFEmtx.Lock()
+	defer da.FE1.feFEmtx.Unlock()
+	return da.FE1.frFE.path[idx], da.FE1.frFE.pathStatus[idx], da.FE1.frFE.fire[idx],da.FE1.frFE.turretReq[idx]
+}
 func check(e error) {
 	if e != nil {
 		log.Println(e)
@@ -144,15 +150,9 @@ func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 	buf.frFE.pathStatus = make([]int, numbots)
 	buf.frFE.fire = make([]bool, numbots)
 	buf.frFE.turretReq = make([]uint64, numbots)
-	buf.frFE.path = make([][]struct {
-		X float64
-		Y float64
-	}, numbots)
+	buf.frFE.path = make([][]Path, numbots)
 	for i := 0; i < int(numbots); i += 1 {
-		buf.frFE.path[i] = make([]struct {
-			X float64
-			Y float64
-		}, pathlength)
+		buf.frFE.path[i] = make([]Path, pathlength)
 	}
 
 	return buf
