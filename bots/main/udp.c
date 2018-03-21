@@ -189,6 +189,10 @@ void app_main() {
     while(!connected_to_ap){}
    // ota_example_task(wifi_event_group);
     //init_turret();
+    init_i2c();
+    while(true) {
+        i2c_comm();
+    }
 	ESP_LOGI(TAG,"BOT ACTIVE7");
     init_turret();
     while(true){
@@ -198,8 +202,4 @@ void app_main() {
     }
 
     init_motors();
-    init_i2c();
-    while(true) {
-        i2c_comm();
-    }
 }

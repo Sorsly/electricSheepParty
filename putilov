@@ -52,11 +52,12 @@ def getIPS(*args):
 
 def burnJTAG(*args):
     os.chdir("bots")
-    os.system("make flash")
+    err = os.system("make flash")
 
     os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg -c \"program_esp32 build/bootloader/bootloader.bin 0x1000 verify exit\"")
     os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg -c \"program_esp32 build/partitions_singleapp.bin 0x8000 verify exit\"")
     os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg -c \"program_esp32 build/{}.bin 0x10000 verify exit\"".format(proj_name))
+    launchdebug()
 
 
 def burnUART(*args):

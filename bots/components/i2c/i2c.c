@@ -18,6 +18,9 @@ void init_i2c(void){
 	    return;
     }
     ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0,I2C_MODE_MASTER,0,0,0));
+    writemag(0x00,0x10);
+    writemag(0x01,0x20);
+    writemag(0x02,0x00);
     return;
 
 }
@@ -59,7 +62,12 @@ uint8_t readmag(uint8_t addr){
     return ret;
 }
 void i2c_comm(void){
-    writemag(0x02,00);
-    uint8_t out = readmag(0x01);
+    uint8_t out = readmag(0x09);
+    uint8_t x_low;
+    if (out & 0x01) {
+            x_low = readmag(0x04);
+            ESP_LOGI(TAG,"%d\n",x_low);
+    }
+    //readmag(0x04);
 
 }
