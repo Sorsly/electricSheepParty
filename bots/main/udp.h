@@ -29,10 +29,8 @@ typedef struct commands {
     // sheepF b2 = dir2
     // sheepF b3 = fire
     // sheepF b4 = lightOn
-    char duty_cycle1;
-    char tOn1;
-    char duty_cycle2;
-    char tOn2;
+    char relDesX;
+    char relDesY;
     char servoAngle;
     uint16_t    portAssign;
 } commands;
