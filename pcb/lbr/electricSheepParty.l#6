@@ -3113,6 +3113,8 @@ Switches electronic signals</description>
 <pin name="VINT" x="15.24" y="5.08" length="middle" rot="R180"/>
 <pin name="AIN2" x="15.24" y="7.62" length="middle" rot="R180"/>
 <pin name="AIN1" x="15.24" y="10.16" length="middle" rot="R180"/>
+<text x="-10.16" y="12.7" size="1.27" layer="95">&gt;NAME</text>
+<text x="-10.16" y="-12.7" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="AP1506">
 <wire x1="-10.16" y1="-7.62" x2="-10.16" y2="7.62" width="0.254" layer="94"/>

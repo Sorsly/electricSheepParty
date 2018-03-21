@@ -3983,7 +3983,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="25.4" y="27.3304" size="0.0254" layer="27" rot="R90"/>
 </element>
 <element name="TP17" library="testpad" library_urn="urn:adsk.eagle:library:385" package="P1-13" package3d_urn="urn:adsk.eagle:package:27946/1" value="TPPAD1-13" x="29.6164" y="37.9476" smashed="yes" rot="R90">
-<attribute name="NAME" x="28.3464" y="36.9316" size="0.6096" layer="25" ratio="10" rot="R90"/>
+<attribute name="NAME" x="30.5435" y="39.9669" size="0.6096" layer="25" ratio="10" rot="R180"/>
 <attribute name="TP_SIGNAL_NAME" value="" x="32.1564" y="36.6776" size="1" layer="37" rot="R90"/>
 <attribute name="VALUE" x="29.6164" y="37.9476" size="0.0254" layer="27" rot="R90"/>
 </element>
