@@ -17,6 +17,8 @@ const SHEEPDIR2 = 0x04
 const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
 
+const MAGFIELDOFFSET = 5
+
 type Sheep struct {
 	endpoint  *net.UDPAddr //Address to send Data
 	resppoint *net.UDPAddr //Addres to recieve data
@@ -29,10 +31,8 @@ type Sheep struct {
 		// sheepF b2 = dir2
 		// sheepF b3 = fire
 		// sheepF b4 = lightOn
-		duty_cycle1 uint8  // Left Duty Cycle
-		tOn1        uint8  // How long to run the motor
-		duty_cycle2 uint8  // Right Duty Cicle
-		tOn2        uint8  // How long to run the motor
+		relDesX		uint8  // Relative Desired X Position
+		relDesY uint8  // Relative Desired Y Position
 		servoAngle  uint8  //Angle to set the servo to
 		portAssign  uint16 //Assigned port
 	}
@@ -66,10 +66,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.resppoint = respServerAddr
 
 	s.commands.sheepF = 0
-	s.commands.duty_cycle1 = 0
-	s.commands.tOn1 = 0
-	s.commands.duty_cycle2 = 0
-	s.commands.tOn2 = 0
+	s.commands.relDesX = 0
+	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
 
@@ -87,7 +85,7 @@ func (s *Sheep) updateState(raw []byte) {
 	s.resp.health = raw[0]
 	s.resp.accelX = raw[1]
 	s.resp.accelY = raw[2]
-	s.resp.orient = raw[3]
+	s.resp.orient = shiftOrient(raw[3],MAGFIELDOFFSET)
 	s.resp.battery = raw[4]
 }
 
@@ -116,10 +114,8 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	binary.LittleEndian.PutUint16(portsplit, s.commands.portAssign)
 	msg := []byte{
 		s.commands.sheepF,
-		s.commands.duty_cycle1,
-		s.commands.tOn1,
-		s.commands.duty_cycle2,
-		s.commands.tOn2,
+		s.commands.relDesX,
+		s.commands.relDesY,
 		s.commands.servoAngle,
 		portsplit[0],
 		portsplit[1]}

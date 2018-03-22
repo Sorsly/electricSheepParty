@@ -52,12 +52,10 @@ void send_thread(resp rsp,commands cmd) {
 
 void parsecommands(char * raw, commands * cmd){
     cmd->sheepf = raw[0];
-    cmd->duty_cycle1= raw[1];
-    cmd->tOn1= raw[2];
-    cmd->duty_cycle2= raw[3];
-    cmd->tOn2= raw[4];
-    cmd->servoAngle= raw[5];
-    cmd->portAssign= (uint16_t)(raw[6] | (raw[7] << 8));
+    cmd->relDesX = raw[1];
+    cmd->relDesY = raw[2];
+    cmd->servoAngle= raw[3];
+    cmd->portAssign= (uint16_t)(raw[4] | (raw[5] << 8));
 }
 void receive_thread(commands *cmd) {
 
@@ -189,6 +187,10 @@ void app_main() {
     while(!connected_to_ap){}
    // ota_example_task(wifi_event_group);
     //init_turret();
+    init_i2c();
+    while(true) {
+        i2c_comm();
+    }
 	ESP_LOGI(TAG,"BOT ACTIVE7");
     init_turret();
     while(true){
@@ -198,8 +200,4 @@ void app_main() {
     }
 
     init_motors();
-    init_i2c();
-    while(true) {
-        i2c_comm();
-    }
 }
