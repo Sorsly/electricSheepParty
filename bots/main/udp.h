@@ -50,7 +50,7 @@ typedef struct resp{
 uint32_t get_usec();
 void init_wifi(void);
 void send_thread(resp,commands);
-resp move(commands * cmd);
+void move(commands * cmd,resp * state);
 void receive_thread(commands *);
 void parsecommands(char * raw,commands *);
 esp_err_t esp32_wifi_eventHandler(void *ctx, system_event_t *event);

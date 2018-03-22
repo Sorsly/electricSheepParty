@@ -6,6 +6,13 @@ static const char *TAG = "MAIN";
 
 static EventGroupHandle_t wifi_event_group;
 
+//INPUT PINS
+static const uint64_t photorec = (1 <<1);
+//OUTPUT PINS
+static const uint64_t topled = (1 <<3);
+static const uint64_t laser = (1 <<2);
+static const uint64_t debugR = (1 <<4);
+static const uint64_t debugG = (1 <<16);
 
 ip4_addr_t ip;
 char ip_str[30];
@@ -160,21 +167,36 @@ void init_wifi(void)
 
 
 
-resp move(commands * cmd){
-    resp accumulatedstate;
+void move(commands * cmd, resp *state){
 	ESP_LOGI(TAG,"DOING THINGS TO ACHIEVE DESIRED STATE");
     ESP_LOGI(TAG,"DYCLE1 %04X",cmd->sheepf);
     set_angle((uint32_t)cmd->servoAngle);
-    accumulatedstate.battery=10;
+    canhit(&(state->health));
     vTaskDelay(10);
-    return accumulatedstate;
 }
 
 
+void init_gpio(){
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = (topled|laser|debugG|debugR);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+
+    io_conf.intr_type = GPIO_PIN_INTR_POSEDGE;
+    io_conf.pin_bit_mask = photorec;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 1;
+    gpio_config(&io_conf);
+
+}
 void app_main() {
 
     commands * nextCommands = malloc(sizeof(commands));
-    resp state;
+    resp * state = malloc(sizeof(state));
+    state->health = 10;
     //init nvs_flash
     esp_err_t nvsret = nvs_flash_init();
 
@@ -186,17 +208,25 @@ void app_main() {
     init_wifi();
     while(!connected_to_ap){}
    // ota_example_task(wifi_event_group);
-    //init_turret();
+    init_turret(&(state->health));
     init_i2c();
+    init_motors();
+    init_gpio();
     while(true) {
-        i2c_comm();
+        //i2c_comm();
+        canhit(&(state->health));
+        fire_laser(true);
+        top_on(true);
+        vTaskDelay(1000);
+        fire_laser(false);
+        top_on(false);
+        vTaskDelay(1000);
     }
 	ESP_LOGI(TAG,"BOT ACTIVE7");
-    init_turret();
     while(true){
             receive_thread(nextCommands);
-            state = move(nextCommands);
-            send_thread(state,*nextCommands);
+            move(nextCommands,state);
+            send_thread(*state,*nextCommands);
     }
 
     init_motors();

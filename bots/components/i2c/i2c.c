@@ -69,5 +69,4 @@ void i2c_comm(void){
             ESP_LOGI(TAG,"%d\n",x_low);
     }
     //readmag(0x04);
-
 }
