@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/binary"
 	"net"
-        "log"
 )
 
 type Camera struct {
@@ -15,7 +14,7 @@ type Camera struct {
 		Y   []uint64
 	}
 }
-const LENGTHFIELD = 4000
+
 func (c *Camera) recvList(portnum string) {
 
 	l, err := net.Listen("tcp", "localhost:"+portnum)
@@ -65,9 +64,4 @@ func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
 }
 
 
-func main() {
-	cam := initcamera(5, "1918")
-	for {
-		log.Println(cam.getPos(LENGTHFIELD))
-	}
-}
+

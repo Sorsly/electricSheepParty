@@ -202,29 +202,4 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	<-wait.C
 }
 
-/*func main() {
 
-	//Initializing sheep connections
-	sheeps := make([]*Sheep, 2)
-	for i := 0; i < 2; i += 1 {
-		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
-	}
-	datawrite := MkChanDataWrite(100, 2,sheeps)
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
-	go http.ListenAndServe(numtoportstr(80), nil)
-        sheeps[0].currX = 1
-        sheeps[0].currY = 1
-        sheeps[1].currX = 10
-        sheeps[1].currY = 10
-
-	for {
-                sheeps[0].commands.servoAngle += 1
-                if sheeps[0].commands.servoAngle == 180{
-                        sheeps[0].commands.servoAngle = 0
-                }
-		datawrite.FE1.UpdateGndBots(sheeps, false, false)
-		log.Println("updoot")
-		wait := time.NewTimer(time.Second)
-		<-wait.C
-	}
-}*/
