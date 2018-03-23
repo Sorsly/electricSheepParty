@@ -60,9 +60,8 @@ int main(int argc, char *argv[]){
 	}
 
 	//Initalize LUT + buffer
-	double scale = 1;
 	int buffs = 150;
-	short * LUT = genlut(frame,scale);
+	short * LUT = genlut(frame);
 	unsigned char * buffer = (unsigned char *)malloc(sizeof(unsigned char)*buffs);
 	for( int i = 0; i < buffs;i++){
 		buffer[i] = 0x00;
@@ -85,10 +84,10 @@ int main(int argc, char *argv[]){
 		addBlobMem(frame,blobHist, memory);
 
 		//For display purposes
-		printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
-		printBlobs(*(blobHist->begin()));
+		//printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
+//		printBlobs(*(blobHist->begin()));
 		displayBlobs(frame, *(blobHist->begin()));
-        printf("Displaying Frame...");
+        //printf("Displaying Frame...");
 		cv::imshow("Output",frame);
 
 		//Send to Server, if they want

@@ -3,12 +3,13 @@
 using namespace cv;
 using namespace std;
 
-short * genlut(cv::Mat ref, double scale){
+short * genlut(cv::Mat ref){
 	int max = ref.cols;
 
 	if(max < ref.rows){
 		max = ref.rows;
 	}
+	float scale = 65536/max;
 
 	short * lut = (short *)malloc(sizeof(short)*max);
 

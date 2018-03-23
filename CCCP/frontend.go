@@ -91,7 +91,7 @@ func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) 
 		buff.toFE.xPos[FEidx] = sheep.currX
 		buff.toFE.yPos[FEidx] = sheep.currY
 		buff.toFE.turretPos[FEidx] = uint64(sheep.commands.servoAngle)
-		buff.toFE.orient[FEidx] = uint64(sheep.resp.orient)
+		buff.toFE.orient[FEidx] = uint64(sheep.resp.orient)*360/255
 		buff.toFE.health[FEidx] = uint64(sheep.resp.health)
 	}
 }
@@ -202,7 +202,7 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	<-wait.C
 }
 
-func main() {
+/*func main() {
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, 2)
@@ -227,4 +227,4 @@ func main() {
 		wait := time.NewTimer(time.Second)
 		<-wait.C
 	}
-}
+}*/

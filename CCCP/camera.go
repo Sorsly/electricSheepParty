@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"net"
+        "log"
 )
 
 type Camera struct {
@@ -14,12 +15,11 @@ type Camera struct {
 		Y   []uint64
 	}
 }
-
+const LENGTHFIELD = 4000
 func (c *Camera) recvList(portnum string) {
 
 	l, err := net.Listen("tcp", "localhost:"+portnum)
 	CheckError(err)
-	defer l.Close()
 	for {
 		conn, err := l.Accept()
 		CheckError(err)
@@ -29,6 +29,7 @@ func (c *Camera) recvList(portnum string) {
 		case c.revraw <- c.buffer:
 		default:
 		}
+                conn.Close()
 
 	}
 }
@@ -44,7 +45,7 @@ func initcamera(botcnt int, portlisten string) *Camera {
 	return c
 }
 
-func (c *Camera) getPos() ([]uint64, []uint64, []uint64) {
+func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
 	//UPDATE POSITION
 	raw := <-c.revraw
 	pos := 1
@@ -52,9 +53,9 @@ func (c *Camera) getPos() ([]uint64, []uint64, []uint64) {
 	for raw[pos] != 0 {
 		c.camres.ids[botnum] = uint64(binary.BigEndian.Uint32(raw[pos : pos+4]))
 		pos += 4
-		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
+		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536
 		pos += 2
-		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
+		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536
 		pos += 2
 
 		botnum += 1
@@ -63,9 +64,10 @@ func (c *Camera) getPos() ([]uint64, []uint64, []uint64) {
 	return c.camres.ids, c.camres.X, c.camres.Y
 }
 
-/*func main() {
-	cam := initcamera(5, "1917")
+
+func main() {
+	cam := initcamera(5, "1918")
 	for {
-		cam.getPos()
+		log.Println(cam.getPos(LENGTHFIELD))
 	}
-}*/
+}

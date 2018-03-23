@@ -10,6 +10,7 @@ import (
 )
 
 const NUMBOTS = 1
+const LENGTHFIELD = 4000
 const OUTPORT = "1917"
 const CAMPORT = "1918"
 
@@ -70,7 +71,7 @@ func main() {
 	for gamedone == false {
 		log.Println("Game Step")
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
-		ids, xs, ys := cam.getPos()
+		ids, xs, ys := cam.getPos(LENGTHFIELD)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
 			if found {
@@ -87,7 +88,7 @@ func main() {
 			if fire {
 				sheep.commands.sheepF |= SHEEPFIRE
 			}else{
-				sheep.commands.sheepF &= ^SHEEPFIRE
+				sheep.commands.sheepF &= 0xF7
 			}
 			log.Printf("Path Status %v\n",patstat)
 			next := getNextPoint(*sheep,pat,10)
