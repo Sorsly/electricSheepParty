@@ -171,7 +171,6 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	var decoded FEPacket
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
-	log.Println(decoded)
 	fe.feFEmtx.Lock()
 	defer fe.feFEmtx.Unlock()
 	fe.frFE.ready = decoded.Ready
@@ -185,6 +184,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 			fe.frFE.path[id][step].Y = node.Z
 		}
 	}
+        log.Println(fe.frFE)
 }
 
 //Function to serve the data
@@ -202,24 +202,29 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	<-wait.C
 }
 
-/*func main() {
-	datawrite := MkChanDataWrite(100, 5)
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
-	go http.ListenAndServe(numtoportstr(80), nil)
+func main() {
 
 	//Initializing sheep connections
-	sheeps := make([]*Sheep, 5)
-	for i := 0; i < 5; i += 1 {
+	sheeps := make([]*Sheep, 2)
+	for i := 0; i < 2; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
-		sheeps[i].idnum = i
 	}
+	datawrite := MkChanDataWrite(100, 2,sheeps)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	go http.ListenAndServe(numtoportstr(80), nil)
+        sheeps[0].currX = 1
+        sheeps[0].currY = 1
+        sheeps[1].currX = 10
+        sheeps[1].currY = 10
 
 	for {
-		sheeps[0].currX += 1
-		sheeps[0].currY += 1
+                sheeps[0].commands.servoAngle += 1
+                if sheeps[0].commands.servoAngle == 180{
+                        sheeps[0].commands.servoAngle = 0
+                }
 		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 		log.Println("updoot")
 		wait := time.NewTimer(time.Second)
 		<-wait.C
 	}
-}*/
+}
