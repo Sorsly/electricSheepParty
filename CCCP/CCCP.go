@@ -10,10 +10,11 @@ import (
 )
 
 const NUMBOTS = 1
+const LENGTHFIELD = 4000
 const OUTPORT = "1917"
 const CAMPORT = "1918"
 
-func main() {
+func main_full() {
 	runtime.GOMAXPROCS(10)
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
@@ -47,7 +48,7 @@ func main() {
 		wait := time.NewTimer(time.Millisecond * 100)
 		<-wait.C
 
-		ids, xs, ys := cam.getPos()
+		ids, xs, ys := cam.getPos(LENGTHFIELD)
 		log.Println("IDS:",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
@@ -70,7 +71,7 @@ func main() {
 	for gamedone == false {
 		log.Println("Game Step")
 		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
-		ids, xs, ys := cam.getPos()
+		ids, xs, ys := cam.getPos(LENGTHFIELD)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
 			if found {
@@ -87,7 +88,7 @@ func main() {
 			if fire {
 				sheep.commands.sheepF |= SHEEPFIRE
 			}else{
-				sheep.commands.sheepF &= ^SHEEPFIRE
+				sheep.commands.sheepF &= 0xF7
 			}
 			log.Printf("Path Status %v\n",patstat)
 			next := getNextPoint(*sheep,pat,10)
@@ -110,4 +111,41 @@ func main() {
 	}
 
 	log.Println("GAME COMPLETE")
+}
+
+func main_frontend() {
+
+	//Initializing sheep connections
+	sheeps := make([]*Sheep, 2)
+	for i := 0; i < 2; i += 1 {
+		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
+	}
+	datawrite := MkChanDataWrite(100, 2,sheeps)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	go http.ListenAndServe(numtoportstr(80), nil)
+	sheeps[0].currX = 1
+	sheeps[0].currY = 1
+	sheeps[1].currX = 10
+	sheeps[1].currY = 10
+
+	for {
+		sheeps[0].commands.servoAngle += 1
+		if sheeps[0].commands.servoAngle == 180{
+			sheeps[0].commands.servoAngle = 0
+		}
+		datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		log.Println("updoot")
+		wait := time.NewTimer(time.Second)
+		<-wait.C
+	}
+}
+func main_camera() {
+	cam := initcamera(5, "1918")
+	for {
+		log.Println(cam.getPos(LENGTHFIELD))
+	}
+}
+
+func main(){
+	main_camera()
 }

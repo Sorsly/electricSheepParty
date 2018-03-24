@@ -3,4 +3,4 @@
 using namespace cv;
 using namespace std;
 
-short * genlut(cv::Mat, double);
+short * genlut(cv::Mat);
