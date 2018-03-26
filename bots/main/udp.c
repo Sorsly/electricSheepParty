@@ -14,9 +14,13 @@ static const uint64_t laser = (1 <<2);
 static const uint64_t debugR = (1 <<4);
 static const uint64_t debugG = (1 <<16);
 
+
 ip4_addr_t ip;
 char ip_str[30];
 bool connected_to_ap = false;
+double startXorient = 0;
+double startYorient = 0;
+
 void send_thread(resp rsp,commands cmd) {
 
     int socket_fd;
@@ -172,7 +176,12 @@ void move(commands * cmd, resp *state){
     ESP_LOGI(TAG,"DYCLE1 %04X",cmd->sheepf);
     set_angle((uint32_t)cmd->servoAngle);
     canhit(&(state->health));
-    vTaskDelay(10);
+    fire_laser(true);
+    top_on(true);
+    fire_laser(false);
+    top_on(false);
+    double theta = getRawTheta(startXorient,startYorient);
+    state->orient =  (char)(theta*255/360);
 }
 
 
@@ -210,18 +219,42 @@ void app_main() {
    // ota_example_task(wifi_event_group);
     init_turret(&(state->health));
     init_i2c();
+
+    uint8_t out = readmag(0x09);
+    uint8_t x_low;
+    uint8_t y_low;
+    uint8_t x_high;
+    uint8_t y_high;
+    int numsamples = 100;
+    uint8_t * databuff = malloc(sizeof(uint8_t)*6);
+    for(int i = 0;i < numsamples; i ++) {
+        out = 0x13; //readmag(0x09);
+        if (out & 0x01) {
+            /*  x_low = readmag(0x04);
+              y_low = readmag(0x06);
+              z_low = readmag(0x08);
+              x_high = readmag(0x03);
+              y_high = readmag(0x05);
+              z_high = readmag(0x07);
+              */
+            readMagData(databuff);
+            x_high = databuff[0];
+            x_low = databuff[1];
+            y_high = databuff[2];
+            y_low = databuff[3];
+            startXorient += (int16_t)(((uint16_t)x_high<<8) | x_low);
+            startYorient += (int16_t)(((uint16_t)y_high<<8) | y_low);
+        } else{
+            i--;
+        }
+    }
+    startXorient = startXorient/numsamples;
+    startYorient = startYorient/numsamples;
+
+
     init_motors();
     init_gpio();
-    while(true) {
-        //i2c_comm();
-        canhit(&(state->health));
-        fire_laser(true);
-        top_on(true);
-        vTaskDelay(1000);
-        fire_laser(false);
-        top_on(false);
-        vTaskDelay(1000);
-    }
+    double angle;
 	ESP_LOGI(TAG,"BOT ACTIVE7");
     while(true){
             receive_thread(nextCommands);

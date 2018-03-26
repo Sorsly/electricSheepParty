@@ -107,6 +107,7 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 		}
 		commandwg.Wait()
+		log.Println(sheeps[0].resp.orient)
 
 	}
 
@@ -147,5 +148,5 @@ func main_camera() {
 }
 
 func main(){
-	main_camera()
+	main_full()
 }
