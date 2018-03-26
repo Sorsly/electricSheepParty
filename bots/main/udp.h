@@ -22,6 +22,7 @@
 #define CONNECTED_BIT BIT0
 
 
+//Commands coming in from the CCCP
 typedef struct commands {
     char sheepf;
     // sheepF b0 = rst
@@ -29,11 +30,15 @@ typedef struct commands {
     // sheepF b2 = dir2
     // sheepF b3 = fire
     // sheepF b4 = lightOn
+    //The relative position that the bot should travel to, given itself as the origin
     char relDesX;
     char relDesY;
     char servoAngle;
+    //Assigned response port
     uint16_t    portAssign;
 } commands;
+
+//The data sent back to the CCCP
 typedef struct resp{
     char health;
     char accelX;
@@ -42,9 +47,6 @@ typedef struct resp{
     char battery;
 }resp;
 
-#define EXAMPLE_WIFI_PORT CONFIG_WIFI_PORT
-#define EXAMPLE_WIFI_SSID CONFIG_WIFI_SSID
-#define EXAMPLE_WIFI_PASS CONFIG_WIFI_PASSWORD
 #define RECEIVER_PORT_NUM 1917
 
 uint32_t get_usec();

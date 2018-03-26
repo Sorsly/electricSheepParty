@@ -1,3 +1,4 @@
+//Pathfinder is a horrible behemoth of code
 package main
 
 import (

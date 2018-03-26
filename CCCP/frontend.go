@@ -1,3 +1,9 @@
+/*
+Frontend is the interface for communicating with the frontends, recieveing commands, and preparing the
+game state in a way the frontend can parse and display
+
+ */
+
 package main
 
 import (
@@ -12,11 +18,17 @@ import (
 )
 
 type FEPacket struct {
+	//The front end is ready to play
 	Ready       bool
+	//All of the frontend is dead
 	Alldead     bool
+	//Status of the front ends path for each bot
 	Status      []int
+	//Which bots should fire
 	Fires       []bool
+	//Desired position of the turret
 	Dturretposs []uint64
+	//All the IDs of the bots, in integers
 	Ids         []int
 	Paths       [][]struct {
 		X float64
@@ -24,6 +36,7 @@ type FEPacket struct {
 		Z float64
 	}
 }
+//Node in a path
 type Path struct {
 	X float64
 	Y float64
@@ -59,6 +72,7 @@ type datawrite struct {
 	FE1 FrontEnd
 }
 
+//for a certain sheep, give the desired commands for that sheep
 func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64){
 	idx := da.FE1.camToFEID[sh]
 	da.FE1.feFEmtx.Lock()
@@ -71,6 +85,7 @@ func check(e error) {
 	}
 }
 
+//This takes in the sheep and game state and updates the datastructure which is sent to the frontend
 func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) {
 	buff.toFEmtx.Lock()
 	defer buff.toFEmtx.Unlock()
@@ -96,7 +111,7 @@ func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) 
 	}
 }
 
-//Outputs the data from the cv buffer
+//Takes the frontend data and loads it into a big byte array, for sending as a response body to the frontend
 func (buff *FrontEnd) Dump() (read int, img []byte) {
 	datasize := 40*buff.numbots + 2
 	buff.toFEmtx.Lock()
@@ -133,7 +148,7 @@ func (buff *FrontEnd) Dump() (read int, img []byte) {
 
 }
 
-//Makes the buffer
+//Makes the frontend buffer
 func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 	buf.numbots = numbots
 	buf.camToFEID = make(map[*Sheep]int)
@@ -163,10 +178,12 @@ func MkChanDataWrite(datalen int, botcnt uint8, sheeps []*Sheep) (writer datawri
 	writer.FE1 = MkFrontEnd(botcnt, 20,sheeps)
 	return
 }
+//util function
 func numtoportstr(port int) string {
 	return ":" + strconv.Itoa(port)
 }
 
+//Takes the raw request body from the frontend and parses it into the command structure for each id
 func (fe *FrontEnd) loadFERaw(raw []byte) {
 	var decoded FEPacket
 	err := json.Unmarshal(raw, &decoded)
@@ -187,7 +204,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
         log.Println(fe.frFE)
 }
 
-//Function to serve the data
+//Function to serve the data as a server, ba dum chi
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	defer r.Body.Close()

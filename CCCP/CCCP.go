@@ -1,3 +1,5 @@
+//CCCP stands for Central Computation and Control Processor. It handles unifying the state of the
+//Game between the two front ends and all of the bots on the field
 package main
 
 import (
@@ -9,16 +11,19 @@ import (
 	"time"
 )
 
-const NUMBOTS = 1
-const LENGTHFIELD = 4000
-const OUTPORT = "1917"
-const CAMPORT = "1918"
+const NUMBOTS = 1 //Number of bots in the game
+const LENGTHFIELD = 4000 // How long the field actually is in terms of millimeters
+const OUTPORT = "1917" // The port the bots will recieve commands from
+const CAMPORT = "1918" //The port the camera will send its data down
 
+//Running main process
 func main_full() {
 	runtime.GOMAXPROCS(10)
+	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
 	log.Println(host)
+	//This is the starting port for the sheeps response
 	inportstart := 2000
 	var commandwg sync.WaitGroup
 
@@ -29,7 +34,7 @@ func main_full() {
 	//Initializing camera
 	cam := initcamera(NUMBOTS, CAMPORT)
 
-	//Initializing idhash
+	//Initializing idhash. used to get a certain sheep object from an id
 	camToIdx :=make(map[uint64]*Sheep)
 
 	//Initializing sheep connections
@@ -38,9 +43,13 @@ func main_full() {
 		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
 	}
 
-	//IDing process
+	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
+	//And then the position of all the bots is found. All the id's found are then iterated over, and if
+	//the new id which would have popped up is then found. That sheep is marked as at that position,
+	//And the sheep is then loaded into the camera id hash
 	log.Println("Sheeps:",sheeps)
 	for _, sheep := range sheeps {
+		found := false
 		sheep.commands.sheepF |= SHEEPRST
 		sheep.commands.sheepF |= SHEEPLIGHT
 		sheep.sendCommands(outServerAddr)
@@ -56,13 +65,18 @@ func main_full() {
 				sheep.currX = xs[idx]
 				sheep.currY = ys[idx]
 				camToIdx[id] = sheep
+				found = true
 				break
 			}
+		}
+		if !found {
+			panic("SHEEP NOT FOUND IN INITIALIZATION PROCESS")
 		}
 	}
 
 	//Initializing Frontend Server
-	datawrite := MkChanDataWrite(100, 5,sheeps)
+	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
+	//Setup server for the unity to make put requests too
 	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 
@@ -70,7 +84,8 @@ func main_full() {
 	log.Println("Entering Game")
 	for gamedone == false {
 		log.Println("Game Step")
-		//DO FRONT END COMMUNICATION STUFF (HERE IS WHERE GAMEDONE IS CHECKED)
+
+		//Update the position of all of the bots
 		ids, xs, ys := cam.getPos(LENGTHFIELD)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
@@ -79,26 +94,29 @@ func main_full() {
 				sheep.currY = ys[i]
 			}
 		}
+		//Using these updated positions, update the frontend interface to reflect that
 		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
-		//FIND OUT THE PATH EVERYONE IS TAKING
+		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, patstat, fire, turretAngl := datawrite.frInfo(sheep)
+			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)
+			//Fire or don't fire
 			if fire {
 				sheep.commands.sheepF |= SHEEPFIRE
 			}else{
 				sheep.commands.sheepF &= 0xF7
 			}
-			log.Printf("Path Status %v\n",patstat)
+			//Get next point to travel too
 			next := getNextPoint(*sheep,pat,10)
 
 			sheep.commands.relDesY = getTrueMag(next.Y - float64(sheep.currY))
 			sheep.commands.relDesX = getTrueMag(next.X - float64(sheep.currX))
 		}
 
-		//BREAK PATH INTO COMMANDS
 
+		//Send those commands down to the bots. this is done in a burst of threads
 		commandwg.Add(NUMBOTS)
 		for _, sheep := range sheeps {
 			go sheep.recState(&commandwg)
@@ -106,14 +124,15 @@ func main_full() {
 			<-wait.C
 			sheep.sendCommands(outServerAddr)
 		}
+		//Wait until all of the bots respond
 		commandwg.Wait()
-		log.Println(sheeps[0].resp.orient)
 
 	}
 
 	log.Println("GAME COMPLETE")
 }
 
+//Code to test the frontend
 func main_frontend() {
 
 	//Initializing sheep connections
@@ -140,6 +159,7 @@ func main_frontend() {
 		<-wait.C
 	}
 }
+//Code to test the camera
 func main_camera() {
 	cam := initcamera(5, "1918")
 	for {

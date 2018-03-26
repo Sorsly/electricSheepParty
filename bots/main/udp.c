@@ -1,10 +1,23 @@
-
+/* Electric Sheep Party: Bot Code
+ * This is the code that runs on the ESP32, that controls the bots.
+ *
+ * It works on a request response model. First it instantiates all of the peripherals
+ * Then it connects to the wifi access point, and then enters the main loop
+ * In the main loop, it constantly listens from a command from the CCCP, in the form of a udp packet
+ * and then calls a move function to try and follow through with those commands. After that function
+ * it then responds to the CCCP with its current state
+ */
 #include "udp.h"
 #include "i2c.h"
 #include "motor.h"
+// Tag for the main loop
 static const char *TAG = "MAIN";
 
+// These are used to connect to the wifi
 static EventGroupHandle_t wifi_event_group;
+ip4_addr_t ip;
+char ip_str[30];
+bool connected_to_ap = false;
 
 //INPUT PINS
 static const uint64_t photorec = (1 <<1);
@@ -14,15 +27,14 @@ static const uint64_t laser = (1 <<2);
 static const uint64_t debugR = (1 <<4);
 static const uint64_t debugG = (1 <<16);
 
-
-ip4_addr_t ip;
-char ip_str[30];
-bool connected_to_ap = false;
+//The initial orientation measurment for subtracting off values
 double startXorient = 0;
 double startYorient = 0;
 
+//Function to send the command struct to the CCCP
 void send_thread(resp rsp,commands cmd) {
 
+    //Standard C socket code
     int socket_fd;
     struct sockaddr_in sa;
 
@@ -40,6 +52,7 @@ void send_thread(resp rsp,commands cmd) {
     memset(&sa, 0, sizeof(struct sockaddr_in));
     inet_pton(AF_INET, CCCPIP, &(sa.sin_addr.s_addr));
     sa.sin_family = AF_INET;
+    //The port responds to the port assigned by the CCCP
     sa.sin_port = htons(cmd.portAssign);
 
     //Parse State
@@ -49,8 +62,7 @@ void send_thread(resp rsp,commands cmd) {
     data_buffer[3] = rsp.orient;
     data_buffer[4] = rsp.battery;
 
-    ESP_LOGI(TAG,"SENDING");
-    ESP_LOGI(TAG,"Received packet from %s:%d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
+    //Sending the data
     sent_data = sendto(socket_fd, data_buffer,RESPSIZE,0,(struct sockaddr*)&sa,sizeof(sa));
     if(sent_data < 0){
 	    printf("send failed\n");
@@ -58,9 +70,11 @@ void send_thread(resp rsp,commands cmd) {
 	    exit(2);
     }
 
+    //Closing the socket
     close(socket_fd);
 }
 
+//This is a utility function that takes the raw data and puts it into the command structure
 void parsecommands(char * raw, commands * cmd){
     cmd->sheepf = raw[0];
     cmd->relDesX = raw[1];
@@ -68,8 +82,11 @@ void parsecommands(char * raw, commands * cmd){
     cmd->servoAngle= raw[3];
     cmd->portAssign= (uint16_t)(raw[4] | (raw[5] << 8));
 }
+
+//This function blocks, and waits for commands to come in from the designated port
 void receive_thread(commands *cmd) {
 
+    //Standard C socket code
     int socket_fd;
     struct sockaddr_in sa,ra;
 
@@ -87,51 +104,46 @@ void receive_thread(commands *cmd) {
 
     memset(&sa, 0, sizeof(struct sockaddr_in));
     ra.sin_family = AF_INET;
+    //Recieve on any adress that htis bot is assigned too
     ra.sin_addr.s_addr = htonl(INADDR_ANY);
+    //All of the bots listen in at this hard coded value
     ra.sin_port = htons(RECEIVER_PORT_NUM);
 
-    ESP_LOGD(TAG,"SOCKET PREPARED");
 
+    //Block until a connection
     if (bind(socket_fd, (struct sockaddr *)&ra, sizeof(struct sockaddr_in)) == -1){
     close(socket_fd);
     exit(1);
     }
-    ESP_LOGD(TAG,"RECIVEING SOCKET READY");
 
+    //Recieve
     recv_data = recv(socket_fd,data_buffer,sizeof(data_buffer),0);
     if(recv_data > 0)
     {
-
         data_buffer[recv_data] = '\0';
-
     }
     close(socket_fd);
+    //Place the raw data into the command structure
     parsecommands(data_buffer,cmd);
 
 }
 
 
-
+//This is a special handler function used by the esp-idf api to dictate how the not connects to the wifi.
+//Full documentation on how this function needs to work can be found in the esp-idf site
 static esp_err_t cust_wifi_event_handler(void *ctx, system_event_t *event)
 {
     switch (event->event_id) {
         case SYSTEM_EVENT_STA_START:
-            ESP_LOGI(TAG, "SYSTEM_EVENT_STA_START");
             ESP_ERROR_CHECK(esp_wifi_connect());
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
         	xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
-            ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
-            ESP_LOGI(TAG, "********************************************");
-            ESP_LOGI(TAG, "* We are now connected to AP")
-            ESP_LOGI(TAG, "* - Our IP address is: %s", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
-            ESP_LOGI(TAG, "********************************************");
             ip = event->event_info.got_ip.ip_info.ip;
             inet_ntop(AF_INET,&ip,ip_str,30);
             connected_to_ap = true;
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
             ESP_ERROR_CHECK(esp_wifi_connect());
             xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
             break;
@@ -142,6 +154,7 @@ static esp_err_t cust_wifi_event_handler(void *ctx, system_event_t *event)
 }
 
 
+//Initializes the wifi
 void init_wifi(void)
 {
     tcpip_adapter_init();
@@ -161,7 +174,6 @@ void init_wifi(void)
             .threshold.authmode = WIFI_AUTH_WPA2_PSK,
         },
     };
-    ESP_LOGI(TAG, "Setting WiFi configuration SSID %s...", wifi_config.sta.ssid);
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK( esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
     ESP_ERROR_CHECK( esp_wifi_start() );
@@ -170,10 +182,9 @@ void init_wifi(void)
 
 
 
-
+//This is the function that does all the lifting of taking the command, doingin things with it,
+// And loading the state with the proper values
 void move(commands * cmd, resp *state){
-	ESP_LOGI(TAG,"DOING THINGS TO ACHIEVE DESIRED STATE");
-    ESP_LOGI(TAG,"DYCLE1 %04X",cmd->sheepf);
     set_angle((uint32_t)cmd->servoAngle);
     canhit(&(state->health));
     fire_laser(true);
@@ -184,7 +195,7 @@ void move(commands * cmd, resp *state){
     state->orient =  (char)(theta*255/360);
 }
 
-
+//Initializes the proper pins as inputs and outputs
 void init_gpio(){
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
@@ -201,12 +212,16 @@ void init_gpio(){
     gpio_config(&io_conf);
 
 }
+
+//the main. Is called on bot startup
 void app_main() {
 
+    //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
     resp * state = malloc(sizeof(state));
+
     state->health = 10;
-    //init nvs_flash
+    //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
     esp_err_t nvsret = nvs_flash_init();
 
     if (nvsret == ESP_ERR_NVS_NO_FREE_PAGES) {
@@ -214,13 +229,18 @@ void app_main() {
         nvsret = nvs_flash_init();
     }
 
-    init_wifi();
+    //Initializing things
+    /*init_wifi();
+    // Wait for when the bot has connected to the AP
     while(!connected_to_ap){}
-   // ota_example_task(wifi_event_group);
+   / ota_example_task(wifi_event_group);*/
     init_turret(&(state->health));
     init_i2c();
+    init_motors();
+    init_gpio();
 
-    uint8_t out = readmag(0x09);
+    //The following code samples the IMU orientation to get initialized vector values
+    uint8_t out;
     uint8_t x_low;
     uint8_t y_low;
     uint8_t x_high;
@@ -228,7 +248,7 @@ void app_main() {
     int numsamples = 100;
     uint8_t * databuff = malloc(sizeof(uint8_t)*6);
     for(int i = 0;i < numsamples; i ++) {
-        out = 0x13; //readmag(0x09);
+        out = readmag(0x09);
         if (out & 0x01) {
             /*  x_low = readmag(0x04);
               y_low = readmag(0x06);
@@ -252,15 +272,14 @@ void app_main() {
     startYorient = startYorient/numsamples;
 
 
-    init_motors();
-    init_gpio();
-    double angle;
-	ESP_LOGI(TAG,"BOT ACTIVE7");
+    while(true) {
+        getRawTheta(startXorient,startYorient);
+    }
+    //Main control loop which blocks for commands, and then responds with state
     while(true){
             receive_thread(nextCommands);
             move(nextCommands,state);
             send_thread(*state,*nextCommands);
     }
 
-    init_motors();
 }

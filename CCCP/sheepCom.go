@@ -1,3 +1,4 @@
+//sheepCom provides an interface for communicating with the bots
 package main
 
 import (
@@ -11,6 +12,7 @@ import (
 	"time"
 )
 
+//these define the bit positions of the various commands for the botflag
 const SHEEPRST = 0x01
 const SHEEPDIR1 = 0x02
 const SHEEPDIR2 = 0x04

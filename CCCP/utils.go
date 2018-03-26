@@ -1,3 +1,4 @@
+//Some utility functions
 package main
 
 import (
@@ -7,6 +8,7 @@ import (
 	"math"
 )
 
+//Structure for loading the ipconfig file
 type Config struct {
 	All []string `json:"all"`
 	Cpu string   `json:"cpu"`
@@ -31,9 +33,11 @@ func getConfig(file string) Config {
 	jsonParser.Decode(&config)
 	return config
 }
+//Measures the distance
 func euclidDist(x1 float64, x2 float64,y1 float64,y2 float64)(float64){
 	return math.Hypot(y1-y2, x1-x2)
 }
+//Taking in the path of the sheep, finds the next point the sheep should travel too
 func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
 	distFromClosest := math.MaxFloat64
 	closest := 0
@@ -44,6 +48,7 @@ func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
 			closest = i
 		}
 	}
+	//If the closest point is greater than a particular threshold, just head towards the closest point
 	if distFromClosest > thresh || closest == len(point){
 		return point[closest]
 	}else {
@@ -51,6 +56,7 @@ func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
 	}
 
 }
+//This levels off the value of the input, peaking it and leveling instead of overflowing
 func getTrueMag(val float64)(uint8){
 	if val < -127 {
 		return 0x80
@@ -59,6 +65,7 @@ func getTrueMag(val float64)(uint8){
 	}
 	return uint8(val)
 }
+//shifts the value of the angle by some arbitrary offset
 func shiftOrient(val uint8,offset uint8)(uint8){
 	actval := int(val) + int(offset)
 	if  actval > 255 {
