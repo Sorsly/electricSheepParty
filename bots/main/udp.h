@@ -54,5 +54,5 @@ void init_wifi(void);
 void send_thread(resp,commands);
 void move(commands * cmd,resp * state);
 void receive_thread(commands *);
-void parsecommands(char * raw,commands *);
+void parsecommands(char * ,commands *);
 esp_err_t esp32_wifi_eventHandler(void *ctx, system_event_t *event);

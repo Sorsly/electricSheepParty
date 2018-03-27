@@ -79,7 +79,7 @@ void parsecommands(char * raw, commands * cmd){
     cmd->sheepf = raw[0];
     cmd->relDesX = raw[1];
     cmd->relDesY = raw[2];
-    cmd->servoAngle= raw[3];
+    cmd->servoAngle = raw[3];
     cmd->portAssign= (uint16_t)(raw[4] | (raw[5] << 8));
 }
 
@@ -90,7 +90,8 @@ void receive_thread(commands *cmd) {
     int socket_fd;
     struct sockaddr_in sa,ra;
 
-    int recv_data; char data_buffer[80];
+    int recv_data;
+    char * data_buffer = malloc(sizeof(char)*10);
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -125,6 +126,7 @@ void receive_thread(commands *cmd) {
     close(socket_fd);
     //Place the raw data into the command structure
     parsecommands(data_buffer,cmd);
+    free(data_buffer);
 
 }
 
@@ -187,10 +189,10 @@ void init_wifi(void)
 void move(commands * cmd, resp *state){
     set_angle((uint32_t)cmd->servoAngle);
     canhit(&(state->health));
-    fire_laser(true);
-    top_on(true);
-    fire_laser(false);
-    top_on(false);
+    fire_laser(cmd->sheepf & 0x08);
+    top_on(cmd->sheepf & 0x10);
+    left_ctl(true,80);
+    right_ctl(true,80);
     double theta = getRawTheta(startXorient,startYorient);
     state->orient =  (char)(theta*255/360);
 }
@@ -230,10 +232,10 @@ void app_main() {
     }
 
     //Initializing things
-    /*init_wifi();
+    init_wifi();
     // Wait for when the bot has connected to the AP
     while(!connected_to_ap){}
-   / ota_example_task(wifi_event_group);*/
+   // ota_example_task(wifi_event_group);
     init_turret(&(state->health));
     init_i2c();
     init_motors();
@@ -272,9 +274,9 @@ void app_main() {
     startYorient = startYorient/numsamples;
 
 
-    while(true) {
+    /*while(true) {
         getRawTheta(startXorient,startYorient);
-    }
+    }*/
     //Main control loop which blocks for commands, and then responds with state
     while(true){
             receive_thread(nextCommands);

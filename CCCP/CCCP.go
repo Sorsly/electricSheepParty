@@ -18,6 +18,9 @@ const CAMPORT = "1918" //The port the camera will send its data down
 
 //Running main process
 func main_full() {
+	var servoangle uint64
+	servoangle = 1
+	ratespin := 0
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
@@ -81,6 +84,7 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
+	fire := true
 	log.Println("Entering Game")
 	for gamedone == false {
 		log.Println("Game Step")
@@ -97,9 +101,19 @@ func main_full() {
 		//Using these updated positions, update the frontend interface to reflect that
 		datawrite.FE1.UpdateGndBots(sheeps, false, false)
 
+		ratespin += 1
+		if ratespin % 10 == 0 {
+			servoangle += 1
+			if servoangle%180 == 0 {
+				servoangle = 1
+			}
+			fire = !fire
+		}
+
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
-			pat, patstat, fire, turretAngl := datawrite.frInfo(sheep)
+			pat, _, _, turretAngl := datawrite.frInfo(sheep)
+			turretAngl = servoangle
 			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)
 			//Fire or don't fire

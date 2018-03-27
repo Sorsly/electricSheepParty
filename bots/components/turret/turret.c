@@ -38,7 +38,7 @@ void canhit(char * health){
 //Sets the angle of the servo
 void set_angle(uint32_t angle){
 	uint32_t dutycycle;
-	dutycycle = (uint32_t)(angle *3000/360 + 1000.0);
+	dutycycle = (uint32_t)((angle+40) * 2500/360);
 	mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A,dutycycle);
 }
 
@@ -46,10 +46,8 @@ void set_angle(uint32_t angle){
 void top_on(bool on){
 	if(on){
 		gpio_set_level(topled,1);
-		gpio_set_level(debugR,1);
 	}else{
 		gpio_set_level(topled,0);
-		gpio_set_level(debugR,0);
 	}
 }
 //Turn the laser on or off
