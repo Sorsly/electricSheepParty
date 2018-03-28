@@ -1,3 +1,4 @@
+//sheepCom provides an interface for communicating with the bots
 package main
 
 import (
@@ -11,6 +12,7 @@ import (
 	"time"
 )
 
+//these define the bit positions of the various commands for the botflag
 const SHEEPRST = 0x01
 const SHEEPDIR1 = 0x02
 const SHEEPDIR2 = 0x04
@@ -107,7 +109,9 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 //Sends state commands to a sheep
 func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	//commout is the string to send out commands form local address on outport
+
 	Conn, err := net.DialUDP("udp", nil, s.endpoint)
+	log.Println(s.endpoint)
 	CheckError(err)
 	defer Conn.Close()
 	portsplit := make([]byte, 2)
@@ -119,7 +123,7 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		s.commands.servoAngle,
 		portsplit[0],
 		portsplit[1]}
-
+	log.Println(msg)
 	Conn.Write(msg)
 
 }

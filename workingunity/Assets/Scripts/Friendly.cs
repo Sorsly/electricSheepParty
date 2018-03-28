@@ -15,6 +15,7 @@ public class Friendly : MonoBehaviour {
     public LayerMask groundLayer;
     public NavMeshAgent playerAgent;
     private NavMeshPath path;
+    public turret turr;
     #region Monobehavior API
     void Awake()
     {
@@ -29,16 +30,48 @@ public class Friendly : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+       
+        desiredturretpos = turr.getDesired();
+        Debug.Log(desiredturretpos);
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
             playerAgent.CalculatePath(GetPointUnderCursor(), path);
-            Debug.Log(path.corners[0]);
         }
+        if (Input.GetMouseButtonDown(0) && isSelected == true && SelectedEnemy())
+        {
+            playerAgent.CalculatePath(intersectPath(5), path);
+        }
+
     }
 #endregion
+    private Vector3 intersectPath(float enemDist)
+    {
+        float dY = turr.target.transform.position.y - transform.position.y;
+        float dX = turr.target.transform.position.x - transform.position.x;
+        float theta = Mathf.Atan(dY / dX);
+        float mag = Mathf.Sqrt(dY * dY + dX * dX);
+        Vector3 retpoint;
+        retpoint.x = Mathf.Cos(theta) * (mag - enemDist) + turr.target.transform.position.x;
+        retpoint.z = Mathf.Sin(theta) * (mag - enemDist) + turr.target.transform.position.y;
+        retpoint.y = transform.position.y;
+        return retpoint;
+    }
     public NavMeshPath pathS()
     {
-        return path;
+        return path;    
+    }
+    private bool SelectedEnemy()
+    {
+        RaycastHit hitInfo = new RaycastHit();
+        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+        if (hit && hitInfo.transform.gameObject.layer == 10)
+        {
+            Debug.Log("Selected Enemy");
+            turr.target = hitInfo.transform.gameObject;
+            return true;
+        }
+        Debug.Log("Not Selected Anything");
+        return false;
     }
     private Vector3 GetPointUnderCursor()
     {

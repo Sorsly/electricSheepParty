@@ -1,3 +1,6 @@
+/*Camera is the network interface for the CV process which runs sepratly. It handles communication
+And parsing of the raw data feed*/
+
 package main
 
 import (
@@ -5,16 +8,19 @@ import (
 	"net"
 )
 
+//Camera structure
 type Camera struct {
 	revraw chan []byte
 	buffer []byte
 	camres struct {
-		ids []uint64
+		ids []uint64 //ID is the id assigned by the camera
 		X   []uint64
 		Y   []uint64
 	}
 }
 
+//This is a non blocking tcp server which the camera process connects into. If the camera does not need
+//The raw data, it does not load it into the process which parses it through a channel
 func (c *Camera) recvList(portnum string) {
 
 	l, err := net.Listen("tcp", "localhost:"+portnum)
@@ -32,7 +38,7 @@ func (c *Camera) recvList(portnum string) {
 
 	}
 }
-
+//Initializes the camera
 func initcamera(botcnt int, portlisten string) *Camera {
 	c := new(Camera)
 	c.camres.ids = make([]uint64, botcnt)
@@ -44,6 +50,8 @@ func initcamera(botcnt int, portlisten string) *Camera {
 	return c
 }
 
+//When this is called, it blocks until the channel feeds in the raw camera data, in which case it then
+//Parses it for the actual positions
 func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
 	//UPDATE POSITION
 	raw := <-c.revraw

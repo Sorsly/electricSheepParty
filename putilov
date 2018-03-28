@@ -10,12 +10,14 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
 ipfile = "ips.txt"
 
+#Sets up a server which the bots can load apps to program over
 def programserver(*args):
     os.chdir("bots")
     os.system("make app")
     os.chdir("build")
     os.system("python -m SimpleHTTPServer 1944")
 
+# Runs the pathfinder
 def CCCP(*args):
     os.chdir("CPU/")
     os.system("go run pathfinder.go> log.txt")
@@ -27,12 +29,14 @@ def CCCP(*args):
     os.system("python pltclass.py")
     os.system("./genplots.sh")
 
+# Generates the file with all the ips on the network
 def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
     rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
 
     query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"
     found = re.findall(query, rawdata, re.DOTALL)
+    #uses the mac address of each ip to determine what it is
     camIps = [ip[0] for ip in found if "Raspberry" in ip[1]]
     botIps = [ip[0] for ip in found if "Espressif" in ip[1]]
 
@@ -50,6 +54,7 @@ def getIPS(*args):
         fh.write(dumps(finalip))
 
 
+#Takes the compiled images of the app, and burns it onto the chip over JTAG
 def burnJTAG(*args):
     os.chdir("bots")
     err = os.system("make flash")
@@ -60,25 +65,29 @@ def burnJTAG(*args):
     launchdebug()
 
 
+#uses uart to program
 def burnUART(*args):
     os.chdir("bots/")
     os.system("make flash")
 
 
+# launch the uart monitor
 def monitorUART(*args):
     os.chdir("bots/")
     os.system("make monitor")
 
-
+# launch the GDB server
 def launchdebug(*args):
     os.system("openocd -s share/openocd/scripts -f interface/jlink.cfg -f board/esp-wroom-32.cfg")
 
 
+# start debugging with GDB
 def debug(*args):
     os.chdir("bots/")
     os.system("xtensa-esp32-elf-gdb -x gdbinit build/{}.elf".format(proj_name))
 
 
+# main
 def main():
     available_builds = {
         "burnJTAG": burnJTAG,
