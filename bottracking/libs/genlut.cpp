@@ -9,7 +9,7 @@ short * genlut(cv::Mat ref){
 	if(max < ref.rows){
 		max = ref.rows;
 	}
-	float scale = 65536/max;
+	float scale = 1;
 
 	short * lut = (short *)malloc(sizeof(short)*max);
 

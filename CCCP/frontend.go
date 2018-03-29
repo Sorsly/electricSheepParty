@@ -206,6 +206,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 
 //Function to serve the data as a server, ba dum chi
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
+	log.Println("Client connected")
 	w.WriteHeader(http.StatusOK)
 	defer r.Body.Close()
 	rawBody, err := ioutil.ReadAll(r.Body)

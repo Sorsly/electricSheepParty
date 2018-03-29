@@ -12,7 +12,7 @@ import (
 )
 
 const NUMBOTS = 1 //Number of bots in the game
-const LENGTHFIELD = 4000 // How long the field actually is in terms of millimeters
+const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
 
@@ -21,6 +21,7 @@ func main_full() {
 	var servoangle uint64
 	servoangle = 1
 	ratespin := 0
+
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
@@ -96,6 +97,7 @@ func main_full() {
 			if found {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
+				log.Printf("Sheep Pos X:%v, Y:%v",sheep.currX,sheep.currY)
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that

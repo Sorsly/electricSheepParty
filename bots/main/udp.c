@@ -10,6 +10,7 @@
 #include "udp.h"
 #include "i2c.h"
 #include "motor.h"
+#include <math.h>
 // Tag for the main loop
 static const char *TAG = "MAIN";
 
@@ -39,7 +40,7 @@ void send_thread(resp rsp,commands cmd) {
     struct sockaddr_in sa;
 
     int sent_data;
-    char data_buffer[5];
+    char * data_buffer = malloc(sizeof(char)*5);
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -187,14 +188,42 @@ void init_wifi(void)
 //This is the function that does all the lifting of taking the command, doingin things with it,
 // And loading the state with the proper values
 void move(commands * cmd, resp *state){
+    //cmd->relDesY=10;
+    //cmd->relDesX=-10;
+    double angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
+    if (angle<0){
+        angle+=360;
+    }
+    printf("angle 1 %f",angle);
+
+    printf("angle 2 %f",angle);
+
+    int turntime=200*angle/240;
+
     set_angle((uint32_t)cmd->servoAngle);
     canhit(&(state->health));
     fire_laser(cmd->sheepf & 0x08);
-    top_on(cmd->sheepf & 0x10);
-    left_ctl(true,80);
-    right_ctl(true,80);
+    top_on(true);
+    //left_ctl(true,80);
+    //right_ctl(true,80);
+    double x2=pow(cmd->relDesX,2);
+    double y2=pow(cmd->relDesY,2);
+    printf("x2 %f y2 %f",x2,y2);
+    double hyp=sqrt(x2+y2);
+    int forwardtime=hyp*200/32;
+    printf("forward time %d",forwardtime);
     double theta = getRawTheta(startXorient,startYorient);
     state->orient =  (char)(theta*255/360);
+    //left_ctl(false,60);
+    //right_ctl(false,90);//for translational
+    left_ctl(true, 80);
+    right_ctl(false,80);
+    vTaskDelay(turntime);
+    left_ctl(false,60);
+    right_ctl(false,90);
+    vTaskDelay(forwardtime);
+    left_ctl(false,0);
+    right_ctl(false,0);
 }
 
 //Initializes the proper pins as inputs and outputs
@@ -218,8 +247,10 @@ void init_gpio(){
 //the main. Is called on bot startup
 void app_main() {
 
+
     //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
+    nextCommands->relDesX = 0;
     resp * state = malloc(sizeof(state));
 
     state->health = 10;

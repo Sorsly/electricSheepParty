@@ -20,7 +20,7 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char *argv[]){
-	cv::VideoCapture cap(0);
+	cv::VideoCapture cap(1);
 
 	//This holds all the blob data. it is a pointer to a vector of pointers to vectors of pointers
 	std::vector<std::vector<blob *> *> * blobHist = new std::vector<std::vector<blob *> *>() ;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
 	cv::Mat frame;
 	clock_t begin;
 	//This value is the depth of blob list the memory should remember
-	int memory = 100;
+	int memory = 50;
 
 	//All argument handling
 	bool useCam;
@@ -84,10 +84,10 @@ int main(int argc, char *argv[]){
 		addBlobMem(frame,blobHist, memory);
 
 		//For display purposes
-		//printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
-//		printBlobs(*(blobHist->begin()));
+		printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
+		printBlobs(*(blobHist->begin()));
 		displayBlobs(frame, *(blobHist->begin()));
-        //printf("Displaying Frame...");
+        printf("Displaying Frame...");
 		cv::imshow("Output",frame);
 
 		//Send to Server, if they want
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-//		cv::waitKey(time);
+		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);
