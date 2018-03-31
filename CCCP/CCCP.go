@@ -18,8 +18,8 @@ const CAMPORT = "1918" //The port the camera will send its data down
 
 //Running main process
 func main_full() {
-	var servoangle uint64
-	servoangle = 1
+	var servoangle int
+	servoangle = 120
 	ratespin := 0
 
 	runtime.GOMAXPROCS(10)
@@ -51,7 +51,6 @@ func main_full() {
 	//And then the position of all the bots is found. All the id's found are then iterated over, and if
 	//the new id which would have popped up is then found. That sheep is marked as at that position,
 	//And the sheep is then loaded into the camera id hash
-	log.Println("Sheeps:",sheeps)
 	for _, sheep := range sheeps {
 		found := false
 		sheep.commands.sheepF |= SHEEPRST
@@ -62,7 +61,6 @@ func main_full() {
 		<-wait.C
 
 		ids, xs, ys := cam.getPos(LENGTHFIELD)
-		log.Println("IDS:",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
@@ -85,10 +83,11 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
-	fire := true
+	fire := false
+	top := false
+	dir := 1
 	log.Println("Entering Game")
 	for gamedone == false {
-		log.Println("Game Step")
 
 		//Update the position of all of the bots
 		ids, xs, ys := cam.getPos(LENGTHFIELD)
@@ -97,7 +96,6 @@ func main_full() {
 			if found {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
-				log.Printf("Sheep Pos X:%v, Y:%v",sheep.currX,sheep.currY)
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
@@ -105,17 +103,15 @@ func main_full() {
 
 		ratespin += 1
 		if ratespin % 10 == 0 {
-			servoangle += 1
+			servoangle += dir
 			if servoangle%180 == 0 {
-				servoangle = 1
+				dir = -dir
 			}
-			fire = !fire
 		}
-
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, _, _, turretAngl := datawrite.frInfo(sheep)
-			turretAngl = servoangle
+			turretAngl = uint64(servoangle)
 			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)
 			//Fire or don't fire
@@ -123,6 +119,11 @@ func main_full() {
 				sheep.commands.sheepF |= SHEEPFIRE
 			}else{
 				sheep.commands.sheepF &= 0xF7
+			}
+			if top {
+				sheep.commands.sheepF |= SHEEPLIGHT
+			}else{
+				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
 			next := getNextPoint(*sheep,pat,10)

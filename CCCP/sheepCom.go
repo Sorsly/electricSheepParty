@@ -7,9 +7,10 @@ import (
 	"strconv"
 
 	"encoding/binary"
-	"log"
 	"sync"
 	"time"
+	"log"
+	"math"
 )
 
 //these define the bit positions of the various commands for the botflag
@@ -42,8 +43,10 @@ type Sheep struct {
 		health  uint8 // How much health the bot has
 		accelX  uint8 // Bots X accelleration
 		accelY  uint8 // Bots Y accelleration
-		orient  uint8 // Bots absolute orientation
+		orient  int16 // Bots absolute orientation
 		battery uint8 // Bots battery life
+		magX    int16
+		magY    int16
 	}
 }
 
@@ -83,25 +86,41 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 
 //Parses the raw UDP response into the sheeps data structure
 func (s *Sheep) updateState(raw []byte) {
-	log.Println()
+	log.Println("raw",raw)
 	s.resp.health = raw[0]
 	s.resp.accelX = raw[1]
 	s.resp.accelY = raw[2]
-	s.resp.orient = shiftOrient(raw[3],MAGFIELDOFFSET)
-	s.resp.battery = raw[4]
+	s.resp.battery = raw[3]
+
+	buffByte := make([]byte,2)
+	buffByte[0] = raw[4]
+	buffByte[1] = raw[5]
+	s.resp.orient = int16(binary.BigEndian.Uint16(buffByte))
+	buffByte[0] = raw[6]
+	buffByte[1] = raw[7]
+	s.resp.magX = int16(binary.BigEndian.Uint16(buffByte))
+	buffByte[0] = raw[8]
+	buffByte[1] = raw[9]
+	s.resp.magY = int16(binary.BigEndian.Uint16(buffByte))
+	log.Println("X: ",s.resp.magX)
+	log.Println("Y: ",s.resp.magY)
+	log.Println("Xmod:",s.resp.magX +213)
+	log.Println("Ymod:",s.resp.magY +890)
+	angle := math.Atan2(float64(s.resp.magY+213),float64(s.resp.magX+890))*180/math.Pi
+	log.Println(angle)
 }
 
 //Recieves the UDP data. if no response in time, does nothing. Nonblocking
 func (s *Sheep) recState(group *sync.WaitGroup) {
 	defer group.Done()
-	resp := make([]byte, 5)
+	resp := make([]byte, 10)
 	respConn, err := net.ListenUDP("udp", s.resppoint)
-	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 10))
+	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 20))
 	defer respConn.Close()
 
-	_, _, err = respConn.ReadFromUDP(resp)
+	c, _, err := respConn.ReadFromUDP(resp)
 
-	if err == nil {
+	if err == nil  && c >0 {
 		s.updateState(resp)
 	}
 }
@@ -111,7 +130,6 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	//commout is the string to send out commands form local address on outport
 
 	Conn, err := net.DialUDP("udp", nil, s.endpoint)
-	log.Println(s.endpoint)
 	CheckError(err)
 	defer Conn.Close()
 	portsplit := make([]byte, 2)
@@ -123,7 +141,6 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		s.commands.servoAngle,
 		portsplit[0],
 		portsplit[1]}
-	log.Println(msg)
 	Conn.Write(msg)
 
 }

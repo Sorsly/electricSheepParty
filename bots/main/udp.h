@@ -18,7 +18,7 @@
 #include <nvs_flash.h>
 
 #define CCCPIP "192.168.42.23"
-#define RESPSIZE 5
+#define RESPSIZE 10
 #define CONNECTED_BIT BIT0
 
 
@@ -43,8 +43,10 @@ typedef struct resp{
     char health;
     char accelX;
     char accelY;
-    char orient;
+    double orient;
     char battery;
+    double magX;
+    double magY;
 }resp;
 
 #define RECEIVER_PORT_NUM 1917

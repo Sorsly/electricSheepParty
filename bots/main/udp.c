@@ -32,6 +32,12 @@ static const uint64_t debugG = (1 <<16);
 double startXorient = 0;
 double startYorient = 0;
 
+void doubleTwoBytes(double in,char * b1,char * b2){
+    int16_t floored = (int16_t)in;
+    *b1 = floored>>8;
+    *b2 = floored & 0x00FF;
+
+}
 //Function to send the command struct to the CCCP
 void send_thread(resp rsp,commands cmd) {
 
@@ -40,7 +46,9 @@ void send_thread(resp rsp,commands cmd) {
     struct sockaddr_in sa;
 
     int sent_data;
-    char * data_buffer = malloc(sizeof(char)*5);
+    char * data_buffer = malloc(sizeof(char)*RESPSIZE);
+    char bBuff1;
+    char bBuff2;
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -60,8 +68,16 @@ void send_thread(resp rsp,commands cmd) {
     data_buffer[0] = rsp.health;
     data_buffer[1] = rsp.accelX;
     data_buffer[2] = rsp.accelY;
-    data_buffer[3] = rsp.orient;
-    data_buffer[4] = rsp.battery;
+    data_buffer[3] = rsp.battery;
+    doubleTwoBytes(rsp.orient,&bBuff1,&bBuff2);
+    data_buffer[4] = bBuff1;
+    data_buffer[5] = bBuff2;
+    doubleTwoBytes(rsp.magX,&bBuff1,&bBuff2);
+    data_buffer[6] = bBuff1;
+    data_buffer[7] = bBuff2;
+    doubleTwoBytes(rsp.magY,&bBuff1,&bBuff2);
+    data_buffer[8] = bBuff1;
+    data_buffer[9] = bBuff2;
 
     //Sending the data
     sent_data = sendto(socket_fd, data_buffer,RESPSIZE,0,(struct sockaddr*)&sa,sizeof(sa));
@@ -75,14 +91,6 @@ void send_thread(resp rsp,commands cmd) {
     close(socket_fd);
 }
 
-//This is a utility function that takes the raw data and puts it into the command structure
-void parsecommands(char * raw, commands * cmd){
-    cmd->sheepf = raw[0];
-    cmd->relDesX = raw[1];
-    cmd->relDesY = raw[2];
-    cmd->servoAngle = raw[3];
-    cmd->portAssign= (uint16_t)(raw[4] | (raw[5] << 8));
-}
 
 //This function blocks, and waits for commands to come in from the designated port
 void receive_thread(commands *cmd) {
@@ -92,7 +100,7 @@ void receive_thread(commands *cmd) {
     struct sockaddr_in sa,ra;
 
     int recv_data;
-    char * data_buffer = malloc(sizeof(char)*10);
+    char data_buffer[10];
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -126,8 +134,14 @@ void receive_thread(commands *cmd) {
     }
     close(socket_fd);
     //Place the raw data into the command structure
-    parsecommands(data_buffer,cmd);
-    free(data_buffer);
+//This is a utility function that takes the raw data and puts it into the command structure
+//    void parsecommands(char * raw, commands * cmd){
+    cmd->sheepf = data_buffer[0];
+    cmd->relDesX = data_buffer[1];
+    cmd->relDesY = data_buffer[2];
+    cmd->servoAngle = data_buffer[3];
+    cmd->portAssign= (uint16_t)(data_buffer[4] | (data_buffer[5] << 8));
+//   }
 
 }
 
@@ -188,42 +202,17 @@ void init_wifi(void)
 //This is the function that does all the lifting of taking the command, doingin things with it,
 // And loading the state with the proper values
 void move(commands * cmd, resp *state){
-    //cmd->relDesY=10;
-    //cmd->relDesX=-10;
-    double angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
-    if (angle<0){
-        angle+=360;
-    }
-    printf("angle 1 %f",angle);
-
-    printf("angle 2 %f",angle);
-
-    int turntime=200*angle/240;
-
-    set_angle((uint32_t)cmd->servoAngle);
     canhit(&(state->health));
     fire_laser(cmd->sheepf & 0x08);
-    top_on(true);
-    //left_ctl(true,80);
-    //right_ctl(true,80);
-    double x2=pow(cmd->relDesX,2);
-    double y2=pow(cmd->relDesY,2);
-    printf("x2 %f y2 %f",x2,y2);
-    double hyp=sqrt(x2+y2);
-    int forwardtime=hyp*200/32;
-    printf("forward time %d",forwardtime);
-    double theta = getRawTheta(startXorient,startYorient);
-    state->orient =  (char)(theta*255/360);
-    //left_ctl(false,60);
-    //right_ctl(false,90);//for translational
-    left_ctl(true, 80);
-    right_ctl(false,80);
-    vTaskDelay(turntime);
-    left_ctl(false,60);
-    right_ctl(false,90);
-    vTaskDelay(forwardtime);
+    set_angle((uint32_t)cmd->servoAngle);
+    top_on(cmd->sheepf & 0x10);
+    double xMag, yMag;
+    double theta = getRawTheta(startXorient,startYorient,&xMag,&yMag);
+    state->orient =  theta;
+    state->magX = xMag;
+    state->magY = yMag;
     left_ctl(false,0);
-    right_ctl(false,0);
+    right_ctl(false,0);//for translational
 }
 
 //Initializes the proper pins as inputs and outputs
@@ -250,7 +239,6 @@ void app_main() {
 
     //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
-    nextCommands->relDesX = 0;
     resp * state = malloc(sizeof(state));
 
     state->health = 10;

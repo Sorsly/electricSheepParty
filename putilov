@@ -1,9 +1,11 @@
-#!/usr/bin/python3.6
+#!/home/zhukov/Projects/senior/electricSheepParty/venv/bin/python3.6
 import os
 import re
 import sys
 import subprocess
+import math
 from json import dumps
+import numpy as np
 import http.server
 import socketserver
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -86,6 +88,17 @@ def debug(*args):
     os.chdir("bots/")
     os.system("xtensa-esp32-elf-gdb -x gdbinit build/{}.elf".format(proj_name))
 
+def calibrate(*args):
+    IminA = np.asmatrix([[-0.5, 0.5], [-0.5, -0.5]])
+    theta = math.pi/2
+    A = np.asmatrix([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
+    m1 = np.asmatrix([[-112], [-844]])
+    m2 = np.asmatrix([[-259], [-789]])
+    print(A)
+    print(IminA)
+    print(m1)
+    O = IminA*(m2 - A*m1)
+    print(O)
 
 # main
 def main():
@@ -97,7 +110,8 @@ def main():
         "debug": debug,
         "getIP": getIPS,
         "cccp": CCCP,
-        "serve":programserver
+        "serve":programserver,
+        "calibrate":calibrate
     }
     if len(sys.argv) == 1 or sys.argv[1] not in available_builds:
         print("Commands:")

@@ -32,14 +32,13 @@ int main(int argc, char *argv[]){
 
 	//All argument handling
 	bool useCam;
-	int time;
+	int time = 30;
 
 	if(!argv[1]){
 		printf("SUPPLY ARGUMENTS\n");
 		return 1;
 	} else if(strcmp(argv[1],"-c")==0){
 		useCam = true;
-		time = 30;
 		cap >> frame;
 	} else if(strcmp(argv[1],"-i")==0){
 		if(argv[2]){
@@ -97,7 +96,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-		cv::waitKey(time);
+//		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);
