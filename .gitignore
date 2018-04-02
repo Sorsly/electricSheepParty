@@ -7,3 +7,4 @@ Makefile
 *.cbp
 *.bin
 metadata/
+*.epf
