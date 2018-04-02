@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-//		cv::waitKey(time);
+		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);

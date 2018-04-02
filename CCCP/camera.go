@@ -12,6 +12,7 @@ import (
 type Camera struct {
 	revraw chan []byte
 	buffer []byte
+	numbots int
 	camres struct {
 		ids []uint64 //ID is the id assigned by the camera
 		X   []uint64
@@ -41,6 +42,7 @@ func (c *Camera) recvList(portnum string) {
 //Initializes the camera
 func initcamera(botcnt int, portlisten string) *Camera {
 	c := new(Camera)
+	c.numbots = botcnt
 	c.camres.ids = make([]uint64, botcnt)
 	c.camres.X = make([]uint64, botcnt)
 	c.camres.Y = make([]uint64, botcnt)
@@ -57,7 +59,7 @@ func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
 	raw := <-c.revraw
 	pos := 1
 	botnum := 0
-	for raw[pos] != 0 {
+	for raw[pos] != 0 && botnum < c.numbots{
 		c.camres.ids[botnum] = uint64(binary.BigEndian.Uint32(raw[pos : pos+4]))
 		pos += 4
 		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536

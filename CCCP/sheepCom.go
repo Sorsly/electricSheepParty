@@ -104,10 +104,11 @@ func (s *Sheep) updateState(raw []byte) {
 	s.resp.magY = int16(binary.BigEndian.Uint16(buffByte))
 	log.Println("X: ",s.resp.magX)
 	log.Println("Y: ",s.resp.magY)
-	log.Println("Xmod:",s.resp.magX +213)
-	log.Println("Ymod:",s.resp.magY +890)
-	angle := math.Atan2(float64(s.resp.magY+213),float64(s.resp.magX+890))*180/math.Pi
+	log.Println("Xmod:",float64(s.resp.magX -118))
+	log.Println("Ymod:",float64(s.resp.magY +712))
+	angle := math.Atan2(float64(s.resp.magY-118),float64(s.resp.magX+712))*180/math.Pi
 	log.Println(angle)
+	log.Println("Jangle: ",float64(s.resp.magX)*180/300)
 }
 
 //Recieves the UDP data. if no response in time, does nothing. Nonblocking
@@ -115,6 +116,7 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 	defer group.Done()
 	resp := make([]byte, 10)
 	respConn, err := net.ListenUDP("udp", s.resppoint)
+	log.Println(s.resppoint)
 	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 20))
 	defer respConn.Close()
 

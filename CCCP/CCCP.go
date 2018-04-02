@@ -84,7 +84,7 @@ func main_full() {
 
 	gamedone := false
 	fire := false
-	top := false
+	top := true
 	dir := 1
 	log.Println("Entering Game")
 	for gamedone == false {
@@ -108,6 +108,7 @@ func main_full() {
 				dir = -dir
 			}
 		}
+		log.Println(sheeps)
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, _, _, turretAngl := datawrite.frInfo(sheep)
@@ -136,6 +137,7 @@ func main_full() {
 		//Send those commands down to the bots. this is done in a burst of threads
 		commandwg.Add(NUMBOTS)
 		for _, sheep := range sheeps {
+			log.Println(sheep)
 			go sheep.recState(&commandwg)
 			wait := time.NewTimer(time.Nanosecond * 500)
 			<-wait.C

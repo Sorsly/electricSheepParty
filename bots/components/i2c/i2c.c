@@ -103,7 +103,7 @@ void readMagData(uint8_t * buffer){
 
 //Heavy lifting of reading sampling and calculating the theta value
 double getRawTheta(double startX, double startY, double * magX,double * magY){
-    uint8_t out;
+    uint8_t out = 0;
     uint8_t x_low = 0;
     uint8_t y_low = 0;
     uint8_t x_high = 0;
@@ -112,24 +112,17 @@ double getRawTheta(double startX, double startY, double * magX,double * magY){
     double y = 0;
     double theta;
     uint8_t * databuff = malloc(sizeof(uint8_t)*6);
-    for(int i = 0;i < numsamples; i ++) {
-        out = readmag(0x09);
-        if (out & 0x01) {
-              readMagData(databuff);
-              x_high = databuff[0];
-              x_low = databuff[1];
-              y_high = databuff[2];
-              y_low = databuff[3];
-              x += (int16_t)(((uint16_t)x_high<<8) | x_low);
-              y += (int16_t)(((uint16_t)y_high<<8) | y_low);
-
-        } else{
-            i--;
-        }
+    while( out & 0x01 != 1){
+       out = readmag(0x09);
+       readMagData(databuff);
+       x_high = databuff[0];
+       x_low = databuff[1];
+       y_high = databuff[2];
+       y_low = databuff[3];
+       x = (int16_t)(((uint16_t)x_high<<8) | x_low);
+       y = (int16_t)(((uint16_t)y_high<<8) | y_low);
     }
     free(databuff);
-    x /= numsamples;
-    y /= numsamples;
     *magX = x;
     *magY = y;
     theta = atan2(x,y)*180/PI;

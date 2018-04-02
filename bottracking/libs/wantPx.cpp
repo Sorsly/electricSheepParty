@@ -4,9 +4,9 @@
 using namespace std;
 bool wantPx(uchar b, uchar g, uchar r){
 	bool ret = false;
-	if(r<180){
-		if(g<100){
-			if(b<100){
+	if(r>245){
+		if(g>245){
+			if(b>245){
 			ret = true;
 			}	
 		}
