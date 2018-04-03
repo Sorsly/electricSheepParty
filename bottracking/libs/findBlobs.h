@@ -2,4 +2,4 @@ struct blob;
 #include "opencv2/opencv.hpp"
 using namespace std;
 using namespace cv;
-std::vector<blob*> * findBlobs(cv::Mat &,double);
+std::vector<blob*> * findBlobs(cv::Mat &,double,bool(*wantfct)(uchar,uchar,uchar));

@@ -17,6 +17,7 @@ type Camera struct {
 		ids []uint64 //ID is the id assigned by the camera
 		X   []uint64
 		Y   []uint64
+		orient []uint64
 	}
 }
 
@@ -46,6 +47,7 @@ func initcamera(botcnt int, portlisten string) *Camera {
 	c.camres.ids = make([]uint64, botcnt)
 	c.camres.X = make([]uint64, botcnt)
 	c.camres.Y = make([]uint64, botcnt)
+	c.camres.orient = make([]uint64, botcnt)
 	c.buffer = make([]byte, botcnt*500)
 	c.revraw = make(chan []byte)
 	go c.recvList(portlisten)
@@ -54,7 +56,7 @@ func initcamera(botcnt int, portlisten string) *Camera {
 
 //When this is called, it blocks until the channel feeds in the raw camera data, in which case it then
 //Parses it for the actual positions
-func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
+func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64, []uint64) {
 	//UPDATE POSITION
 	raw := <-c.revraw
 	pos := 1
@@ -66,11 +68,13 @@ func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64) {
 		pos += 2
 		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536
 		pos += 2
+		c.camres.orient[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
+		pos += 2
 
 		botnum += 1
 	}
 
-	return c.camres.ids, c.camres.X, c.camres.Y
+	return c.camres.ids, c.camres.X, c.camres.Y, c.camres.orient
 }
 
 

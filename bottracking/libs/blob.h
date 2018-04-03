@@ -2,6 +2,7 @@
 struct blob {
 	double cenX;
 	double cenY;
+	double orient;
 	int vol;
 	long long ID;
 };

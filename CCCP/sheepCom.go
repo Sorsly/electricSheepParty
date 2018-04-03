@@ -37,7 +37,10 @@ type Sheep struct {
 		relDesX		uint8  // Relative Desired X Position
 		relDesY uint8  // Relative Desired Y Position
 		servoAngle  uint8  //Angle to set the servo to
+		camOrient uint16
 		portAssign  uint16 //Assigned port
+		twiddleL uint8
+		twiddleR uint8
 	}
 	resp struct {
 		health  uint8 // How much health the bot has
@@ -75,6 +78,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
+	s.commands.twiddleL = 50
+	s.commands.twiddleR = 50
 
 	s.resp.health = 0
 	s.resp.accelX = 0
@@ -104,9 +109,10 @@ func (s *Sheep) updateState(raw []byte) {
 	s.resp.magY = int16(binary.BigEndian.Uint16(buffByte))
 	log.Println("X: ",s.resp.magX)
 	log.Println("Y: ",s.resp.magY)
-	log.Println("Xmod:",float64(s.resp.magX -118))
-	log.Println("Ymod:",float64(s.resp.magY +712))
-	angle := math.Atan2(float64(s.resp.magY-118),float64(s.resp.magX+712))*180/math.Pi
+	log.Println("Xmod:",float64(s.resp.magX + 456))
+	log.Println("Ymod:",float64(s.resp.magY +342))
+	log.Println("raw ATan:", math.Atan2(float64(s.resp.magY),float64(s.resp.magX))*180/math.Pi)
+	angle := math.Atan2(float64(s.resp.magY + 46),float64(s.resp.magX+342))*180/math.Pi
 	log.Println(angle)
 	log.Println("Jangle: ",float64(s.resp.magX)*180/300)
 }
@@ -116,7 +122,6 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 	defer group.Done()
 	resp := make([]byte, 10)
 	respConn, err := net.ListenUDP("udp", s.resppoint)
-	log.Println(s.resppoint)
 	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 20))
 	defer respConn.Close()
 
@@ -135,14 +140,20 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	CheckError(err)
 	defer Conn.Close()
 	portsplit := make([]byte, 2)
+	orientsplit := make([]byte,2)
 	binary.LittleEndian.PutUint16(portsplit, s.commands.portAssign)
+	binary.LittleEndian.PutUint16(orientsplit, s.commands.camOrient)
 	msg := []byte{
 		s.commands.sheepF,
 		s.commands.relDesX,
 		s.commands.relDesY,
 		s.commands.servoAngle,
 		portsplit[0],
-		portsplit[1]}
+		portsplit[1],
+		orientsplit[0],
+		orientsplit[1],
+		s.commands.twiddleL,
+		s.commands.twiddleR}
 	Conn.Write(msg)
 
 }

@@ -18,7 +18,7 @@ void displayBlobs(cv::Mat & pic,std::vector<blob*> *bloblist){
 			p = pic.ptr<uchar>(_y);
 			for(int _x = 0; _x < cols; _x += 1){
 				if(pxpos == _x && pypos == _y){
-					circle(pic,cv::Point(_x,_y),50,Scalar(255,0,255),5,8,0);
+					circle(pic,cv::Point(_x,_y),10,Scalar(255,0,255),5,8,0);
 				}
 			}
 		}

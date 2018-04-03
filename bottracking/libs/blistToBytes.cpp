@@ -9,6 +9,7 @@ int blistToBytes(std::vector<blob*> * blist, short * lut, unsigned char * buff, 
 	int xi;
 	int yi;
 	unsigned char *p;
+	uint16_t angle;
 	int interval = 1;
 
 	std::vector<blob *>::iterator it = blist->begin();
@@ -45,6 +46,13 @@ int blistToBytes(std::vector<blob*> * blist, short * lut, unsigned char * buff, 
 		pos++;
 
 		buff[pos] = p[0];
+		pos++;
+
+
+        angle = floor((*it)->orient);
+        buff[pos] = (uint8_t )(angle >> 8);
+		pos++;
+		buff[pos] = (uint8_t )(angle);
 		pos++;
 
 		if(interval == 1){
