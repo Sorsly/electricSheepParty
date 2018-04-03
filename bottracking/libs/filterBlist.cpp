@@ -16,7 +16,7 @@ bool want(blob * b){
 }
 
 //Pretty simple. Figure it out
-void filterBlist(std::vector<blob*> * blist){
+void filterBlist(std::vector<blob*> * blist, bool(*wantfct)(blob *)){
 	std::vector<blob *>::iterator it = blist->begin();
 	while(it != blist->end()){
 		if(!want(*it)){

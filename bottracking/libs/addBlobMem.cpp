@@ -13,16 +13,17 @@ addBlobMem: Adds the list of blobs in the current frame to the blob history. It 
 #include "findBlobs.h"
 #include "filterBlist.h"
 #include "addID.h"
+#include "wantPx.h"
 
 using namespace cv;
 using namespace std;
 
 int addBlobMem(cv::Mat & pic, std::vector<std::vector<blob *> * > * hist, int mem){
 	//Gets the blobs. The integer input is the minmum squared distance of the blobs
-	std::vector<blob*> * nBlist = findBlobs(pic,6000);
+	std::vector<blob*> * nBlist = findBlobs(pic,6000,&wantPx);
 
 	//filters out all the blobs that don't meet the hardcoded critera
-	filterBlist(nBlist);
+	filterBlist(nBlist,&want);
 	addID(nBlist,hist,10000);
 
 	//Adds new list and removes oldes values

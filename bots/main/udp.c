@@ -141,6 +141,7 @@ void receive_thread(commands *cmd) {
     cmd->relDesY = data_buffer[2];
     cmd->servoAngle = data_buffer[3];
     cmd->portAssign= (uint16_t)(data_buffer[4] | (data_buffer[5] << 8));
+    cmd->camorient = (uint16_t)(data_buffer[6] | (data_buffer[7] << 8));
 //   }
 
 }

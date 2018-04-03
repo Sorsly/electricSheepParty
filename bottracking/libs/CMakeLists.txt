@@ -11,4 +11,4 @@ filterBlist.cpp
 addID.cpp
 socketClient.cpp
 genlut.cpp
-blistToBytes.cpp)
+blistToBytes.cpp getOrient.h getOrient.cpp)

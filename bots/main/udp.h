@@ -36,6 +36,7 @@ typedef struct commands {
     char servoAngle;
     //Assigned response port
     uint16_t    portAssign;
+    uint16_t camorient;
 } commands;
 
 //The data sent back to the CCCP

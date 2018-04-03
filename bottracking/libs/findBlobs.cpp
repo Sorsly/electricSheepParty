@@ -6,7 +6,7 @@
 #include "addToBlob.h"
 using namespace std;
 
-std::vector<blob*> * findBlobs(cv::Mat & pic,double distThresh){
+std::vector<blob*> * findBlobs(cv::Mat & pic,double distThresh, bool(*wantfct)(uchar,uchar,uchar)){
 	//New list to hold all the blobs
 	std::vector<blob*> * bloblist = new std::vector<blob*>;
 	blob * blobBuff;
@@ -27,7 +27,7 @@ std::vector<blob*> * findBlobs(cv::Mat & pic,double distThresh){
 		for(int _x = 0; _x < cols; _x += 1){
 			ppointer = _x*channels;
 			//Scans through, finds the pixels we give a shit about, and adds them to a blob if theres one in range
-			if (wantPx(p[ppointer],p[ppointer+1],p[ppointer+2])){
+			if ((*wantfct)(p[ppointer],p[ppointer+1],p[ppointer+2])){
 				found = false;
 				for(vector <blob*>::iterator ii = bloblist->begin();ii != bloblist->end();ii++){
 					dist2 = pow((*ii)->cenY-_y,2)+pow((*ii)->cenX-_x,2);
@@ -44,6 +44,7 @@ std::vector<blob*> * findBlobs(cv::Mat & pic,double distThresh){
 					blobBuff->vol = 1;
 					blobBuff->ID = 0x00000000;
 					bloblist->push_back(blobBuff);
+					blobBuff->orient = 100;
 				}
 			}
 		}

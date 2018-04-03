@@ -6,7 +6,7 @@ using namespace cv;
 
 void printBlobs(std::vector<blob*> * blist){
 	for(vector <blob*>::iterator ii = blist->begin();ii != blist->end();ii++){
-		printf("Blob:%x, X:%f, Y:%f, Vol:%d \n", (unsigned int)(*ii)->ID, (*ii)->cenX, (*ii)->cenY, (*ii)->vol);
+		printf("Blob:%x, X:%f, Y:%f, Vol:%d, Orient:%f \n", (unsigned int)(*ii)->ID, (*ii)->cenX, (*ii)->cenY, (*ii)->vol,(*ii)->orient);
 	}
 	printf("\n");
 }

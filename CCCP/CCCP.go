@@ -60,12 +60,13 @@ func main_full() {
 		wait := time.NewTimer(time.Millisecond * 100)
 		<-wait.C
 
-		ids, xs, ys := cam.getPos(LENGTHFIELD)
+		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
 				sheep.currX = xs[idx]
 				sheep.currY = ys[idx]
+				sheep.commands.camOrient = uint16(orients[idx])
 				camToIdx[id] = sheep
 				found = true
 				break
@@ -90,12 +91,13 @@ func main_full() {
 	for gamedone == false {
 
 		//Update the position of all of the bots
-		ids, xs, ys := cam.getPos(LENGTHFIELD)
+		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
 			if found {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
+				sheep.commands.camOrient = uint16(orients[i])
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
@@ -108,7 +110,6 @@ func main_full() {
 				dir = -dir
 			}
 		}
-		log.Println(sheeps)
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, _, _, turretAngl := datawrite.frInfo(sheep)
@@ -137,7 +138,6 @@ func main_full() {
 		//Send those commands down to the bots. this is done in a burst of threads
 		commandwg.Add(NUMBOTS)
 		for _, sheep := range sheeps {
-			log.Println(sheep)
 			go sheep.recState(&commandwg)
 			wait := time.NewTimer(time.Nanosecond * 500)
 			<-wait.C
@@ -187,5 +187,6 @@ func main_camera() {
 }
 
 func main(){
-	main_full()
+	//main_full()
+	main_camera()
 }
