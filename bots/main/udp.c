@@ -209,25 +209,25 @@ void move(commands * cmd, resp *state){
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-    double init_angle=0;//will be changed later to account for initialization data
+    
     double des_angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
     if (des_angle<0){
         des_angle+=360;
     }
-    double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    curr_angle=curr_angle-init_angle;
+    //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
+    double curr_angle=camorient;
     if (abs(des_angle-curr_angle)>5){
 	double delt_angle=curr_angle-des_angle;
 	int turntime=abs(200*delt_angle/240);
 	if (delt_angle>0){
 		//turn right
-		left_ctl(true, ltwidle);
-		right_ctr(false,rtwidle);
+		left_ctl(true, cmd->twidleR);
+		right_ctr(false,cmd->rtwidle);
 		vTaskDelay(turntime);
 	}else{	
-		left_ctl(false,ltwidle);
-		right_ctl(true,rtwidle);
-		vTaskDelay(turntime;
+		left_ctl(false,cmd->twidleR);
+		right_ctl(true,cmd->twidleL);
+		vTaskDelay(turntime);
 	}
     }
     double x2=pow(cmd->relDesX,2);
@@ -235,8 +235,8 @@ void move(commands * cmd, resp *state){
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
     if (hyp>4){
-	left_ctl(false,ltwidle);
-	right_ctl(false,rtwidle);
+	left_ctl(false,cmd->twidleL);
+	right_ctl(false,cmd->twidleR);
 	VTaskDelay(20);
     }
 }
