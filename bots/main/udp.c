@@ -215,18 +215,18 @@ void move(commands * cmd, resp *state){
         des_angle+=360;
     }
     //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    double curr_angle=camorient;
+    double curr_angle=cmd->camorient;
     if (abs(des_angle-curr_angle)>5){
 	double delt_angle=curr_angle-des_angle;
 	int turntime=abs(200*delt_angle/240);
 	if (delt_angle>0){
 		//turn right
-		left_ctl(true, cmd->twidleR);
-		right_ctr(false,cmd->rtwidle);
+		left_ctl(true, cmd->twiddleL);
+		right_ctl(false, cmd->twiddleR);
 		vTaskDelay(turntime);
 	}else{	
-		left_ctl(false,cmd->twidleR);
-		right_ctl(true,cmd->twidleL);
+		left_ctl(false,cmd->twiddleR);
+		right_ctl(true,cmd->twiddleL);
 		vTaskDelay(turntime);
 	}
     }
@@ -235,9 +235,9 @@ void move(commands * cmd, resp *state){
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
     if (hyp>4){
-	left_ctl(false,cmd->twidleL);
-	right_ctl(false,cmd->twidleR);
-	VTaskDelay(20);
+	left_ctl(false,cmd->twiddleL);
+	right_ctl(false,cmd->twiddleR);
+	vTaskDelay(20);
     }
 }
 
