@@ -39,6 +39,8 @@ type Sheep struct {
 		servoAngle  uint8  //Angle to set the servo to
 		camOrient uint16
 		portAssign  uint16 //Assigned port
+		twiddleL uint8
+		twiddleR uint8
 	}
 	resp struct {
 		health  uint8 // How much health the bot has
@@ -76,6 +78,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
+	s.commands.twiddleL = 50
+	s.commands.twiddleR = 50
 
 	s.resp.health = 0
 	s.resp.accelX = 0
@@ -147,7 +151,9 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		portsplit[0],
 		portsplit[1],
 		orientsplit[0],
-		orientsplit[1]}
+		orientsplit[1],
+		s.commands.twiddleL,
+		s.commands.twiddleR}
 	Conn.Write(msg)
 
 }

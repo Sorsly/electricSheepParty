@@ -37,6 +37,8 @@ typedef struct commands {
     //Assigned response port
     uint16_t    portAssign;
     uint16_t camorient;
+    uint8_t twiddleR;
+    uint8_t twiddleL;
 } commands;
 
 //The data sent back to the CCCP
