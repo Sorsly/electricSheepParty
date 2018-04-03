@@ -21,19 +21,15 @@ def programserver(*args):
 
 # Runs the pathfinder
 def CCCP(*args):
-    os.chdir("CPU/")
-    os.system("go run pathfinder.go> log.txt")
-    os.chdir("plots/")
-    os.system("rm *")
-    os.chdir("../")
-    os.system("mv log.txt plotstuff/")
-    os.chdir("plotstuff/")
-    os.system("python pltclass.py")
-    os.system("./genplots.sh")
+    os.chdir("CCCP/")
+    os.system("go build")
+    os.system("sudo ./CCCP")
 
 # Generates the file with all the ips on the network
 def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
+    if "192.168." not in cpuip:
+        raise Exception("YOU ARE NOT CONNECTED TO THE LAN")
     rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
 
     query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"

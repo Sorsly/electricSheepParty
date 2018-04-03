@@ -128,10 +128,10 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			next := getNextPoint(*sheep,pat,10)
+			_ = getNextPoint(*sheep,pat,10)
 
-			sheep.commands.relDesY = getTrueMag(next.Y - float64(sheep.currY))
-			sheep.commands.relDesX = getTrueMag(next.X - float64(sheep.currX))
+			sheep.commands.relDesY = 100 //getTrueMag(next.Y - float64(sheep.currY))
+			sheep.commands.relDesX = 100 //getTrueMag(next.X - float64(sheep.currX))
 		}
 
 
