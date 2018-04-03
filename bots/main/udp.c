@@ -206,13 +206,36 @@ void move(commands * cmd, resp *state){
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-    double xMag, yMag;
-    double theta = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    state->orient =  theta;
-    state->magX = xMag;
-    state->magY = yMag;
-    left_ctl(false,0);
-    right_ctl(false,0);//for translational
+    double init_angle=0;//will be changed later to account for initialization data
+    double des_angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
+    if (des_angle<0){
+        des_angle+=360;
+    }
+    double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
+    curr_angle=curr_angle-init_angle;
+    if (abs(des_angle-curr_angle)>5){
+	double delt_angle=curr_angle-des_angle;
+	int turntime=abs(200*delt_angle/240);
+	if (delt_angle>0){
+		//turn right
+		left_ctl(true, ltwidle);
+		right_ctr(false,rtwidle);
+		vTaskDelay(turntime);
+	}else{	
+		left_ctl(false,ltwidle);
+		right_ctl(true,rtwidle);
+		vTaskDelay(turntime;
+	}
+    }
+    double x2=pow(cmd->relDesX,2);
+    double y2=pow(cmd->relDesY,2);
+    printf("x2 %f y2 %f",x2,y2);
+    double hyp=sqrt(x2+y2);
+    if (hyp>4){
+	left_ctl(false,ltwidle);
+	right_ctl(false,rtwidle);
+	VTaskDelay(20);
+    }
 }
 
 //Initializes the proper pins as inputs and outputs
