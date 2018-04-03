@@ -112,7 +112,7 @@ double getRawTheta(double startX, double startY, double * magX,double * magY){
     double y = 0;
     double theta;
     uint8_t * databuff = malloc(sizeof(uint8_t)*6);
-    while( out & 0x01 != 1){
+    while( (out & 0x01 )!= 1){
        out = readmag(0x09);
        readMagData(databuff);
        x_high = databuff[0];

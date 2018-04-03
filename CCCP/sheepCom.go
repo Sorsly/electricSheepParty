@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"strconv"
-
 	"encoding/binary"
 	"sync"
 	"time"
