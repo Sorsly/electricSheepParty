@@ -10,6 +10,9 @@ public class Enemy : MonoBehaviour {
     public ulong health;
     public turret turr;
     public ulong desiredturretpos;
+    public ulong enempos;
+    public ulong desiredenempos;
+    public Enemy enem;
     void Start () {
 
 
@@ -19,5 +22,6 @@ public class Enemy : MonoBehaviour {
 	void Update () {
         turr.transform.eulerAngles = new Vector3(90, turretpos);
         desiredturretpos = turr.getDesired();
+        enem.transform.eulerAngles = new Vector3(90, enempos);
     }
 }
