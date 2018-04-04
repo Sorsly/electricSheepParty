@@ -21,7 +21,7 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char *argv[]){
-	cv::VideoCapture cap(0);
+	cv::VideoCapture cap(1);
 
 	//This holds all the blob data. it is a pointer to a vector of pointers to vectors of pointers
 	std::vector<std::vector<blob *> *> * blobHist = new std::vector<std::vector<blob *> *>() ;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-		//cv::waitKey(time);
+		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);

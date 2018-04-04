@@ -44,7 +44,7 @@ std::vector<blob*> * findBlobs(cv::Mat & pic,double distThresh, bool(*wantfct)(u
 					blobBuff->vol = 1;
 					blobBuff->ID = 0x00000000;
 					bloblist->push_back(blobBuff);
-					blobBuff->orient = 100;
+					blobBuff->orient = 0;
 				}
 			}
 		}
