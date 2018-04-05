@@ -65,7 +65,7 @@ void getOrient(std::vector<blob*> * blist,cv::Mat & pic,int frameSize){
         printf("Largest Size: %d\n",largest);
         inRange(roiImg,Scalar(0,0,150),Scalar(100,100,255),mask);
         cv::imshow("Found: ",mask);
-        (*it)->orient = atan2(closest->cenY+ roi.y - (*it)->cenY ,closest->cenX+ roi.x -(*it)->cenX)*180/PI;
+        (*it)->orient = -atan2(closest->cenY+ roi.y - (*it)->cenY ,closest->cenX+ roi.x -(*it)->cenX)*180/PI;
         circle(pic,cv::Point(closest->cenX+roi.x,closest->cenY+roi.y),10,Scalar(0,0,255),5,8,0);
         while( (*it)->orient < 0){
             (*it)->orient += 360;
