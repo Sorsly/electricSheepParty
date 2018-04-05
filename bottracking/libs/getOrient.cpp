@@ -22,10 +22,30 @@ void getOrient(std::vector<blob*> * blist,cv::Mat & pic,int frameSize){
     std::vector<blob*> * nBlist;
     blob* closest;
     double angle;
+    int lX;
+    int lY;
+    int hX;
+    int hY;
 
     while(it != blist->end()) {
         largest = 0;
-        roi = cv::Rect((*it)->cenX-frameSize/2,(*it)->cenY -frameSize/2,frameSize,frameSize);
+        lX = (*it)->cenX -frameSize/2;
+        lY = (*it)->cenY -frameSize/2;
+        hX = (*it)->cenX +frameSize/2;
+        hY = (*it)->cenY +frameSize/2;
+        if(lX < 0){
+            lX = 0;
+        }
+        if(lY < 0){
+            lY = 0;
+        }
+        if(hX > pic.cols){
+            hX = pic.cols-1;
+        }
+        if(hY > pic.rows){
+            hY = pic.rows-1;
+        }
+        roi = cv::Rect(cv::Point(lX,lY),cv::Point(hX,hY));
         rectangle(pic,roi,cv::Scalar(0, 255, 0));
         roiImg = pic(roi);
         nBlist = findBlobs(roiImg,300,&wantOrientPx);
@@ -43,11 +63,10 @@ void getOrient(std::vector<blob*> * blist,cv::Mat & pic,int frameSize){
             itt ++;
         }
         printf("Largest Size: %d\n",largest);
-        displayBlobs(roiImg,nBlist);
         inRange(roiImg,Scalar(0,0,150),Scalar(100,100,255),mask);
         cv::imshow("Found: ",mask);
-        circle(pic,cv::Point(closest->cenX+roi.x,closest->cenY+roi.y),10,Scalar(0,0,255),5,8,0);
         (*it)->orient = atan2(closest->cenY+ roi.y - (*it)->cenY ,closest->cenX+ roi.x -(*it)->cenX)*180/PI;
+        circle(pic,cv::Point(closest->cenX+roi.x,closest->cenY+roi.y),10,Scalar(0,0,255),5,8,0);
         while( (*it)->orient < 0){
             (*it)->orient += 360;
         }
@@ -64,7 +83,7 @@ bool filterfunc(blob * b){
 }
 bool wantOrientPx(uchar b, uchar g, uchar r){
     bool ret = false;
-    if(r>150){
+    if(r>130){
         if(g<100){
             if(b<100){
                 ret = true;

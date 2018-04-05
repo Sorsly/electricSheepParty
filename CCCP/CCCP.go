@@ -39,12 +39,13 @@ func main_full() {
 	cam := initcamera(NUMBOTS, CAMPORT)
 
 	//Initializing idhash. used to get a certain sheep object from an id
-	camToIdx :=make(map[uint64]*Sheep)
+	camToIdx := make(map[uint64]*Sheep)
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
 		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
+		sheeps[i].commands.sheepF &= 0xEF
 	}
 
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
@@ -89,6 +90,7 @@ func main_full() {
 	dir := 1
 	log.Println("Entering Game")
 	for gamedone == false {
+		log.Println(sheeps)
 
 		//Update the position of all of the bots
 		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
@@ -128,10 +130,12 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			_ = getNextPoint(*sheep,pat,10)
+			next := getNextPoint(*sheep,pat,10)
+			next.Y = 350
+			next.X = 600
 
-			sheep.commands.relDesY = 100 //getTrueMag(next.Y - float64(sheep.currY))
-			sheep.commands.relDesX = 100 //getTrueMag(next.X - float64(sheep.currX))
+			sheep.commands.relDesY = getTrueMag(next.Y - float64(sheep.currY))
+			sheep.commands.relDesX = getTrueMag(next.X - float64(sheep.currX))
 		}
 
 
@@ -187,6 +191,6 @@ func main_camera() {
 }
 
 func main(){
-	//main_full()
-	main_camera()
+	main_full()
+	//main_camera()
 }

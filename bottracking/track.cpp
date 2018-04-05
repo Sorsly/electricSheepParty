@@ -83,7 +83,7 @@ int main(int argc, char *argv[]){
 		//All the real computation occurs here
 		addBlobMem(frame,blobHist, memory);
 
-		getOrient(*(blobHist->begin()),frame,120);
+		getOrient(*(blobHist->begin()),frame,70);
 
 		//For display purposes
 		printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
