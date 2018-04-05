@@ -210,7 +210,7 @@ void move(commands * cmd, resp *state){
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
     
-    double des_angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
+    double des_angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141+180;
     if (des_angle<0){
         des_angle+=360;
     }
