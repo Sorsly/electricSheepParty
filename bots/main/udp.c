@@ -100,7 +100,7 @@ void receive_thread(commands *cmd) {
     struct sockaddr_in sa,ra;
 
     int recv_data;
-    char data_buffer[10];
+    char data_buffer[12];
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -137,13 +137,13 @@ void receive_thread(commands *cmd) {
 //This is a utility function that takes the raw data and puts it into the command structure
 //    void parsecommands(char * raw, commands * cmd){
     cmd->sheepf = data_buffer[0];
-    cmd->relDesX = data_buffer[1];
-    cmd->relDesY = data_buffer[2];
-    cmd->servoAngle = data_buffer[3];
-    cmd->portAssign= (uint16_t)(data_buffer[4] | (data_buffer[5] << 8));
-    cmd->camorient = (uint16_t)(data_buffer[6] | (data_buffer[7] << 8));
-    cmd->twiddleL = data_buffer[8];
-    cmd->twiddleR = data_buffer[9];
+    cmd->relDesX = (int16_t)(data_buffer[1] | (data_buffer[2] << 8));
+    cmd->relDesY = (int16_t)(data_buffer[3] | (data_buffer[4] << 8));
+    cmd->servoAngle = data_buffer[5];
+    cmd->portAssign= (uint16_t)(data_buffer[6] | (data_buffer[7] << 8));
+    cmd->camorient = (uint16_t)(data_buffer[8] | (data_buffer[9] << 8));
+    cmd->twiddleL = data_buffer[10];
+    cmd->twiddleR = data_buffer[11];
 //   }
 
 }
@@ -235,8 +235,8 @@ void move(commands * cmd, resp *state){
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
     if (hyp>4){
-	left_ctl(false,cmd->twiddleL);
-	right_ctl(false,cmd->twiddleR);
+	left_ctl(true,cmd->twiddleL);
+	right_ctl(true,cmd->twiddleR);
 	vTaskDelay(20);
     }
 }

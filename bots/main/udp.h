@@ -31,8 +31,8 @@ typedef struct commands {
     // sheepF b3 = fire
     // sheepF b4 = lightOn
     //The relative position that the bot should travel to, given itself as the origin
-    uint8_t relDesX;
-    uint8_t relDesY;
+    int16_t relDesX;
+    int16_t relDesY;
     char servoAngle;
     //Assigned response port
     uint16_t    portAssign;

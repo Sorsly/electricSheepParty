@@ -57,13 +57,13 @@ func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
 
 }
 //This levels off the value of the input, peaking it and leveling instead of overflowing
-func getTrueMag(val float64)(uint8){
+func getTrueMag(val float64)(int8){
 	if val < -127 {
-		return 0x80
+		return -127
 	} else if val > 127 {
-		return 0x7F
+		return 127
 	}
-	return uint8(val)
+	return int8(val)
 }
 //shifts the value of the angle by some arbitrary offset
 func shiftOrient(val uint8,offset uint8)(uint8){
