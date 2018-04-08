@@ -32,19 +32,14 @@ public class Friendly : MonoBehaviour {
     {
        
         desiredturretpos = turr.getDesired();
-        Debug.Log(desiredturretpos);
-        Debug.Log("ruijofrera");
-        if (Input.GetMouseButtonDown(1))// && isSelected == true)
+        if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
-            Debug.Log("button pressed");
             playerAgent.CalculatePath(GetPointUnderCursor(), path);
-            Debug.Log(BotPath());
-            path.corners[0] = BotPath();
         }
-        //if (Input.GetMouseButtonDown(0) && isSelected == true && SelectedEnemy())
-        //{
-        //    playerAgent.CalculatePath(intersectPath(5), path);
-        //}
+        if (Input.GetMouseButtonDown(0) && isSelected == true && SelectedEnemy())
+        {
+            playerAgent.CalculatePath(intersectPath(5), path);
+        }
 
     }
 #endregion
@@ -86,17 +81,5 @@ public class Friendly : MonoBehaviour {
         Physics.Raycast(ray, out hit);
 
         return hit.point;
-    }
-
-    public Vector3 BotPath()
-    {
-        Vector3 back;
-        Vector3 dest = GetPointUnderCursor();
-        float currx = transform.position.x;
-        float currz = transform.position.z;
-        back.x = dest.x - currx;
-        back.z = dest.z - currz;
-        back.y = 0;
-        return back;
     }
 }

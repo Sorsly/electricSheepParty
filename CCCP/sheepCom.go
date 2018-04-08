@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 	"log"
-	"math"
 )
 
 //these define the bit positions of the various commands for the botflag
@@ -33,8 +32,8 @@ type Sheep struct {
 		// sheepF b2 = dir2
 		// sheepF b3 = fire
 		// sheepF b4 = lightOn
-		relDesX		uint8  // Relative Desired X Position
-		relDesY uint8  // Relative Desired Y Position
+		relDesX		int16  // Relative Desired X Position
+		relDesY int16  // Relative Desired Y Position
 		servoAngle  uint8  //Angle to set the servo to
 		camOrient uint16
 		portAssign  uint16 //Assigned port
@@ -77,8 +76,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
-	s.commands.twiddleL = 50
-	s.commands.twiddleR = 50
+	s.commands.twiddleL = 80
+	s.commands.twiddleR = 80
 
 	s.resp.health = 0
 	s.resp.accelX = 0
@@ -90,7 +89,6 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 
 //Parses the raw UDP response into the sheeps data structure
 func (s *Sheep) updateState(raw []byte) {
-	log.Println("raw",raw)
 	s.resp.health = raw[0]
 	s.resp.accelX = raw[1]
 	s.resp.accelY = raw[2]
@@ -106,14 +104,6 @@ func (s *Sheep) updateState(raw []byte) {
 	buffByte[0] = raw[8]
 	buffByte[1] = raw[9]
 	s.resp.magY = int16(binary.BigEndian.Uint16(buffByte))
-	log.Println("X: ",s.resp.magX)
-	log.Println("Y: ",s.resp.magY)
-	log.Println("Xmod:",float64(s.resp.magX + 456))
-	log.Println("Ymod:",float64(s.resp.magY +342))
-	log.Println("raw ATan:", math.Atan2(float64(s.resp.magY),float64(s.resp.magX))*180/math.Pi)
-	angle := math.Atan2(float64(s.resp.magY + 46),float64(s.resp.magX+342))*180/math.Pi
-	log.Println(angle)
-	log.Println("Jangle: ",float64(s.resp.magX)*180/300)
 }
 
 //Recieves the UDP data. if no response in time, does nothing. Nonblocking
@@ -140,12 +130,19 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	defer Conn.Close()
 	portsplit := make([]byte, 2)
 	orientsplit := make([]byte,2)
+	relXsplit := make([]byte,2)
+	relYsplit := make([]byte,2)
 	binary.LittleEndian.PutUint16(portsplit, s.commands.portAssign)
 	binary.LittleEndian.PutUint16(orientsplit, s.commands.camOrient)
+	binary.LittleEndian.PutUint16(relXsplit, uint16(s.commands.relDesX))
+	binary.LittleEndian.PutUint16(relYsplit, uint16(s.commands.relDesY))
+
 	msg := []byte{
 		s.commands.sheepF,
-		s.commands.relDesX,
-		s.commands.relDesY,
+		relXsplit[0],
+		relXsplit[1],
+		relYsplit[0],
+		relYsplit[1],
 		s.commands.servoAngle,
 		portsplit[0],
 		portsplit[1],
@@ -153,6 +150,7 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		orientsplit[1],
 		s.commands.twiddleL,
 		s.commands.twiddleR}
+	log.Println("Raw Commands: ",msg)
 	Conn.Write(msg)
 
 }

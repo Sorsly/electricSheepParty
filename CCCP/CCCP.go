@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
+	"math"
 )
 
 const NUMBOTS = 1 //Number of bots in the game
@@ -39,12 +40,13 @@ func main_full() {
 	cam := initcamera(NUMBOTS, CAMPORT)
 
 	//Initializing idhash. used to get a certain sheep object from an id
-	camToIdx :=make(map[uint64]*Sheep)
+	camToIdx := make(map[uint64]*Sheep)
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
 		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
+		sheeps[i].commands.sheepF &= 0xEF
 	}
 
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
@@ -57,10 +59,11 @@ func main_full() {
 		sheep.commands.sheepF |= SHEEPLIGHT
 		sheep.sendCommands(outServerAddr)
 
-		wait := time.NewTimer(time.Millisecond * 100)
+		wait := time.NewTimer(time.Second)
 		<-wait.C
 
-		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
+		ids, xs, ys,orients := cam.getPos(65536)
+		log.Println("IDing ids",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
@@ -88,16 +91,21 @@ func main_full() {
 	top := true
 	dir := 1
 	log.Println("Entering Game")
+	log.Println(camToIdx)
 	for gamedone == false {
+		log.Println(sheeps)
 
 		//Update the position of all of the bots
 		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
+		log.Println(ids)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
+			log.Println(sheep,found)
 			if found {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
 				sheep.commands.camOrient = uint16(orients[i])
+				log.Println("SheepPos:",sheep.currX,sheep.currY)
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
@@ -129,9 +137,19 @@ func main_full() {
 			}
 			//Get next point to travel too
 			next := getNextPoint(*sheep,pat,10)
+			next.Y = 250
+			next.X = 250
 
-			sheep.commands.relDesY = getTrueMag(next.Y - float64(sheep.currY))
-			sheep.commands.relDesX = getTrueMag(next.X - float64(sheep.currX))
+			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
+			sheep.commands.relDesX = int16(next.X - float64(sheep.currX))
+			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
+			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
+			log.Println("Sheep Orient:",sheep.commands.camOrient)
+			des_angle :=math.Atan2(-float64(sheep.commands.relDesY),float64(sheep.commands.relDesX))*180/3.141
+			if des_angle < 0{
+				des_angle += 360
+			}
+			log.Println("Desired Sheep Orient:",des_angle)
 		}
 
 
@@ -146,6 +164,7 @@ func main_full() {
 		//Wait until all of the bots respond
 		commandwg.Wait()
 
+		//panic("Done")
 	}
 
 	log.Println("GAME COMPLETE")
@@ -188,5 +207,6 @@ func main_camera() {
 
 func main(){
 	//main_full()
-	main_camera()
+	//main_camera()
+	main_frontend()
 }

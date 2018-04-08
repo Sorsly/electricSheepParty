@@ -9,7 +9,7 @@ using namespace std;
 //Want or do not want?
 bool want(blob * b){
 	bool ret = true;
-	if(b->vol<70 ){
+	if(b->vol<20 ){
 		ret = false;
 	}
 	return ret;
@@ -19,7 +19,7 @@ bool want(blob * b){
 void filterBlist(std::vector<blob*> * blist, bool(*wantfct)(blob *)){
 	std::vector<blob *>::iterator it = blist->begin();
 	while(it != blist->end()){
-		if(!want(*it)){
+		if(!wantfct(*it)){
 			free(*it);
 			it = blist->erase(it);
 		}

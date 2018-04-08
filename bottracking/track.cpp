@@ -21,7 +21,7 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char *argv[]){
-	cv::VideoCapture cap(0);
+	cv::VideoCapture cap(1);
 
 	//This holds all the blob data. it is a pointer to a vector of pointers to vectors of pointers
 	std::vector<std::vector<blob *> *> * blobHist = new std::vector<std::vector<blob *> *>() ;
@@ -83,8 +83,9 @@ int main(int argc, char *argv[]){
 		//All the real computation occurs here
 		addBlobMem(frame,blobHist, memory);
 
-		getOrient(*(blobHist->begin()),frame,120);
+		getOrient(*(blobHist->begin()),frame,70);
 
+                circle(frame,cv::Point(250,250),10,Scalar(255,0,0),5,8,0);
 		//For display purposes
 		printf("Time: %f\n",double(clock()-begin)/CLOCKS_PER_SEC);
 		printBlobs(*(blobHist->begin()));
@@ -99,7 +100,7 @@ int main(int argc, char *argv[]){
 			c.closeSock();
 		}
 
-		//cv::waitKey(time);
+		cv::waitKey(time);
 	}
 
 	freeHist(blobHist);

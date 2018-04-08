@@ -31,7 +31,7 @@ class NetworkInter : MonoBehaviour
     }
     private void Update()
     {
-        StartCoroutine(Upload(DoLast));
+        StartCoroutine(Upload());
 
     }
     public static string ByteArrayToString(byte[] ba)
@@ -43,7 +43,6 @@ class NetworkInter : MonoBehaviour
     }
     void DoLast()
     {
-        Debug.Log("give me life");
         numbots = results[0];
         ulong xPos;
         ulong yPos;
@@ -58,7 +57,7 @@ class NetworkInter : MonoBehaviour
             turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + friend.idnum * 8);
             orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + friend.idnum * 8);
             health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + friend.idnum * 8);
-            //friend.transform.position = new Vector3(xPos, friend.transform.position.y, yPos);
+            friend.transform.position = new Vector3(xPos, friend.transform.position.y, yPos);
             friend.transform.eulerAngles = new Vector3(0, orient);
             friend.health = health;
             friend.turr.transform.eulerAngles = new Vector3(90, turretPos);
@@ -105,16 +104,17 @@ class NetworkInter : MonoBehaviour
         send = JsonConvert.SerializeObject(tocccp);
         return send;
     }
-    IEnumerator Upload(Action doLast)
+    IEnumerator Upload()
     {
-        string msg = genJSON();
+        string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://192.168.42.23", myData))
+        using (UnityWebRequest www = UnityWebRequest.Put("http://192.168.1.117", myData))
         {
             yield return www.Send();
 
             if (www.isNetworkError)
             {
+                Debug.Log("NETWORK ERROR");
                 Debug.Log(www.error);
             }
             else
@@ -122,6 +122,6 @@ class NetworkInter : MonoBehaviour
                 results = www.downloadHandler.data;
             }
         }
-        doLast();
+        DoLast();
     }
 }

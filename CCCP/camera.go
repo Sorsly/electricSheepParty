@@ -64,9 +64,9 @@ func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64, []uint
 	for raw[pos] != 0 && botnum < c.numbots{
 		c.camres.ids[botnum] = uint64(binary.BigEndian.Uint32(raw[pos : pos+4]))
 		pos += 4
-		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536
+		c.camres.X[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
 		pos += 2
-		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))*lengthReal/65536
+		c.camres.Y[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
 		pos += 2
 		c.camres.orient[botnum] = uint64(binary.BigEndian.Uint16(raw[pos : pos+2]))
 		pos += 2

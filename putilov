@@ -3,11 +3,13 @@ import os
 import re
 import sys
 import subprocess
+import multiprocessing
 import math
 from json import dumps
 import numpy as np
 import http.server
 import socketserver
+import time
 dir_path = os.path.dirname(os.path.realpath(__file__))
 proj_name = re.search(r"PROJECT_NAME := (\w+)", open("bots/Makefile", "r").read()).group(1)
 ipfile = "ips.txt"
@@ -20,20 +22,12 @@ def programserver(*args):
     os.system("python -m SimpleHTTPServer 1944")
 
 # Runs the pathfinder
-def CCCP(*args):
-    os.chdir("CPU/")
-    os.system("go run pathfinder.go> log.txt")
-    os.chdir("plots/")
-    os.system("rm *")
-    os.chdir("../")
-    os.system("mv log.txt plotstuff/")
-    os.chdir("plotstuff/")
-    os.system("python pltclass.py")
-    os.system("./genplots.sh")
 
 # Generates the file with all the ips on the network
 def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
+    if "192.168." not in cpuip:
+        raise Exception("YOU ARE NOT CONNECTED TO THE LAN")
     rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
 
     query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"
@@ -100,6 +94,31 @@ def calibrate(*args):
     O = IminA*(m2 - A*m1)
     print(O)
 
+def CCCP(*args):
+    os.chdir("CCCP")
+    err = os.system("go build")
+    err = os.system("sudo ./CCCP 2>cccplog.txt")
+
+def Camera(*args):
+    os.chdir("bottracking")
+    err = os.system("make")
+    os.chdir("../")
+    err = os.system("./bottracking/run.a -c > camlog.txt")
+
+def run():
+    cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
+    if "192.168" not in cpuip:
+        raise Exception("Connect to Sliva")
+    on = input("Are all the bots turned on? [y/n]")
+    if on != 'y':
+       raise Exception("Turn on Bots") 
+    camproc = multiprocessing.Process(target=Camera)
+    cccproc = multiprocessing.Process(target=CCCP)
+    camproc.start()
+    time.sleep(1)
+    cccproc.start()
+    
+        
 # main
 def main():
     available_builds = {
@@ -111,7 +130,8 @@ def main():
         "getIP": getIPS,
         "cccp": CCCP,
         "serve":programserver,
-        "calibrate":calibrate
+        "calibrate":calibrate,
+        "run":run
     }
     if len(sys.argv) == 1 or sys.argv[1] not in available_builds:
         print("Commands:")

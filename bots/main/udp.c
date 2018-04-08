@@ -100,7 +100,7 @@ void receive_thread(commands *cmd) {
     struct sockaddr_in sa,ra;
 
     int recv_data;
-    char data_buffer[10];
+    char data_buffer[12];
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -137,13 +137,13 @@ void receive_thread(commands *cmd) {
 //This is a utility function that takes the raw data and puts it into the command structure
 //    void parsecommands(char * raw, commands * cmd){
     cmd->sheepf = data_buffer[0];
-    cmd->relDesX = data_buffer[1];
-    cmd->relDesY = data_buffer[2];
-    cmd->servoAngle = data_buffer[3];
-    cmd->portAssign= (uint16_t)(data_buffer[4] | (data_buffer[5] << 8));
-    cmd->camorient = (uint16_t)(data_buffer[6] | (data_buffer[7] << 8));
-    cmd->twiddleL = data_buffer[8];
-    cmd->twiddleR = data_buffer[9];
+    cmd->relDesX = (int16_t)(data_buffer[1] | (data_buffer[2] << 8));
+    cmd->relDesY = (int16_t)(data_buffer[3] | (data_buffer[4] << 8));
+    cmd->servoAngle = data_buffer[5];
+    cmd->portAssign= (uint16_t)(data_buffer[6] | (data_buffer[7] << 8));
+    cmd->camorient = (uint16_t)(data_buffer[8] | (data_buffer[9] << 8));
+    cmd->twiddleL = data_buffer[10];
+    cmd->twiddleR = data_buffer[11];
 //   }
 
 }
@@ -210,11 +210,12 @@ void move(commands * cmd, resp *state){
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
     
-    double des_angle=atan2(cmd->relDesY,cmd->relDesX)*180/3.141-90;
+    double des_angle=atan2(-cmd->relDesY,cmd->relDesX)*180/3.141;
     if (des_angle<0){
         des_angle+=360;
     }
     //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
+<<<<<<< HEAD
     double curr_angle=cmd->camorient+180;//adjust for camera's angle
     if (curr_angle>360){
 	curr_angle+=-360;
@@ -222,17 +223,21 @@ void move(commands * cmd, resp *state){
 	curr_angle+=360;
     }
 
+=======
+    double curr_angle=cmd->camorient;
+    printf("%f %f",des_angle,curr_angle);
+>>>>>>> 3f69e2b8121960c69d361ded253f5a131e960943
     if (abs(des_angle-curr_angle)>5){
 	double delt_angle=curr_angle-des_angle;
 	int turntime=abs(200*delt_angle/240);
 	if (delt_angle>0){
 		//turn right
-		left_ctl(true, cmd->twiddleL);
-		right_ctl(false, cmd->twiddleR);
+        left_ctl(false,cmd->twiddleR);
+        right_ctl(true,cmd->twiddleL);
 		vTaskDelay(turntime);
 	}else{	
-		left_ctl(false,cmd->twiddleR);
-		right_ctl(true,cmd->twiddleL);
+        left_ctl(true, cmd->twiddleL);
+        right_ctl(false, cmd->twiddleR);
 		vTaskDelay(turntime);
 	}
     }
@@ -241,6 +246,7 @@ void move(commands * cmd, resp *state){
     double y2=pow(cmd->relDesY,2);
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
+<<<<<<< HEAD
     if (hyp>4&&hyp<8){
 	left_ctl(false,cmd->twiddleL);
 	right_ctl(false,cmd->twiddleR);
@@ -249,6 +255,12 @@ void move(commands * cmd, resp *state){
 	left_ctl(false,cmd->twiddleL);
 	right_ctl(false,cmd->twiddleR);
 	vTaskDelay(60);
+=======
+    if (hyp>30){
+	left_ctl(true,cmd->twiddleL);
+	right_ctl(true,cmd->twiddleR);
+	vTaskDelay(20);
+>>>>>>> 3f69e2b8121960c69d361ded253f5a131e960943
     }
 }
 
