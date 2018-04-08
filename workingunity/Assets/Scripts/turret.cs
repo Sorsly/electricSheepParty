@@ -13,9 +13,6 @@ public class turret : MonoBehaviour {
     {
         float dX = target.transform.position.x - chassis.transform.position.x;
         float dY = target.transform.position.z - chassis.transform.position.z;
-        Debug.Log("Difs");
-        Debug.Log(dX);
-        Debug.Log(dY);
         float angle;
         if (dX == 0){
             dX = 0.00001F;

@@ -186,6 +186,10 @@ func numtoportstr(port int) string {
 //Takes the raw request body from the frontend and parses it into the command structure for each id
 func (fe *FrontEnd) loadFERaw(raw []byte) {
 	var decoded FEPacket
+	log.Println(raw)
+	if len(raw) == 0{
+		return
+	}
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
 	fe.feFEmtx.Lock()
@@ -207,6 +211,10 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 //Function to serve the data as a server, ba dum chi
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	log.Println("Client connected")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time, Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods",  "GET, POST, OPTIONS, PUT")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	defer r.Body.Close()
 	rawBody, err := ioutil.ReadAll(r.Body)

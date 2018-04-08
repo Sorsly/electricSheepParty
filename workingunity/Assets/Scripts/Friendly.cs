@@ -32,7 +32,6 @@ public class Friendly : MonoBehaviour {
     {
        
         desiredturretpos = turr.getDesired();
-        Debug.Log(desiredturretpos);
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
             playerAgent.CalculatePath(GetPointUnderCursor(), path);
