@@ -31,7 +31,7 @@ class NetworkInter : MonoBehaviour
     }
     private void Update()
     {
-        StartCoroutine(Upload(DoLast));
+        StartCoroutine(Upload());
 
     }
     public static string ByteArrayToString(byte[] ba)
@@ -104,16 +104,17 @@ class NetworkInter : MonoBehaviour
         send = JsonConvert.SerializeObject(tocccp);
         return send;
     }
-    IEnumerator Upload(Action doLast)
+    IEnumerator Upload()
     {
-        string msg = genJSON();
+        string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://10.186.92.45", myData))
+        using (UnityWebRequest www = UnityWebRequest.Put("http://192.168.1.117", myData))
         {
             yield return www.Send();
 
             if (www.isNetworkError)
             {
+                Debug.Log("NETWORK ERROR");
                 Debug.Log(www.error);
             }
             else
@@ -121,6 +122,6 @@ class NetworkInter : MonoBehaviour
                 results = www.downloadHandler.data;
             }
         }
-        doLast();
+        DoLast();
     }
 }
