@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
+	"math"
 )
 
 const NUMBOTS = 1 //Number of bots in the game
@@ -139,11 +140,16 @@ func main_full() {
 			next.Y = 250
 			next.X = 250
 
-			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
 			sheep.commands.relDesX = int16(next.X - float64(sheep.currX))
-			log.Println("Trying To get to: ", sheep.commands.relDesX,int16(next.X-float64(sheep.currX)))
-			log.Println("Trying To get to: ", sheep.commands.relDesY,int16(next.Y-float64(sheep.currY)))
+			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
+			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
+			log.Println("Sheep Orient:",sheep.commands.camOrient)
+			des_angle :=math.Atan2(-float64(sheep.commands.relDesY),float64(sheep.commands.relDesX))*180/3.141
+			if des_angle < 0{
+				des_angle += 360
+			}
+			log.Println("Desired Sheep Orient:",des_angle)
 		}
 
 
