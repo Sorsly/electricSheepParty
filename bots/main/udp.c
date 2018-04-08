@@ -215,7 +215,13 @@ void move(commands * cmd, resp *state){
         des_angle+=360;
     }
     //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    double curr_angle=cmd->camorient;
+    double curr_angle=cmd->camorient+180;//adjust for camera's angle
+    if (curr_angle>360){
+	curr_angle+=-360;
+    } else if (curr_angle<0){
+	curr_angle+=360;
+    }
+
     if (abs(des_angle-curr_angle)>5){
 	double delt_angle=curr_angle-des_angle;
 	int turntime=abs(200*delt_angle/240);
@@ -230,14 +236,19 @@ void move(commands * cmd, resp *state){
 		vTaskDelay(turntime);
 	}
     }
+
     double x2=pow(cmd->relDesX,2);
     double y2=pow(cmd->relDesY,2);
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
-    if (hyp>4){
+    if (hyp>4&&hyp<8){
 	left_ctl(false,cmd->twiddleL);
 	right_ctl(false,cmd->twiddleR);
-	vTaskDelay(20);
+	vTaskDelay(20);//move approximately 2 cm
+    } else if(hyp>8){
+	left_ctl(false,cmd->twiddleL);
+	right_ctl(false,cmd->twiddleR);
+	vTaskDelay(60);
     }
 }
 
