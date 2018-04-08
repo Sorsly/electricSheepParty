@@ -108,11 +108,11 @@ class NetworkInter : MonoBehaviour
     {
         string msg = genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://10.186.95.100", myData))
+        using (UnityWebRequest www = UnityWebRequest.Put("http://10.186.92.45", myData))
         {
             yield return www.Send();
 
-            if (www.isError)
+            if (www.isNetworkError)
             {
                 Debug.Log(www.error);
             }
