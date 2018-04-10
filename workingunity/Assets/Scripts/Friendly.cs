@@ -16,6 +16,7 @@ public class Friendly : MonoBehaviour {
     public NavMeshAgent playerAgent;
     private NavMeshPath path;
     public turret turr;
+    public GameObject hovertext;
     #region Monobehavior API
     void Awake()
     {

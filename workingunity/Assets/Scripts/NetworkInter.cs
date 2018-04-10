@@ -13,6 +13,7 @@ class NetworkInter : MonoBehaviour
     private byte[] results;
     public Friendly[] friends;
     public Enemy[] enemies;
+    public string IP;
     private int numbots;
     class toCCCP
     {
@@ -108,7 +109,7 @@ class NetworkInter : MonoBehaviour
     {
         string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://192.168.1.117", myData))
+        using (UnityWebRequest www = UnityWebRequest.Put("http://" + IP, myData))
         {
             yield return www.Send();
 
