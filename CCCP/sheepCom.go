@@ -76,8 +76,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
-	s.commands.twiddleL = 80
-	s.commands.twiddleR = 80
+	s.commands.twiddleL = 100
+	s.commands.twiddleR = 100
 
 	s.resp.health = 0
 	s.resp.accelX = 0

@@ -206,7 +206,7 @@ func main_camera() {
 }
 
 func main(){
-	//main_full()
+	main_full()
 	//main_camera()
-	main_frontend()
+	//main_frontend()
 }
