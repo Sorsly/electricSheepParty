@@ -219,38 +219,36 @@ void move(commands * cmd, resp *state){
         des_angle+=360;
     }
     //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    double curr_angle=cmd->camorient;
-    double x2=pow(cmd->relDesX,2);
-    double y2=pow(cmd->relDesY,2);
-    printf("x2 %f y2 %f",x2,y2);
-    double hyp=sqrt(x2+y2);
-    if (abs(des_angle-curr_angle)>5 && hyp > 30){
-        double delt_angle=curr_angle-des_angle;
-        int turntime=abs(200*delt_angle/240);
-        if (delt_angle>0){
-            //turn right
-            left_ctl(false,cmd->twiddleR);
-            right_ctl(true,cmd->twiddleL);
-        }else{
-            left_ctl(true, cmd->twiddleL);
-            right_ctl(false, cmd->twiddleR);
-        }
-        vTaskDelay(turntime);
-    } else{
-        left_ctl(false,0);
-        right_ctl(true,0);
+    double curr_angle=cmd->camorient;//adjust for camera's angle
 
+    if (abs(des_angle-curr_angle)>5){
+	double delt_angle=curr_angle-des_angle;
+	int turntime=abs(200*delt_angle/240);
+	if (delt_angle>0){
+		//turn right
+        	left_ctl(false,cmd->twiddleR);
+        	right_ctl(true,cmd->twiddleL);
+		vTaskDelay(turntime);
+	}else{	
+        	left_ctl(true, cmd->twiddleL);
+        	right_ctl(false, cmd->twiddleR);
+		vTaskDelay(turntime);
+	}
     }
-    if (abs(des_angle-curr_angle)<45 ){
-        if (hyp > 30) {
-            left_ctl(true, cmd->twiddleL);
-            right_ctl(true, cmd->twiddleR);
-        }else {
-            left_ctl(true, 0);
-            right_ctl(true, 0);
-
-        }
-        vTaskDelay(10);
+    if (abs(des_angle-Curr_angle)<45){
+    	double x2=pow(cmd->relDesX,2);
+    	double y2=pow(cmd->relDesY,2);
+    	printf("x2 %f y2 %f",x2,y2);
+   	double hyp=sqrt(x2+y2);
+    	if (hyp>35&&hyp<70){
+		left_ctl(false,cmd->twiddleL);
+		right_ctl(false,cmd->twiddleR);
+		vTaskDelay(20);//move approximately 2 cm, 20 and 60 may need to be adjusted!
+    	} else if(hyp>70){
+		left_ctl(false,cmd->twiddleL);
+		right_ctl(false,cmd->twiddleR);
+		vTaskDelay(60);
+	}
     }
 }
 

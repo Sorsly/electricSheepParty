@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour {
     public ulong health;
     public turret turr;
     public ulong desiredturretpos;
+    public GameObject hovertext;
     void Start () {
 
 
