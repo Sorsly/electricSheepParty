@@ -9,7 +9,7 @@ using namespace std;
 //Want or do not want?
 bool want(blob * b){
 	bool ret = true;
-	if(b->vol<20 ){
+	if(b->vol<15 ){
 		ret = false;
 	}
 	return ret;

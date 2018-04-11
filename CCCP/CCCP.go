@@ -69,6 +69,8 @@ func main_full() {
 			if !inHash {
 				sheep.currX = xs[idx]
 				sheep.currY = ys[idx]
+				sheep.pathhead.X = float64(sheep.currX)
+				sheep.pathhead.Y = float64(sheep.currY)
 				sheep.commands.camOrient = uint16(orients[idx])
 				camToIdx[id] = sheep
 				found = true
@@ -133,7 +135,7 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			next := getNextPoint(*sheep,pat,150)
+			next := getNextPoint(*sheep,pat,50)
 			log.Println("Pre Next: ",next)
 			log.Println("Next: ",next)
 			log.Println("SheepHealth: ",sheep.resp.health)

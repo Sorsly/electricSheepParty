@@ -209,6 +209,10 @@ void move(commands * cmd, resp *state){
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
+        
+        cmd->relDesY=10;
+        cmd->relDesX=20;
+        cmd->camorient=10;
     
     double des_angle=atan2(-cmd->relDesY,cmd->relDesX)*180/3.141;
     if (des_angle<0){
@@ -222,17 +226,16 @@ void move(commands * cmd, resp *state){
     double hyp=sqrt(x2+y2);
     if (abs(des_angle-curr_angle)>5 && hyp > 30){
         double delt_angle=curr_angle-des_angle;
-        int turntime=abs(200*delt_angle/240)*0.1;
+        int turntime=abs(200*delt_angle/240);
         if (delt_angle>0){
             //turn right
             left_ctl(false,cmd->twiddleR);
             right_ctl(true,cmd->twiddleL);
-            vTaskDelay(turntime);
         }else{
             left_ctl(true, cmd->twiddleL);
             right_ctl(false, cmd->twiddleR);
-            vTaskDelay(turntime);
         }
+        vTaskDelay(turntime);
     } else{
         left_ctl(false,0);
         right_ctl(true,0);

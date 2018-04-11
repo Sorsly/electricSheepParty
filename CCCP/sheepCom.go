@@ -25,6 +25,8 @@ type Sheep struct {
 	resppoint *net.UDPAddr //Addres to recieve data
 	currX     uint64       //Current position X
 	currY     uint64       //Current position Y
+	pathidx	  int
+	pathhead Path
 	commands  struct {
 		sheepF uint8
 		// sheepF b0 = rst
@@ -62,6 +64,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s := new(Sheep)
 	s.currX = 0
 	s.currY = 0
+	s.pathidx = 0
+	s.pathhead = Path{X:0,Y:0}
 
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd, "1917"))
 	CheckError(err)
@@ -77,7 +81,7 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
 	s.commands.twiddleL = 100
-	s.commands.twiddleR = 100
+	s.commands.twiddleR = 70
 
 	s.resp.health = 0
 	s.resp.accelX = 0
