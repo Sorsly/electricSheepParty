@@ -136,6 +136,10 @@ func main_full() {
 			}
 			//Get next point to travel too
 			next := getNextPoint(*sheep,pat,50)
+			next.X = 250
+			next.Y = 250
+			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
+			log.Println("Dist: ",dist)
 			log.Println("Pre Next: ",next)
 			log.Println("Next: ",next)
 			log.Println("SheepHealth: ",sheep.resp.health)
