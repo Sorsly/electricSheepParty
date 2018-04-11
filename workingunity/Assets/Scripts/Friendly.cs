@@ -41,7 +41,8 @@ public class Friendly : MonoBehaviour {
         {
             playerAgent.CalculatePath(intersectPath(5), path);
         }
-
+        Debug.Log("Actual");
+        Debug.Log(transform.position);
     }
 #endregion
     private Vector3 intersectPath(float enemDist)
