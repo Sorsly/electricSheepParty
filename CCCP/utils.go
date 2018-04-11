@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"math"
+	"log"
 )
 
 //Structure for loading the ipconfig file
@@ -38,22 +39,32 @@ func euclidDist(x1 float64, x2 float64,y1 float64,y2 float64)(float64){
 	return math.Hypot(y1-y2, x1-x2)
 }
 //Taking in the path of the sheep, finds the next point the sheep should travel too
-func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
+func getNextPoint(sh Sheep, point [] Path, thresh float64)(ret Path){
 	distFromClosest := math.MaxFloat64
 	closest := 0
 	for i,p := range point{
 		dist := euclidDist(float64(sh.currX),p.X,float64(sh.currY),p.Y)
-		if dist < distFromClosest {
+		if dist < distFromClosest && p.X != 0 && p.Y != 0{
 			distFromClosest = dist
 			closest = i
 		}
 	}
-	//If the closest point is greater than a particular threshold, just head towards the closest point
+	log.Println("In Utils closest: ",closest)
+	log.Println("In Utils distclosest: ",distFromClosest)
+	//If you are sufficiently close, do the next point
 	if distFromClosest > thresh || closest == len(point){
-		return point[closest]
+		ret.X = point[closest].X*2
+		ret.Y = point[closest].Y*2
 	}else {
-		return point[closest+1]
+		ret.X = point[closest+1].X*2
+		ret.Y = point[closest+1].Y*2
 	}
+	if ret.X == 0 && ret.Y == 0{
+		ret.X = float64(sh.currX)
+		ret.Y = float64(sh.currY)
+	}
+	log.Println(ret)
+	return
 
 }
 //This levels off the value of the input, peaking it and leveling instead of overflowing

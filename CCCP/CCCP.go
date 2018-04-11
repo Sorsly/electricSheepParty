@@ -93,14 +93,11 @@ func main_full() {
 	log.Println("Entering Game")
 	log.Println(camToIdx)
 	for gamedone == false {
-		log.Println(sheeps)
 
 		//Update the position of all of the bots
 		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
-		log.Println(ids)
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
-			log.Println(sheep,found)
 			if found {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
@@ -120,7 +117,7 @@ func main_full() {
 		}
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
-			pat, _, _, turretAngl := datawrite.frInfo(sheep)
+			pat, _, _, turretAngl,_ := datawrite.frInfo(sheep)
 			turretAngl = uint64(servoangle)
 			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)
@@ -136,20 +133,21 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			next := getNextPoint(*sheep,pat,10)
-			next.Y = 250
-			next.X = 250
+			next := getNextPoint(*sheep,pat,150)
+			log.Println("Pre Next: ",next)
+			log.Println("Next: ",next)
+			log.Println("SheepHealth: ",sheep.resp.health)
+			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
+			log.Println("Sheep Orient:",sheep.commands.camOrient)
+			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
+			log.Println("Path: ",pat)
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
 			sheep.commands.relDesX = int16(next.X - float64(sheep.currX))
-			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
-			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
-			log.Println("Sheep Orient:",sheep.commands.camOrient)
 			des_angle :=math.Atan2(-float64(sheep.commands.relDesY),float64(sheep.commands.relDesX))*180/3.141
 			if des_angle < 0{
 				des_angle += 360
 			}
-			log.Println("Desired Sheep Orient:",des_angle)
 		}
 
 
@@ -162,6 +160,8 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 		}
 		//Wait until all of the bots respond
+		wait := time.NewTimer(time.Millisecond*500)
+		<-wait.C
 		commandwg.Wait()
 
 		//panic("Done")
@@ -174,17 +174,15 @@ func main_full() {
 func main_frontend() {
 
 	//Initializing sheep connections
-	sheeps := make([]*Sheep, 2)
-	for i := 0; i < 2; i += 1 {
+	sheeps := make([]*Sheep, 1)
+	for i := 0; i < 1; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
 	}
-	datawrite := MkChanDataWrite(100, 2,sheeps)
+	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
 	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 	sheeps[0].currX = 1
 	sheeps[0].currY = 1
-	sheeps[1].currX = 10
-	sheeps[1].currY = 10
 
 	for {
 		sheeps[0].commands.servoAngle += 1

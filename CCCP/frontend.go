@@ -19,7 +19,8 @@ import (
 
 type FEPacket struct {
 	//The front end is ready to play
-	Ready       bool
+	Ready1       bool
+	Ready2       bool
 	//All of the frontend is dead
 	Alldead     bool
 	//Status of the front ends path for each bot
@@ -73,11 +74,11 @@ type datawrite struct {
 }
 
 //for a certain sheep, give the desired commands for that sheep
-func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64){
+func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64,bool){
 	idx := da.FE1.camToFEID[sh]
 	da.FE1.feFEmtx.Lock()
 	defer da.FE1.feFEmtx.Unlock()
-	return da.FE1.frFE.path[idx], da.FE1.frFE.pathStatus[idx], da.FE1.frFE.fire[idx],da.FE1.frFE.turretReq[idx]
+	return da.FE1.frFE.path[idx], da.FE1.frFE.pathStatus[idx], da.FE1.frFE.fire[idx],da.FE1.frFE.turretReq[idx], da.FE1.frFE.ready
 }
 func check(e error) {
 	if e != nil {
@@ -186,7 +187,6 @@ func numtoportstr(port int) string {
 //Takes the raw request body from the frontend and parses it into the command structure for each id
 func (fe *FrontEnd) loadFERaw(raw []byte) {
 	var decoded FEPacket
-	log.Println(raw)
 	if len(raw) == 0{
 		return
 	}
@@ -194,7 +194,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	check(err)
 	fe.feFEmtx.Lock()
 	defer fe.feFEmtx.Unlock()
-	fe.frFE.ready = decoded.Ready
+	fe.frFE.ready = decoded.Ready1
 	fe.frFE.alldead = decoded.Alldead
 	for idx, id := range decoded.Ids {
 		fe.frFE.pathStatus[id] = decoded.Status[idx]
@@ -205,12 +205,10 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 			fe.frFE.path[id][step].Y = node.Z
 		}
 	}
-        log.Println(fe.frFE)
 }
 
 //Function to serve the data as a server, ba dum chi
 func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
-	log.Println("Client connected")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time, Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods",  "GET, POST, OPTIONS, PUT")

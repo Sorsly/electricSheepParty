@@ -111,7 +111,7 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 	defer group.Done()
 	resp := make([]byte, 10)
 	respConn, err := net.ListenUDP("udp", s.resppoint)
-	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 20))
+	respConn.SetReadDeadline(time.Now().Add(time.Millisecond * 100))
 	defer respConn.Close()
 
 	c, _, err := respConn.ReadFromUDP(resp)
