@@ -236,11 +236,11 @@ void move(commands * cmd, resp *state){
     	double y2=pow(cmd->relDesY,2);
     	printf("x2 %f y2 %f",x2,y2);
    	double hyp=sqrt(x2+y2);
-    	if (hyp>4&&hyp<8){
+    	if (hyp>35&&hyp<70){
 		left_ctl(false,cmd->twiddleL);
 		right_ctl(false,cmd->twiddleR);
-		vTaskDelay(20);//move approximately 2 cm
-    	} else if(hyp>8){
+		vTaskDelay(20);//move approximately 2 cm, 20 and 60 may need to be adjusted!
+    	} else if(hyp>70){
 		left_ctl(false,cmd->twiddleL);
 		right_ctl(false,cmd->twiddleR);
 		vTaskDelay(60);
