@@ -227,6 +227,7 @@
     <Compile Include="Assets\Scripts\Friendly.cs" />
     <Compile Include="Assets\Scripts\NetworkInter.cs" />
     <Compile Include="Assets\Scripts\Obstacle.cs" />
+    <Compile Include="Assets\Scripts\statushandler.cs" />
     <Compile Include="Assets\Scripts\turret.cs" />
     <Compile Include="Assets\Scripts\UnitSelectionComponent.cs" />
     <Compile Include="Assets\Scripts\Utils.cs" />

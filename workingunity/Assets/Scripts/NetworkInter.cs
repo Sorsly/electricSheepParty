@@ -13,6 +13,7 @@ class NetworkInter : MonoBehaviour
     private byte[] results;
     public Friendly[] friends;
     public Enemy[] enemies;
+    public string IP;
     private int numbots;
     class toCCCP
     {
@@ -43,39 +44,47 @@ class NetworkInter : MonoBehaviour
     }
     void DoLast()
     {
-        numbots = results[0];
-        ulong xPos;
-        ulong yPos;
-        ulong orient;
-        ulong health;
-        ulong turretPos;
-        foreach (var friend in friends)
+        if (results.Length != 0)
         {
-            xPos = BitConverter.ToUInt64(results, 2 + friend.idnum * 8);
+            numbots = results[0];
+            ulong xPos;
+            ulong yPos;
+            ulong orient;
+            ulong health;
+            ulong turretPos;
+            foreach (var friend in friends)
+            {
+                xPos = BitConverter.ToUInt64(results, 2 + friend.idnum * 8);
 
-            yPos = BitConverter.ToUInt64(results, 2 + numbots * 8 + friend.idnum * 8);
-            turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + friend.idnum * 8);
-            orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + friend.idnum * 8);
-            health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + friend.idnum * 8);
-            friend.transform.position = new Vector3(xPos, friend.transform.position.y, yPos);
-            friend.transform.eulerAngles = new Vector3(0, orient);
-            friend.health = health;
-            friend.turr.transform.eulerAngles = new Vector3(90, turretPos);
-        }
+                yPos = BitConverter.ToUInt64(results, 2 + numbots * 8 + friend.idnum * 8);
+                turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + friend.idnum * 8);
+                orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + friend.idnum * 8);
+                health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + friend.idnum * 8);
+                Vector3 newpos = new Vector3(xPos/2, friend.transform.position.y, yPos/2);
+                friend.transform.position = newpos;
+                Debug.Log(newpos);
+                Vector3 neworient = new Vector3(0, orient);
+                friend.transform.eulerAngles = neworient;
+                friend.health = health;
+                friend.turr.transform.eulerAngles = new Vector3(90, turretPos);
+            }
 
-        foreach (var enemy in enemies)
-        {
+            foreach (var enemy in enemies)
+            {
 
-            xPos = BitConverter.ToUInt64(results, 2 + enemy.idnum * 8);
+                xPos = BitConverter.ToUInt64(results, 2 + enemy.idnum * 8);
 
-            yPos = BitConverter.ToUInt64(results, 2 + numbots * 8 + enemy.idnum * 8);
-            turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + enemy.idnum * 8);
-            orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + enemy.idnum * 8);
-            health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + enemy.idnum * 8);
-            enemy.transform.position = new Vector3(xPos, enemy.transform.position.y, yPos);
-            enemy.transform.eulerAngles = new Vector3(0, orient);
-            enemy.health = health;
-            enemy.turr.transform.eulerAngles = new Vector3(90, turretPos);
+                yPos = BitConverter.ToUInt64(results, 2 + numbots * 8 + enemy.idnum * 8);
+                turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + enemy.idnum * 8);
+                orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + enemy.idnum * 8);
+                health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + enemy.idnum * 8);
+                enemy.transform.position = new Vector3(xPos, enemy.transform.position.y, yPos);
+
+                Vector3 neworient = new Vector3(0, orient);
+                enemy.transform.eulerAngles = neworient;
+                enemy.health = health;
+                enemy.turr.transform.eulerAngles = new Vector3(90, turretPos);
+            }
         }
     }
     private string genJSON()
@@ -102,13 +111,14 @@ class NetworkInter : MonoBehaviour
         }
 
         send = JsonConvert.SerializeObject(tocccp);
+        Debug.Log(send);
         return send;
     }
     IEnumerator Upload()
     {
         string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://192.168.1.117", myData))
+        using (UnityWebRequest www = UnityWebRequest.Put("http://" + IP, myData))
         {
             yield return www.Send();
 
