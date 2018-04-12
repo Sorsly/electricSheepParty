@@ -225,6 +225,9 @@ void move(commands * cmd, resp *state){
     double delt_angle=curr_angle-des_angle;
     if (abs(des_angle-curr_angle)>5 && hyp>35){
 	double delt_angle=curr_angle-des_angle;
+    if (delt_angle<0){
+            delt_angle+=360;
+    }
 	int turntime=abs(200*delt_angle/240);
 	if (delt_angle>0 && delt_angle<=180){
 		//turn right
