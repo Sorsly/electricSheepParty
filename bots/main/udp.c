@@ -222,7 +222,7 @@ void move(commands * cmd, resp *state,botmemory * mem){
     //Not move command
     if(cmd->relDesX == 0 && cmd->relDesY == 0){
         left_ctl(true,0);
-        left_ctl(true,0);
+        right_ctl(true,0);
         return;
     }
     //Calculate Desired Angle

@@ -138,7 +138,7 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			next := getNextPoint(*sheep,pat,50)
+			next := getNextPoint(sheep,pat,50)
 			//next.X = 250
 			//next.Y = 250
 			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
@@ -158,6 +158,7 @@ func main_full() {
 			log.Println( "Sheep Err Angle: ",sheep.resp.orient)
 			log.Println( "Sheep Err Angle: ",sheep.resp.health)
 			log.Println("Path: ",pat)
+			log.Println("PathHead: ",sheep.pathhead)
 		}
 
 

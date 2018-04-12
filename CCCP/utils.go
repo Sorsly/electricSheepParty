@@ -45,10 +45,10 @@ func samepoint(p1 Path,p2 Path) bool{
 	return false
 }
 //Taking in the path of the sheep, finds the next point the sheep should travel too
-func getNextPoint(sh Sheep, point [] Path, thresh float64)(ret Path){
+func getNextPoint(sh * Sheep, point [] Path, thresh float64)(ret Path){
 	if !samepoint(sh.pathhead, point[0]){
-		sh.pathhead.X = point[0].X*2
-		sh.pathhead.Y = point[0].Y*2
+		sh.pathhead.X = point[0].X
+		sh.pathhead.Y = point[0].Y
 		sh.pathidx = 1
 	}
 	dist := euclidDist(float64(sh.currX), point[sh.pathidx].X*2, float64(sh.currY), point[sh.pathidx].Y*2)
