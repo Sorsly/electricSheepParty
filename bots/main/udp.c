@@ -13,7 +13,6 @@
 #include <math.h>
 // Tag for the main loop
 static const char *TAG = "MAIN";
-static const double PI = 3.141;
 
 // These are used to connect to the wifi
 static EventGroupHandle_t wifi_event_group;
@@ -70,8 +69,8 @@ void send_thread(resp rsp,commands cmd) {
     data_buffer[1] = rsp.accelX;
     data_buffer[2] = rsp.accelY;
     data_buffer[3] = rsp.battery;
-    bBuff1 = (char)rsp.lastAngleError;
-    bBuff2 = (char)(rsp.lastAngleError>>8);
+    bBuff1 = (char)rsp.lastorient;
+    bBuff2 = (char)(rsp.lastorient>>8);
     data_buffer[4] = bBuff1;
     data_buffer[5] = bBuff2;
     doubleTwoBytes(rsp.magX,&bBuff1,&bBuff2);
@@ -202,34 +201,23 @@ void init_wifi(void)
 
 }
 
-double angleBetween(double X,double Y, double hyp, double theta){
-    double dot = X*cos(theta) + Y*sin(theta);
-    double retTheta = acos(dot/hyp);
-    if(X*sin(theta) - Y*cos(theta) > 0){
-        retTheta = - retTheta;
-    }
-    return retTheta;
-}
+
 
 //This is the function that does all the lifting of taking the command, doingin things with it,
 // And loading the state with the proper values
-void move(commands * cmd, resp *state,botmemory * mem){
-    //Set Sheeps Peripherals
+void move(commands * cmd, resp *state){
     canhit(&(state->health));
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-    //Not move command
-    if(cmd->relDesX == 0 && cmd->relDesY == 0){
-        return;
-    }
-    //Calculate Desired Angle
-    double des_angle=atan2(-cmd->relDesY,cmd->relDesX);
+        
+
+    double des_angle=atan2(-cmd->relDesY,cmd->relDesX)*180/3.141;
     if (des_angle<0){
-        des_angle+=2*PI;
+        des_angle+=360;
     }
-    //PD values
-    double curr_angle=cmd->camorient*PI/180;//adjust for camera's angle
+    //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
+    double curr_angle=cmd->camorient;//adjust for camera's angle
     double x2=pow(cmd->relDesX,2);
     double y2=pow(cmd->relDesY,2);
     printf("x2 %f y2 %f",x2,y2);
@@ -304,7 +292,6 @@ void app_main() {
     //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
     resp * state = malloc(sizeof(state));
-    botmemory * mem = malloc(sizeof(botmemory));
 
     state->health = 10;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
@@ -363,21 +350,9 @@ void app_main() {
     }*/
     //Main control loop which blocks for commands, and then responds with state
     while(true){
-        receive_thread(nextCommands);
-        if(nextCommands->sheepf & 0x01){
-            top_on(nextCommands->sheepf & 0x10);
-            mem->lastTransError = sqrt(pow(nextCommands->relDesX,2) + pow(nextCommands->relDesY,2));
-            mem->lastAngleError = angleBetween(nextCommands->relDesX,
-                                               nextCommands->relDesY,
-                                               mem->lastTransError,
-                                               nextCommands->camorient);
-        }else {
-            move(nextCommands, state, mem);
-        }
-        send_thread(*state,*nextCommands);
-        if(nextCommands->sheepf &  0x20){
-            break;
-        }
+            receive_thread(nextCommands);
+            move(nextCommands,state);
+            send_thread(*state,*nextCommands);
     }
 
 }

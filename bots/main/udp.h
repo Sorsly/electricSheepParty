@@ -40,16 +40,13 @@ typedef struct commands {
     uint8_t twiddleR;
     uint8_t twiddleL;
 } commands;
-typedef struct botmemory {
-    double lastAngleError;
-    double lastTransError;
-}botmemory;
+
 //The data sent back to the CCCP
 typedef struct resp{
     char health;
     char accelX;
     char accelY;
-    uint16_t lastAngleError;
+    uint16_t lastorient;
     char battery;
     double magX;
     double magY;
@@ -60,7 +57,7 @@ typedef struct resp{
 uint32_t get_usec();
 void init_wifi(void);
 void send_thread(resp,commands);
-void move(commands * cmd,resp * state,botmemory * );
+void move(commands * cmd,resp * state);
 void receive_thread(commands *);
 void parsecommands(char * ,commands *);
 esp_err_t esp32_wifi_eventHandler(void *ctx, system_event_t *event);

@@ -79,9 +79,6 @@ func main_full() {
 		}
 		if !found {
 			panic("SHEEP NOT FOUND IN INITIALIZATION PROCESS")
-		}else{
-			sheep.sendCommands(outServerAddr)
-			sheep.commands.sheepF &= 0xFE
 		}
 	}
 
@@ -149,8 +146,6 @@ func main_full() {
 			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
 			log.Println("Sheep Orient:",sheep.commands.camOrient)
 			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
-			log.Println( "Sheep Err Angle: ",sheep.resp.orient)
-			log.Println( "Sheep Err Angle: ",sheep.resp.health)
 			log.Println("Path: ",pat)
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))

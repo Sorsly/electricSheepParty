@@ -17,7 +17,6 @@ const SHEEPDIR1 = 0x02
 const SHEEPDIR2 = 0x04
 const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
-const SHEEPSTOP = 0x20
 
 const MAGFIELDOFFSET = 5
 
@@ -81,7 +80,7 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
-	s.commands.twiddleL = 70
+	s.commands.twiddleL = 100
 	s.commands.twiddleR = 70
 
 	s.resp.health = 0
