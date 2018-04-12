@@ -219,19 +219,27 @@ void move(commands * cmd, resp *state){
 
     if (abs(des_angle-curr_angle)>5){
 	double delt_angle=curr_angle-des_angle;
-	int turntime=abs(200*delt_angle/240);
-	if (delt_angle>0){
+	int turntime=abs(200*delt_angle/240)/2;
+	if (delt_angle>0 && delt_angle<=180){
 		//turn right
         	left_ctl(false,cmd->twiddleR);
         	right_ctl(true,cmd->twiddleL);
 		vTaskDelay(turntime);
-	}else{	
+		left_ctl(false,0);
+		right_ctl(false,0);
+	}else{
+		//turn left	
         	left_ctl(true, cmd->twiddleL);
         	right_ctl(false, cmd->twiddleR);
 		vTaskDelay(turntime);
+		left_ctl(false,0);
+		right_ctl(false,0);
 	}
+    } else{
+	left_ctl(false,0);
+	right_ctl(false,0);
     }
-    if (abs(des_angle-Curr_angle)<45){
+    if (abs(des_angle-Curr_angle)<45&&hyp>35){
     	double x2=pow(cmd->relDesX,2);
     	double y2=pow(cmd->relDesY,2);
     	printf("x2 %f y2 %f",x2,y2);
@@ -240,10 +248,14 @@ void move(commands * cmd, resp *state){
 		left_ctl(false,cmd->twiddleL);
 		right_ctl(false,cmd->twiddleR);
 		vTaskDelay(20);//move approximately 2 cm, 20 and 60 may need to be adjusted!
+		left_ctl(false,0);
+		right_ctl(false,0);
     	} else if(hyp>70){
 		left_ctl(false,cmd->twiddleL);
 		right_ctl(false,cmd->twiddleR);
 		vTaskDelay(60);
+		right_ctl(false,0);
+		left_ctl(false,0);
 	}
     }
 }
