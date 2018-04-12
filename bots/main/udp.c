@@ -222,36 +222,37 @@ void move(commands * cmd, resp *state){
     double y2=pow(cmd->relDesY,2);
     printf("x2 %f y2 %f",x2,y2);
     double hyp=sqrt(x2+y2);
-
+    double delt_angle=curr_angle-des_angle;
     if (abs(des_angle-curr_angle)>5 && hyp>35){
-	double delt_angle=curr_angle-des_angle;
-	int turntime=abs(200*delt_angle/240)*0.1;
-	if (delt_angle>0){
-		//turn right
-        	left_ctl(false,cmd->twiddleR);
-        	right_ctl(true,cmd->twiddleL);
-		vTaskDelay(turntime);
-	}else{	
-        	left_ctl(true, cmd->twiddleL);
-        	right_ctl(false, cmd->twiddleR);
-		vTaskDelay(turntime);
-	}
-    }else{
-        left_ctl(true,0);
-        right_ctl(true,0);
-    }
-    if (abs(des_angle-curr_angle)<35){
-        if (hyp>35&&hyp<70){
-            left_ctl(true,cmd->twiddleL);
-            right_ctl(true,cmd->twiddleR);
-            vTaskDelay(10);//move approximately 2 cm, 20 and 60 may need to be adjusted!
-        } else if(hyp>70){
-            left_ctl(true,cmd->twiddleL);
-            right_ctl(true,cmd->twiddleR);
-            vTaskDelay(40);
+        double vAangle = abs(delt_angle-state->lastorient);
+        int turntime=abs(200*delt_angle/240)*0.02 - vAangle*24;
+        if(turntime < 0){
+            turntime = 0;
         }
-    }
-    state->lastorient = curr_angle;
+        if (delt_angle>0){
+            //turn right
+                left_ctl(false,100);
+                //right_ctl(true,cmd->twiddleL);
+            //vTaskDelay(turntime);
+        }else{
+                left_ctl(true, 100);
+                //right_ctl(false, cmd->twiddleR);
+            //vTaskDelay(turntime);
+        }
+        }else{
+            left_ctl(true,0);
+            right_ctl(true,0);
+        }
+        if (abs(des_angle-curr_angle)<35){
+            if (hyp>35&&hyp<70){
+                left_ctl(true,cmd->twiddleL);
+                right_ctl(true,cmd->twiddleR);
+            } else if(hyp>70){
+                left_ctl(true,cmd->twiddleL);
+                right_ctl(true,cmd->twiddleR);
+            }
+        }
+    state->lastorient = (uint16_t )abs(delt_angle);
 }
 
 //Initializes the proper pins as inputs and outputs
