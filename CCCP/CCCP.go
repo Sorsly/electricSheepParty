@@ -139,19 +139,9 @@ func main_full() {
 			}
 			//Get next point to travel too
 			next := getNextPoint(*sheep,pat,50)
-			next.X = 250
-			next.Y = 250
+			//next.X = 250
+			//next.Y = 250
 			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
-			log.Println("Dist: ",dist)
-			log.Println("Pre Next: ",next)
-			log.Println("Next: ",next)
-			log.Println("SheepHealth: ",sheep.resp.health)
-			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
-			log.Println("Sheep Orient:",sheep.commands.camOrient)
-			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
-			log.Println( "Sheep Err Angle: ",sheep.resp.orient)
-			log.Println( "Sheep Err Angle: ",sheep.resp.health)
-			log.Println("Path: ",pat)
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
 			sheep.commands.relDesX = int16(next.X - float64(sheep.currX))
@@ -159,6 +149,15 @@ func main_full() {
 			if des_angle < 0{
 				des_angle += 360
 			}
+			log.Println("Dist: ",dist)
+			log.Println("Next: ",next)
+			log.Println("SheepHealth: ",sheep.resp.health)
+			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
+			log.Println("Sheep Orient:",sheep.commands.camOrient)
+			log.Println("Trying To get to: ", sheep.commands.relDesX, sheep.commands.relDesY)
+			log.Println( "Sheep Err Angle: ",sheep.resp.orient)
+			log.Println( "Sheep Err Angle: ",sheep.resp.health)
+			log.Println("Path: ",pat)
 		}
 
 
@@ -171,6 +170,8 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 		}
 		//Wait until all of the bots respond
+		wait := time.NewTimer(time.Millisecond*50)
+		<-wait.C
 		commandwg.Wait()
 
 		//panic("Done")
