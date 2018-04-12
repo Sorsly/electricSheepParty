@@ -171,8 +171,6 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 		}
 		//Wait until all of the bots respond
-		wait := time.NewTimer(time.Millisecond*500)
-		<-wait.C
 		commandwg.Wait()
 
 		//panic("Done")

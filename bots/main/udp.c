@@ -237,7 +237,7 @@ void move(commands * cmd, resp *state,botmemory * mem){
     double vTrans = transErr - mem->lastTransError;
     double vAngle = angleErr - mem->lastAngleError;
     double K_pt = 1.13    *100.0/800;
-    double K_pa = -0.7 *100.0/PI;
+    double K_pa = -2 *100.0/PI;
     double K_dt = 1    *100.0/800;
     double K_da = -1.4   *100.0/PI;
     double U_t = 0;
