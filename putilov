@@ -97,7 +97,7 @@ def calibrate(*args):
 def CCCP(*args):
     os.chdir("CCCP")
     err = os.system("go build")
-    err = os.system("sudo ./CCCP 2>cccplog.txt")
+    err = os.system("sudo ./CCCP ")
 
 def Camera(*args):
     os.chdir("bottracking")

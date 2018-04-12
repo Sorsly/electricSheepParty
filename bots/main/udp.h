@@ -46,7 +46,7 @@ typedef struct resp{
     char health;
     char accelX;
     char accelY;
-    double orient;
+    uint16_t lastorient;
     char battery;
     double magX;
     double magY;

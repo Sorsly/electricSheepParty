@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"math"
+	"log"
 )
 
 //Structure for loading the ipconfig file
@@ -37,24 +38,31 @@ func getConfig(file string) Config {
 func euclidDist(x1 float64, x2 float64,y1 float64,y2 float64)(float64){
 	return math.Hypot(y1-y2, x1-x2)
 }
+func samepoint(p1 Path,p2 Path) bool{
+	if p1.X == p2.X && p1.Y == p2.Y{
+		return true
+	}
+	return false
+}
 //Taking in the path of the sheep, finds the next point the sheep should travel too
-func getNextPoint(sh Sheep, point [] Path, thresh float64)(Path){
-	distFromClosest := math.MaxFloat64
-	closest := 0
-	for i,p := range point{
-		dist := euclidDist(float64(sh.currX),p.X,float64(sh.currY),p.Y)
-		if dist < distFromClosest {
-			distFromClosest = dist
-			closest = i
-		}
+func getNextPoint(sh Sheep, point [] Path, thresh float64)(ret Path){
+	if !samepoint(sh.pathhead, point[0]){
+		sh.pathhead.X = point[0].X*2
+		sh.pathhead.Y = point[0].Y*2
+		sh.pathidx = 1
 	}
-	//If the closest point is greater than a particular threshold, just head towards the closest point
-	if distFromClosest > thresh || closest == len(point){
-		return point[closest]
-	}else {
-		return point[closest+1]
+	dist := euclidDist(float64(sh.currX), point[sh.pathidx].X*2, float64(sh.currY), point[sh.pathidx].Y*2)
+	log.Println("Dist: ",dist)
+	if  dist < thresh{
+		sh.pathidx += 1
 	}
-
+	log.Println("Path Index:",sh.pathidx)
+	ret.X = point[sh.pathidx].X*2
+	ret.Y = point[sh.pathidx].Y*2
+	if samepoint(ret,Path{X:0,Y:0}){
+		ret = Path{X:float64(sh.currX), Y:float64(sh.currY)}
+	}
+	return
 }
 //This levels off the value of the input, peaking it and leveling instead of overflowing
 func getTrueMag(val float64)(int8){

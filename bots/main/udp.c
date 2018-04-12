@@ -69,7 +69,8 @@ void send_thread(resp rsp,commands cmd) {
     data_buffer[1] = rsp.accelX;
     data_buffer[2] = rsp.accelY;
     data_buffer[3] = rsp.battery;
-    doubleTwoBytes(rsp.orient,&bBuff1,&bBuff2);
+    bBuff1 = (char)rsp.lastorient;
+    bBuff2 = (char)(rsp.lastorient>>8);
     data_buffer[4] = bBuff1;
     data_buffer[5] = bBuff2;
     doubleTwoBytes(rsp.magX,&bBuff1,&bBuff2);
@@ -209,17 +210,22 @@ void move(commands * cmd, resp *state){
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-    
+        
+
     double des_angle=atan2(-cmd->relDesY,cmd->relDesX)*180/3.141;
     if (des_angle<0){
         des_angle+=360;
     }
     //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
     double curr_angle=cmd->camorient;//adjust for camera's angle
+    double x2=pow(cmd->relDesX,2);
+    double y2=pow(cmd->relDesY,2);
+    printf("x2 %f y2 %f",x2,y2);
+    double hyp=sqrt(x2+y2);
 
-    if (abs(des_angle-curr_angle)>5){
+    if (abs(des_angle-curr_angle)>5 && hyp>35){
 	double delt_angle=curr_angle-des_angle;
-	int turntime=abs(200*delt_angle/240)/2;
+	int turntime=abs(200*delt_angle/240)/5;
 	if (delt_angle>0 && delt_angle<=180){
 		//turn right
         	left_ctl(false,cmd->twiddleR);
@@ -258,6 +264,7 @@ void move(commands * cmd, resp *state){
 		left_ctl(false,0);
 	}
     }
+    state->lastorient = curr_angle;
 }
 
 //Initializes the proper pins as inputs and outputs
