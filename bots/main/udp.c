@@ -13,6 +13,7 @@
 #include <math.h>
 // Tag for the main loop
 static const char *TAG = "MAIN";
+static const double PI = 3.141;
 
 // These are used to connect to the wifi
 static EventGroupHandle_t wifi_event_group;
@@ -69,8 +70,8 @@ void send_thread(resp rsp,commands cmd) {
     data_buffer[1] = rsp.accelX;
     data_buffer[2] = rsp.accelY;
     data_buffer[3] = rsp.battery;
-    bBuff1 = (char)rsp.lastorient;
-    bBuff2 = (char)(rsp.lastorient>>8);
+    bBuff1 = (char)rsp.lastAngleError;
+    bBuff2 = (char)(rsp.lastAngleError>>8);
     data_buffer[4] = bBuff1;
     data_buffer[5] = bBuff2;
     doubleTwoBytes(rsp.magX,&bBuff1,&bBuff2);
@@ -201,58 +202,92 @@ void init_wifi(void)
 
 }
 
-
+double angleBetween(double X,double Y, double hyp, double theta){
+    double dot = X*cos(theta) + Y*sin(theta);
+    double retTheta = acos(dot/hyp);
+    if(X*sin(theta) - Y*cos(theta) > 0){
+        retTheta = - retTheta;
+    }
+    return retTheta;
+}
 
 //This is the function that does all the lifting of taking the command, doingin things with it,
 // And loading the state with the proper values
-void move(commands * cmd, resp *state){
+void move(commands * cmd, resp *state,botmemory * mem){
+    //Set Sheeps Peripherals
     canhit(&(state->health));
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-        
-
-    double des_angle=atan2(-cmd->relDesY,cmd->relDesX)*180/3.141;
-    if (des_angle<0){
-        des_angle+=360;
+    //Not move command
+    if(cmd->relDesX == 0 && cmd->relDesY == 0){
+        return;
     }
-    //double curr_angle = getRawTheta(startXorient,startYorient,&xMag,&yMag);
-    double curr_angle=cmd->camorient;//adjust for camera's angle
+    //Calculate Desired Angle
+    double des_angle=atan2(-cmd->relDesY,cmd->relDesX);
+    if (des_angle<0){
+        des_angle+=2*PI;
+    }
+    //PD values
+    double curr_angle=cmd->camorient*PI/180;//adjust for camera's angle
     double x2=pow(cmd->relDesX,2);
     double y2=pow(cmd->relDesY,2);
-    printf("x2 %f y2 %f",x2,y2);
-    double hyp=sqrt(x2+y2);
-    double delt_angle=curr_angle-des_angle;
-    if (abs(des_angle-curr_angle)>5 && hyp>35){
-        double vAangle = abs(delt_angle-state->lastorient);
-        int turntime=abs(200*delt_angle/240)*0.02 - vAangle*24;
-        if(turntime < 0){
-            turntime = 0;
+    double transErr = sqrt(x2+y2);
+    double angleErr = angleBetween(cmd->relDesX,-cmd->relDesY,transErr,curr_angle);
+    double vTrans = transErr - mem->lastTransError;
+    double vAngle = angleErr - mem->lastAngleError;
+    double K_pt = 1.13    *100.0/800;
+    double K_pa = -0.7 *100.0/PI;
+    double K_dt = 1    *100.0/800;
+    double K_da = -1.4   *100.0/PI;
+    double U_t = 0;
+    double U_a = 0;
+    double motorL = 0;
+    double motorR = 0;
+
+    // Control Block
+    if (abs(angleErr)>5 || transErr>35){
+        U_t = K_pt*transErr + K_dt*vTrans;
+        U_a = K_pa*angleErr + K_da*vAngle;
+        motorL = -U_t + U_a;
+        motorR = -U_t - U_a;
+        if(abs(motorR + cmd->twiddleR )> 100){
+            motorR = 100 - cmd->twiddleR;
         }
-        if (delt_angle>0){
-            //turn right
-                left_ctl(false,100);
-                //right_ctl(true,cmd->twiddleL);
-            //vTaskDelay(turntime);
+        if(abs(motorL + cmd->twiddleL)> 100){
+            motorL = 100 - cmd->twiddleL;
+        }
+        if(motorR > 0){
+            right_ctl(true,cmd->twiddleR + motorR);
         }else{
-                left_ctl(true, 100);
-                //right_ctl(false, cmd->twiddleR);
-            //vTaskDelay(turntime);
+            right_ctl(false,cmd->twiddleR - motorR);
         }
+        if(motorL > 0){
+            left_ctl(true,cmd->twiddleL + motorL);
         }else{
-            left_ctl(true,0);
-            right_ctl(true,0);
+            left_ctl(false,cmd->twiddleL - motorL);
         }
-        if (abs(des_angle-curr_angle)<35){
-            if (hyp>35&&hyp<70){
-                left_ctl(true,cmd->twiddleL);
-                right_ctl(true,cmd->twiddleR);
-            } else if(hyp>70){
-                left_ctl(true,cmd->twiddleL);
-                right_ctl(true,cmd->twiddleR);
-            }
-        }
-    state->lastorient = (uint16_t )abs(delt_angle);
+
+
+    }else{
+        left_ctl(true,0);
+        right_ctl(true,0);
+    }
+    state->lastAngleError = (uint16_t)(abs(angleErr*180/PI));
+    printf("%f,%f,%f,%f,%f,%f,%f",motorR,motorL,U_a,U_t,vAngle,transErr,vTrans);
+    mem->lastAngleError = angleErr;
+    mem->lastTransError = transErr;
+    //turn right
+    //left_ctl(false,100);
+    //right_ctl(true,cmd->twiddleL);
+
+    //turn left
+    //left_ctl(true, 100);
+    //right_ctl(false, cmd->twiddleR);
+
+    //forward
+    //left_ctl(true,cmd->twiddleL);
+    //right_ctl(true,cmd->twiddleR);
 }
 
 //Initializes the proper pins as inputs and outputs
@@ -280,6 +315,7 @@ void app_main() {
     //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
     resp * state = malloc(sizeof(state));
+    botmemory * mem = malloc(sizeof(botmemory));
 
     state->health = 10;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
@@ -338,9 +374,21 @@ void app_main() {
     }*/
     //Main control loop which blocks for commands, and then responds with state
     while(true){
-            receive_thread(nextCommands);
-            move(nextCommands,state);
-            send_thread(*state,*nextCommands);
+        receive_thread(nextCommands);
+        if(nextCommands->sheepf & 0x01){
+            top_on(nextCommands->sheepf & 0x10);
+            mem->lastTransError = sqrt(pow(nextCommands->relDesX,2) + pow(nextCommands->relDesY,2));
+            mem->lastAngleError = angleBetween(nextCommands->relDesX,
+                                               nextCommands->relDesY,
+                                               mem->lastTransError,
+                                               nextCommands->camorient);
+        }else {
+            move(nextCommands, state, mem);
+        }
+        send_thread(*state,*nextCommands);
+        if(nextCommands->sheepf &  0x20){
+            break;
+        }
     }
 
 }
