@@ -61,6 +61,7 @@ type FrontEnd struct {
 	frFE    struct {
 		ready   bool
 		alldead bool
+		pathlengthmax int
 		path    [][]Path
 		pathStatus []int
 		fire       []bool
@@ -167,6 +168,7 @@ func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 	buf.frFE.fire = make([]bool, numbots)
 	buf.frFE.turretReq = make([]uint64, numbots)
 	buf.frFE.path = make([][]Path, numbots)
+	buf.frFE.pathlengthmax = pathlength;
 	for i := 0; i < int(numbots); i += 1 {
 		buf.frFE.path[i] = make([]Path, pathlength)
 	}
@@ -190,6 +192,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	if len(raw) == 0{
 		return
 	}
+	pathsteps := 0
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
 	fe.feFEmtx.Lock()
@@ -203,6 +206,12 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 		for step, node := range decoded.Paths[idx] {
 			fe.frFE.path[id][step].X = node.X
 			fe.frFE.path[id][step].Y = node.Z
+			pathsteps += 1
+		}
+		for pathsteps < fe.frFE.pathlengthmax{
+			fe.frFE.path[id][pathsteps].X = 0
+			fe.frFE.path[id][pathsteps].Y = 0
+			pathsteps += 1
 		}
 	}
 }
