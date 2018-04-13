@@ -39,6 +39,10 @@ typedef struct commands {
     uint16_t camorient;
     uint8_t twiddleR;
     uint8_t twiddleL;
+    uint8_t K_pt;
+    uint8_t K_pa;
+    uint8_t K_dt;
+    uint8_t K_da;
 } commands;
 typedef struct botmemory {
     double lastAngleError;

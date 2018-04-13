@@ -42,6 +42,10 @@ type Sheep struct {
 		portAssign  uint16 //Assigned port
 		twiddleL uint8
 		twiddleR uint8
+		kPt uint8
+		kPa uint8
+		kDt uint8
+		kDa uint8
 	}
 	resp struct {
 		health  uint8 // How much health the bot has
@@ -75,6 +79,11 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 
 	s.endpoint = outServerAddr
 	s.resppoint = respServerAddr
+
+	s.commands.kPt = 88
+	s.commands.kPa = 50
+	s.commands.kDt = 100
+	s.commands.kDa = 71
 
 	s.commands.sheepF = 0
 	s.commands.relDesX = 0
@@ -154,7 +163,12 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		orientsplit[0],
 		orientsplit[1],
 		s.commands.twiddleL,
-		s.commands.twiddleR}
+		s.commands.twiddleR,
+		s.commands.kPt,
+		s.commands.kPa,
+		s.commands.kDt,
+		s.commands.kDa,
+		}
 	log.Println("Raw Commands: ",msg)
 	Conn.Write(msg)
 

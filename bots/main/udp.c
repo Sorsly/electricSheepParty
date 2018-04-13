@@ -102,7 +102,7 @@ void receive_thread(commands *cmd) {
     struct sockaddr_in sa,ra;
 
     int recv_data;
-    char data_buffer[12];
+    uint8_t data_buffer[15];
 
     socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -146,6 +146,10 @@ void receive_thread(commands *cmd) {
     cmd->camorient = (uint16_t)(data_buffer[8] | (data_buffer[9] << 8));
     cmd->twiddleL = data_buffer[10];
     cmd->twiddleR = data_buffer[11];
+    cmd->K_pt = data_buffer[11];
+    cmd->K_pa = data_buffer[12];
+    cmd->K_dt = data_buffer[13];
+    cmd->K_da = data_buffer[14];
 //   }
 
 }
@@ -238,10 +242,10 @@ void move(commands * cmd, resp *state,botmemory * mem){
     double angleErr = angleBetween(cmd->relDesX,-cmd->relDesY,transErr,curr_angle);
     double vTrans = transErr - mem->lastTransError;
     double vAngle = angleErr - mem->lastAngleError;
-    double K_pt = 1.13    *100.0/800;
-    double K_pa = -2 *100.0/PI;
-    double K_dt = 1    *100.0/800;
-    double K_da = -1.4   *100.0/PI;
+    double K_pt =  (100.0/cmd->K_pt)*100.0/800;
+    double K_pa = -(100.0/cmd->K_pa)*100.0/PI;
+    double K_dt =  (100.0/cmd->K_dt)*100.0/800;
+    double K_da = -(100.0/cmd->K_da)*100.0/PI;
     double U_t = 0;
     double U_a = 0;
     double motorL = 0;
