@@ -324,7 +324,7 @@ void app_main() {
     resp * state = malloc(sizeof(state));
     botmemory * mem = malloc(sizeof(botmemory));
 
-    state->health = 10;
+    state->health = 100;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
     esp_err_t nvsret = nvs_flash_init();
 
@@ -354,6 +354,7 @@ void app_main() {
                                                mem->lastTransError,
                                                nextCommands->camorient);
         }else if (nextCommands->sheepf & 0x40){
+            top_on(false);
             ota_example_task(wifi_event_group);
         }else {
             move(nextCommands, state, mem);
