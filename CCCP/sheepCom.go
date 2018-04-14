@@ -18,6 +18,7 @@ const SHEEPDIR2 = 0x04
 const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
 const SHEEPSTOP = 0x20
+const SHEEPREPROGRAM = 0x40
 
 const MAGFIELDOFFSET = 5
 
@@ -35,6 +36,8 @@ type Sheep struct {
 		// sheepF b2 = dir2
 		// sheepF b3 = fire
 		// sheepF b4 = lightOn
+		// sheepF b5 = sheepstop
+		// sheepF b6 = sheepreprogram
 		relDesX		int16  // Relative Desired X Position
 		relDesY int16  // Relative Desired Y Position
 		servoAngle  uint8  //Angle to set the servo to

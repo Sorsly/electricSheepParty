@@ -16,6 +16,7 @@ const NUMBOTS = 1 //Number of bots in the game
 const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
+const REPROGRAMON = true
 
 //Running main process
 func main_full() {
@@ -49,6 +50,15 @@ func main_full() {
 		sheeps[i].commands.sheepF &= 0xEF
 	}
 
+	if REPROGRAMON {
+		for _, sheep := range sheeps {
+			sheep.commands.sheepF = SHEEPREPROGRAM
+			sheep.sendCommands(outServerAddr)
+			sheep.commands.sheepF &= 0xBF
+		}
+		wait := time.NewTimer(10*time.Second)
+		<-wait.C
+	}
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
 	//And then the position of all the bots is found. All the id's found are then iterated over, and if
 	//the new id which would have popped up is then found. That sheep is marked as at that position,
@@ -215,6 +225,7 @@ func main_camera() {
 }
 
 func main(){
+	// This works and strip "/static/" fragment from path
 	main_full()
 	//main_camera()
 	//main_frontend()

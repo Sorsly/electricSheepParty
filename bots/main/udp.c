@@ -10,6 +10,7 @@
 #include "udp.h"
 #include "i2c.h"
 #include "motor.h"
+#include "ota.h"
 #include <math.h>
 // Tag for the main loop
 static const char *TAG = "MAIN";
@@ -336,58 +337,24 @@ void app_main() {
     init_wifi();
     // Wait for when the bot has connected to the AP
     while(!connected_to_ap){}
-   // ota_example_task(wifi_event_group);
+    ESP_LOGI(TAG,"CONNECTED 4")
     init_turret(&(state->health));
-    init_i2c();
+ //   init_i2c();
     init_motors();
     init_gpio();
 
-    //The following code samples the IMU orientation to get initialized vector values
-    uint8_t out;
-    uint8_t x_low;
-    uint8_t y_low;
-    uint8_t x_high;
-    uint8_t y_high;
-    int numsamples = 100;
-    uint8_t * databuff = malloc(sizeof(uint8_t)*6);
-    for(int i = 0;i < numsamples; i ++) {
-        out = readmag(0x09);
-        if (out & 0x01) {
-            /*  x_low = readmag(0x04);
-              y_low = readmag(0x06);
-              z_low = readmag(0x08);
-              x_high = readmag(0x03);
-              y_high = readmag(0x05);
-              z_high = readmag(0x07);
-              */
-            readMagData(databuff);
-            x_high = databuff[0];
-            x_low = databuff[1];
-            y_high = databuff[2];
-            y_low = databuff[3];
-            startXorient += (int16_t)(((uint16_t)x_high<<8) | x_low);
-            startYorient += (int16_t)(((uint16_t)y_high<<8) | y_low);
-        } else{
-            i--;
-        }
-    }
-    startXorient = startXorient/numsamples;
-    startYorient = startYorient/numsamples;
-
-
-    /*while(true) {
-        getRawTheta(startXorient,startYorient);
-    }*/
     //Main control loop which blocks for commands, and then responds with state
-    while(true){
+    while(true) {
         receive_thread(nextCommands);
-        if(nextCommands->sheepf & 0x01){
+        if (nextCommands->sheepf & 0x01) {
             top_on(nextCommands->sheepf & 0x10);
-            mem->lastTransError = sqrt(pow(nextCommands->relDesX,2) + pow(nextCommands->relDesY,2));
+            mem->lastTransError = sqrt(pow(nextCommands->relDesX, 2) + pow(nextCommands->relDesY, 2));
             mem->lastAngleError = angleBetween(nextCommands->relDesX,
                                                nextCommands->relDesY,
                                                mem->lastTransError,
                                                nextCommands->camorient);
+        }else if (nextCommands->sheepf & 0x40){
+            ota_example_task(wifi_event_group);
         }else {
             move(nextCommands, state, mem);
         }
