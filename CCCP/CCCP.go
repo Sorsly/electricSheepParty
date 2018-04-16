@@ -102,7 +102,7 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
-	fire := true
+	fire := false
 	top := true
 	dir := 1
 	log.Println("Entering Game")
@@ -133,7 +133,7 @@ func main_full() {
 		}
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
-			pat, _, _, turretAngl,_ := datawrite.frInfo(sheep)
+			pat, _, fire, turretAngl,_ := datawrite.frInfo(sheep)
 			turretAngl = uint64(servoangle)
 			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)

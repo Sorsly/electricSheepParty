@@ -324,7 +324,7 @@ void app_main() {
     resp * state = malloc(sizeof(state));
     botmemory * mem = malloc(sizeof(botmemory));
 
-    state->health = 10;
+    state->health = 1;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
     esp_err_t nvsret = nvs_flash_init();
 
