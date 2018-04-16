@@ -56,7 +56,7 @@ func initcamera(botcnt int, portlisten string) *Camera {
 
 //When this is called, it blocks until the channel feeds in the raw camera data, in which case it then
 //Parses it for the actual positions
-func (c *Camera) getPos(lengthReal uint64) ([]uint64, []uint64, []uint64, []uint64) {
+func (c *Camera) getPos() ([]uint64, []uint64, []uint64, []uint64) {
 	//UPDATE POSITION
 	raw := <-c.revraw
 	pos := 1
