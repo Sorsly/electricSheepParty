@@ -13,17 +13,14 @@ import (
 )
 
 const NUMBOTS = 1 //Number of bots in the game
-const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
+const PXWIDTH = 640
+const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
 const REPROGRAMON = false
 
 //Running main process
 func main_full() {
-	var servoangle int
-	servoangle = 120
-	ratespin := 0
-
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
@@ -72,7 +69,7 @@ func main_full() {
 		wait := time.NewTimer(time.Second)
 		<-wait.C
 
-		ids, xs, ys,orients := cam.getPos(65536)
+		ids, xs, ys,orients := cam.getPos()
 		log.Println("IDing ids",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
@@ -96,21 +93,32 @@ func main_full() {
 	}
 
 	//Initializing Frontend Server
-	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
+	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
 	//Setup server for the unity to make put requests too
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
+	http.HandleFunc("/info", http.HandlerFunc(datawrite.APIServe))
 	go http.ListenAndServe(numtoportstr(80), nil)
 
+	//Wait for both Front ends to check in
+	for datawrite.gamestart != true {
+		wait := time.NewTimer(time.Millisecond*10)
+		<-wait.C
+	}
+
+	//Random constant used in game
 	gamedone := false
 	fire := false
 	top := true
 	dir := 1
+	var servoangle int
+	servoangle = 120
+	ratespin := 0
+
 	log.Println("Entering Game")
-	log.Println(camToIdx)
 	for gamedone == false {
 
 		//Update the position of all of the bots
-		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
+		ids, xs, ys,orients := cam.getPos()
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
 			if found {
@@ -121,7 +129,7 @@ func main_full() {
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
-		datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		datawrite.FE.UpdateGndBots(sheeps, false, false)
 
 		ratespin += 1
 		if ratespin % 10 == 0 {
@@ -184,7 +192,9 @@ func main_full() {
 		<-wait.C
 		commandwg.Wait()
 
-		//panic("Done")
+		if datawrite.gamestatus != 0 {
+			gamedone = true
+		}
 	}
 
 	log.Println("GAME COMPLETE")
@@ -195,11 +205,12 @@ func main_frontend() {
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, 1)
+	ips := getConfig("ips.txt")
 	for i := 0; i < 1; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
 	}
-	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 	sheeps[0].currX = 1
 	sheeps[0].currY = 1
@@ -209,7 +220,7 @@ func main_frontend() {
 		if sheeps[0].commands.servoAngle == 180{
 			sheeps[0].commands.servoAngle = 0
 		}
-		datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		datawrite.FE.UpdateGndBots(sheeps, false, false)
 		log.Println("updoot")
 		wait := time.NewTimer(time.Second)
 		<-wait.C
@@ -219,7 +230,7 @@ func main_frontend() {
 func main_camera() {
 	cam := initcamera(5, "1918")
 	for {
-		log.Println(cam.getPos(LENGTHFIELD))
+		log.Println(cam.getPos())
 	}
 }
 
