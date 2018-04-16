@@ -84,8 +84,8 @@ bool filterfunc(blob * b){
 bool wantOrientPx(uchar b, uchar g, uchar r){
     bool ret = false;
     if(r>130){
-        if(g<100){
-            if(b<100){
+        if(g<80){
+            if(b<80){
                 ret = true;
             }
         }

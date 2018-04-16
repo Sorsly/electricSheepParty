@@ -16,7 +16,7 @@ const NUMBOTS = 1 //Number of bots in the game
 const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
-const REPROGRAMON = true
+const REPROGRAMON = false
 
 //Running main process
 func main_full() {
@@ -102,7 +102,7 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	gamedone := false
-	fire := false
+	fire := true
 	top := true
 	dir := 1
 	log.Println("Entering Game")
@@ -126,6 +126,7 @@ func main_full() {
 		ratespin += 1
 		if ratespin % 10 == 0 {
 			servoangle += dir
+			fire = !fire
 			if servoangle%180 == 0 {
 				dir = -dir
 			}
@@ -149,8 +150,6 @@ func main_full() {
 			}
 			//Get next point to travel too
 			next := getNextPoint(sheep,pat,50)
-			//next.X = 250
-			//next.Y = 250
 			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
@@ -159,14 +158,14 @@ func main_full() {
 			if des_angle < 0{
 				des_angle += 360
 			}
+			log.Println("####################GAME STEP ##################################")
+			log.Println("Servo Desired: ",sheep.commands.servoAngle)
 			log.Println("Dist: ",dist)
 			log.Println("Next: ",next)
 			log.Println("SheepHealth: ",sheep.resp.health)
 			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
 			log.Println("Sheep Orient:",sheep.commands.camOrient)
 			log.Println("Trying To get to: ", sheep.commands.relDesX, sheep.commands.relDesY)
-			log.Println( "Sheep Err Angle: ",sheep.resp.orient)
-			log.Println( "Sheep Err Angle: ",sheep.resp.health)
 			log.Println("Path: ",pat)
 			log.Println("PathHead: ",sheep.pathhead)
 		}

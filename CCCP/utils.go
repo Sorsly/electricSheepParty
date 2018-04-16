@@ -53,7 +53,7 @@ func getNextPoint(sh * Sheep, point [] Path, thresh float64)(ret Path){
 	}
 	dist := euclidDist(float64(sh.currX), point[sh.pathidx].X*2, float64(sh.currY), point[sh.pathidx].Y*2)
 	log.Println("Dist: ",dist)
-	if  dist < thresh{
+	if  dist < thresh && dist != 0{
 		sh.pathidx += 1
 	}
 	log.Println("Path Index:",sh.pathidx)
