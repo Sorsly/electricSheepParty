@@ -12,7 +12,7 @@ import (
 	"math"
 )
 
-const NUMBOTS = 1 //Number of bots in the game
+const NUMBOTS = 2 //Number of bots in the game
 const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
