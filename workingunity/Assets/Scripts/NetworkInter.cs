@@ -62,7 +62,6 @@ class NetworkInter : MonoBehaviour
                 health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + friend.idnum * 8);
                 Vector3 newpos = new Vector3(xPos/2, friend.transform.position.y, yPos/2);
                 friend.transform.position = newpos;
-                Debug.Log(newpos);
                 Vector3 neworient = new Vector3(0, orient);
                 friend.transform.eulerAngles = neworient;
                 friend.health = health;
