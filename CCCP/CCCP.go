@@ -34,7 +34,7 @@ func main_full() {
 	var commandwg sync.WaitGroup
 
 	// String to communicate out with bots
-	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, OUTPORT))
+	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort("0.0.0.0", OUTPORT))
 	CheckError(err)
 
 	//Initializing camera
@@ -46,7 +46,7 @@ func main_full() {
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
+		sheeps[i] = initsheep(ip, "0.0.0.0", uint16(inportstart+i))
 		sheeps[i].commands.sheepF &= 0xEF
 	}
 
