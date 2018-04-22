@@ -18,6 +18,7 @@ const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
 const REPROGRAMON = false
+const CAROLYNSERVER = "http://ec2-52-15-233-132.us-east-2.compute.amazonaws.com:3000/url/"
 
 //Running main process
 func main_full() {
@@ -26,6 +27,7 @@ func main_full() {
 	ips := getConfig("ips.txt")
 	host := ips.Cpu
 	log.Println(host)
+	uploaddomain(CAROLYNSERVER,host)
 	//This is the starting port for the sheeps response
 	inportstart := 2000
 	var commandwg sync.WaitGroup
