@@ -90,6 +90,13 @@ bool wantOrientPx(uchar b, uchar g, uchar r){
             }
         }
     }
+    if(r<70){
+        if(g<70){
+            if(b>90){
+                ret = true;
+            }
+        }
+    }
     return ret;
 }
 
