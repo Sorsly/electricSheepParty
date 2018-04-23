@@ -20,6 +20,7 @@ const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
 const REPROGRAMON = false
 const CAROLYNSERVER = "http://ec2-52-15-233-132.us-east-2.compute.amazonaws.com:3000/url/"
+const MARGIN = 10
 
 //Running main process
 func main_full() {
@@ -176,6 +177,22 @@ func main_full() {
 			des_angle :=math.Atan2(-float64(sheep.commands.relDesY),float64(sheep.commands.relDesX))*180/3.141
 			if des_angle < 0{
 				des_angle += 360
+			}
+			if sheep.currX < MARGIN {
+				sheep.commands.relDesY = 0
+				sheep.commands.relDesX = 40
+			}
+			if sheep.currX > PXWIDTH - MARGIN {
+				sheep.commands.relDesY = 0
+				sheep.commands.relDesX = -40
+			}
+			if sheep.currY < MARGIN {
+				sheep.commands.relDesY = 40
+				sheep.commands.relDesX = 0
+			}
+			if sheep.currY > PXHEIGHT - MARGIN{
+				sheep.commands.relDesY = -40
+				sheep.commands.relDesX = 0
 			}
 			log.Println("####################GAME STEP ##################################")
 			log.Println("Servo Desired: ",sheep.commands.servoAngle)
