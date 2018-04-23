@@ -38,34 +38,31 @@ func getConfig(file string) Config {
 func euclidDist(x1 float64, x2 float64,y1 float64,y2 float64)(float64){
 	return math.Hypot(y1-y2, x1-x2)
 }
+func samepoint(p1 Path,p2 Path) bool{
+	if p1.X == p2.X && p1.Y == p2.Y{
+		return true
+	}
+	return false
+}
 //Taking in the path of the sheep, finds the next point the sheep should travel too
-func getNextPoint(sh Sheep, point [] Path, thresh float64)(ret Path){
-	distFromClosest := math.MaxFloat64
-	closest := 0
-	for i,p := range point{
-		dist := euclidDist(float64(sh.currX),p.X,float64(sh.currY),p.Y)
-		if dist < distFromClosest && p.X != 0 && p.Y != 0{
-			distFromClosest = dist
-			closest = i
-		}
+func getNextPoint(sh * Sheep, point [] Path, thresh float64)(ret Path){
+	if !samepoint(sh.pathhead, point[0]){
+		sh.pathhead.X = point[0].X
+		sh.pathhead.Y = point[0].Y
+		sh.pathidx = 1
 	}
-	log.Println("In Utils closest: ",closest)
-	log.Println("In Utils distclosest: ",distFromClosest)
-	//If you are sufficiently close, do the next point
-	if distFromClosest > thresh || closest == len(point){
-		ret.X = point[closest].X*2
-		ret.Y = point[closest].Y*2
-	}else {
-		ret.X = point[closest+1].X*2
-		ret.Y = point[closest+1].Y*2
+	dist := euclidDist(float64(sh.currX), point[sh.pathidx].X*2, float64(sh.currY), point[sh.pathidx].Y*2)
+	log.Println("Dist: ",dist)
+	if  dist < thresh && dist != 0{
+		sh.pathidx += 1
 	}
-	if ret.X == 0 && ret.Y == 0{
-		ret.X = float64(sh.currX)
-		ret.Y = float64(sh.currY)
+	log.Println("Path Index:",sh.pathidx)
+	ret.X = point[sh.pathidx].X*2
+	ret.Y = point[sh.pathidx].Y*2
+	if samepoint(ret,Path{X:0,Y:0}){
+		ret = Path{X:float64(sh.currX), Y:float64(sh.currY)}
 	}
-	log.Println(ret)
 	return
-
 }
 //This levels off the value of the input, peaking it and leveling instead of overflowing
 func getTrueMag(val float64)(int8){

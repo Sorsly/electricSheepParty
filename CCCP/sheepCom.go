@@ -17,6 +17,8 @@ const SHEEPDIR1 = 0x02
 const SHEEPDIR2 = 0x04
 const SHEEPFIRE = 0x08
 const SHEEPLIGHT = 0x10
+const SHEEPSTOP = 0x20
+const SHEEPREPROGRAM = 0x40
 
 const MAGFIELDOFFSET = 5
 
@@ -25,6 +27,8 @@ type Sheep struct {
 	resppoint *net.UDPAddr //Addres to recieve data
 	currX     uint64       //Current position X
 	currY     uint64       //Current position Y
+	pathidx	  int
+	pathhead Path
 	commands  struct {
 		sheepF uint8
 		// sheepF b0 = rst
@@ -32,6 +36,8 @@ type Sheep struct {
 		// sheepF b2 = dir2
 		// sheepF b3 = fire
 		// sheepF b4 = lightOn
+		// sheepF b5 = sheepstop
+		// sheepF b6 = sheepreprogram
 		relDesX		int16  // Relative Desired X Position
 		relDesY int16  // Relative Desired Y Position
 		servoAngle  uint8  //Angle to set the servo to
@@ -39,6 +45,10 @@ type Sheep struct {
 		portAssign  uint16 //Assigned port
 		twiddleL uint8
 		twiddleR uint8
+		kPt uint8
+		kPa uint8
+		kDt uint8
+		kDa uint8
 	}
 	resp struct {
 		health  uint8 // How much health the bot has
@@ -62,6 +72,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s := new(Sheep)
 	s.currX = 0
 	s.currY = 0
+	s.pathidx = 0
+	s.pathhead = Path{X:0,Y:0}
 
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd, "1917"))
 	CheckError(err)
@@ -71,13 +83,18 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.endpoint = outServerAddr
 	s.resppoint = respServerAddr
 
+	s.commands.kPt = 88
+	s.commands.kPa = 50
+	s.commands.kDt = 100
+	s.commands.kDa = 71
+
 	s.commands.sheepF = 0
 	s.commands.relDesX = 0
 	s.commands.relDesY = 0
 	s.commands.servoAngle = 0
 	s.commands.portAssign = respPort
-	s.commands.twiddleL = 100
-	s.commands.twiddleR = 100
+	s.commands.twiddleL = 57
+	s.commands.twiddleR = 57
 
 	s.resp.health = 0
 	s.resp.accelX = 0
@@ -149,8 +166,13 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		orientsplit[0],
 		orientsplit[1],
 		s.commands.twiddleL,
-		s.commands.twiddleR}
-	log.Println("Raw Commands: ",msg)
+		s.commands.twiddleR,
+		s.commands.kPt,
+		s.commands.kPa,
+		s.commands.kDt,
+		s.commands.kDa,
+		}
+	log.Println("Raw Commands to BOT: ",msg)
 	Conn.Write(msg)
 
 }

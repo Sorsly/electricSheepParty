@@ -13,16 +13,14 @@ import (
 )
 
 const NUMBOTS = 1 //Number of bots in the game
-const LENGTHFIELD = 19000 // How long the field actually is in terms of millimeters
+const PXWIDTH = 640
+const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
+const REPROGRAMON = false
 
 //Running main process
 func main_full() {
-	var servoangle int
-	servoangle = 120
-	ratespin := 0
-
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
@@ -49,6 +47,15 @@ func main_full() {
 		sheeps[i].commands.sheepF &= 0xEF
 	}
 
+	if REPROGRAMON {
+		for _, sheep := range sheeps {
+			sheep.commands.sheepF = SHEEPREPROGRAM
+			sheep.sendCommands(outServerAddr)
+			sheep.commands.sheepF &= 0xBF
+		}
+		wait := time.NewTimer(10*time.Second)
+		<-wait.C
+	}
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
 	//And then the position of all the bots is found. All the id's found are then iterated over, and if
 	//the new id which would have popped up is then found. That sheep is marked as at that position,
@@ -62,13 +69,15 @@ func main_full() {
 		wait := time.NewTimer(time.Second)
 		<-wait.C
 
-		ids, xs, ys,orients := cam.getPos(65536)
+		ids, xs, ys,orients := cam.getPos()
 		log.Println("IDing ids",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
 				sheep.currX = xs[idx]
 				sheep.currY = ys[idx]
+				sheep.pathhead.X = float64(sheep.currX)
+				sheep.pathhead.Y = float64(sheep.currY)
 				sheep.commands.camOrient = uint16(orients[idx])
 				camToIdx[id] = sheep
 				found = true
@@ -77,25 +86,39 @@ func main_full() {
 		}
 		if !found {
 			panic("SHEEP NOT FOUND IN INITIALIZATION PROCESS")
+		}else{
+			sheep.sendCommands(outServerAddr)
+			sheep.commands.sheepF &= 0xFE
 		}
 	}
 
 	//Initializing Frontend Server
-	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
+	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
 	//Setup server for the unity to make put requests too
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
+	http.HandleFunc("/info", http.HandlerFunc(datawrite.APIServe))
 	go http.ListenAndServe(numtoportstr(80), nil)
 
+	//Wait for both Front ends to check in
+	for datawrite.gamestart != true {
+		wait := time.NewTimer(time.Millisecond*10)
+		<-wait.C
+	}
+
+	//Random constant used in game
 	gamedone := false
 	fire := false
 	top := true
 	dir := 1
+	var servoangle int
+	servoangle = 120
+	ratespin := 0
+
 	log.Println("Entering Game")
-	log.Println(camToIdx)
 	for gamedone == false {
 
 		//Update the position of all of the bots
-		ids, xs, ys,orients := cam.getPos(LENGTHFIELD)
+		ids, xs, ys,orients := cam.getPos()
 		for i, id := range ids {
 			sheep,found := camToIdx[id]
 			if found {
@@ -106,18 +129,19 @@ func main_full() {
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
-		datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		datawrite.FE.UpdateGndBots(sheeps, false, false)
 
 		ratespin += 1
 		if ratespin % 10 == 0 {
 			servoangle += dir
+			fire = !fire
 			if servoangle%180 == 0 {
 				dir = -dir
 			}
 		}
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
-			pat, _, _, turretAngl,_ := datawrite.frInfo(sheep)
+			pat, _, fire, turretAngl,_ := datawrite.frInfo(sheep)
 			turretAngl = uint64(servoangle)
 			//Set servo angle
 			sheep.commands.servoAngle = uint8(turretAngl)
@@ -133,14 +157,8 @@ func main_full() {
 				sheep.commands.sheepF &= 0xEF
 			}
 			//Get next point to travel too
-			next := getNextPoint(*sheep,pat,150)
-			log.Println("Pre Next: ",next)
-			log.Println("Next: ",next)
-			log.Println("SheepHealth: ",sheep.resp.health)
-			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
-			log.Println("Sheep Orient:",sheep.commands.camOrient)
-			log.Println("Trying To get to: ", int16(next.X-float64(sheep.currX)), int16(next.Y-float64(sheep.currY)))
-			log.Println("Path: ",pat)
+			next := getNextPoint(sheep,pat,50)
+			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
 			sheep.commands.relDesX = int16(next.X - float64(sheep.currX))
@@ -148,6 +166,16 @@ func main_full() {
 			if des_angle < 0{
 				des_angle += 360
 			}
+			log.Println("####################GAME STEP ##################################")
+			log.Println("Servo Desired: ",sheep.commands.servoAngle)
+			log.Println("Dist: ",dist)
+			log.Println("Next: ",next)
+			log.Println("SheepHealth: ",sheep.resp.health)
+			log.Println("Sheep Pos:",sheep.currX,sheep.currY)
+			log.Println("Sheep Orient:",sheep.commands.camOrient)
+			log.Println("Trying To get to: ", sheep.commands.relDesX, sheep.commands.relDesY)
+			log.Println("Path: ",pat)
+			log.Println("PathHead: ",sheep.pathhead)
 		}
 
 
@@ -160,11 +188,13 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 		}
 		//Wait until all of the bots respond
-		wait := time.NewTimer(time.Millisecond*500)
+		wait := time.NewTimer(time.Millisecond*50)
 		<-wait.C
 		commandwg.Wait()
 
-		//panic("Done")
+		if datawrite.gamestatus != 0 {
+			gamedone = true
+		}
 	}
 
 	log.Println("GAME COMPLETE")
@@ -175,11 +205,12 @@ func main_frontend() {
 
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, 1)
+	ips := getConfig("ips.txt")
 	for i := 0; i < 1; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
 	}
-	datawrite := MkChanDataWrite(100, NUMBOTS,sheeps)
-	http.HandleFunc("/", http.HandlerFunc(datawrite.APIserve))
+	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
+	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
 	go http.ListenAndServe(numtoportstr(80), nil)
 	sheeps[0].currX = 1
 	sheeps[0].currY = 1
@@ -189,7 +220,7 @@ func main_frontend() {
 		if sheeps[0].commands.servoAngle == 180{
 			sheeps[0].commands.servoAngle = 0
 		}
-		datawrite.FE1.UpdateGndBots(sheeps, false, false)
+		datawrite.FE.UpdateGndBots(sheeps, false, false)
 		log.Println("updoot")
 		wait := time.NewTimer(time.Second)
 		<-wait.C
@@ -199,11 +230,12 @@ func main_frontend() {
 func main_camera() {
 	cam := initcamera(5, "1918")
 	for {
-		log.Println(cam.getPos(LENGTHFIELD))
+		log.Println(cam.getPos())
 	}
 }
 
 func main(){
+	// This works and strip "/static/" fragment from path
 	main_full()
 	//main_camera()
 	//main_frontend()

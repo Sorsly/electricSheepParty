@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"strings"
 )
 
 type FEPacket struct {
@@ -36,6 +37,10 @@ type FEPacket struct {
 		Y float64
 		Z float64
 	}
+}
+type APIPacket struct {
+	AssignedBots []int
+	Gamestatus   string
 }
 //Node in a path
 type Path struct {
@@ -61,6 +66,7 @@ type FrontEnd struct {
 	frFE    struct {
 		ready   bool
 		alldead bool
+		pathlengthmax int
 		path    [][]Path
 		pathStatus []int
 		fire       []bool
@@ -70,15 +76,22 @@ type FrontEnd struct {
 
 //The streamer
 type datawrite struct {
-	FE1 FrontEnd
+	FE FrontEnd
+	FEIPs map[string]bool
+	gamestart bool
+	// 0 No winner
+	// 1 Player 1 has won
+	// 2 Player 2 has won
+	gamestatus int
+	numcheckins  int
 }
 
 //for a certain sheep, give the desired commands for that sheep
 func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64,bool){
-	idx := da.FE1.camToFEID[sh]
-	da.FE1.feFEmtx.Lock()
-	defer da.FE1.feFEmtx.Unlock()
-	return da.FE1.frFE.path[idx], da.FE1.frFE.pathStatus[idx], da.FE1.frFE.fire[idx],da.FE1.frFE.turretReq[idx], da.FE1.frFE.ready
+	idx := da.FE.camToFEID[sh]
+	da.FE.feFEmtx.Lock()
+	defer da.FE.feFEmtx.Unlock()
+	return da.FE.frFE.path[idx], da.FE.frFE.pathStatus[idx], da.FE.frFE.fire[idx],da.FE.frFE.turretReq[idx], da.FE.frFE.ready
 }
 func check(e error) {
 	if e != nil {
@@ -167,6 +180,7 @@ func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 	buf.frFE.fire = make([]bool, numbots)
 	buf.frFE.turretReq = make([]uint64, numbots)
 	buf.frFE.path = make([][]Path, numbots)
+	buf.frFE.pathlengthmax = pathlength
 	for i := 0; i < int(numbots); i += 1 {
 		buf.frFE.path[i] = make([]Path, pathlength)
 	}
@@ -175,8 +189,15 @@ func MkFrontEnd(numbots uint8, pathlength int, sheeps []*Sheep) (buf FrontEnd) {
 }
 
 //Makes the stream
-func MkChanDataWrite(datalen int, botcnt uint8, sheeps []*Sheep) (writer datawrite) {
-	writer.FE1 = MkFrontEnd(botcnt, 20,sheeps)
+func MkChanDataWrite(feips []string, botcnt uint8, sheeps []*Sheep) (writer datawrite) {
+	writer.FE = MkFrontEnd(botcnt, 20,sheeps)
+	writer.gamestart = false
+	writer.FEIPs = make(map[string]bool)
+	for _,ip := range feips{
+		writer.FEIPs[ip] = true
+	}
+	writer.gamestatus = 0
+	writer.numcheckins = 0
 	return
 }
 //util function
@@ -190,6 +211,7 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	if len(raw) == 0{
 		return
 	}
+	pathsteps := 0
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
 	fe.feFEmtx.Lock()
@@ -203,12 +225,18 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 		for step, node := range decoded.Paths[idx] {
 			fe.frFE.path[id][step].X = node.X
 			fe.frFE.path[id][step].Y = node.Z
+			pathsteps += 1
+		}
+		for pathsteps < fe.frFE.pathlengthmax{
+			fe.frFE.path[id][pathsteps].X = 0
+			fe.frFE.path[id][pathsteps].Y = 0
+			pathsteps += 1
 		}
 	}
 }
 
 //Function to serve the data as a server, ba dum chi
-func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
+func (ch *datawrite) Botctrlserve(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time, Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods",  "GET, POST, OPTIONS, PUT")
@@ -216,9 +244,9 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	defer r.Body.Close()
 	rawBody, err := ioutil.ReadAll(r.Body)
-	go ch.FE1.loadFERaw(rawBody)
+	go ch.FE.loadFERaw(rawBody)
 	check(err)
-	_, data := ch.FE1.Dump()
+	_, data := ch.FE.Dump()
 	_, err = w.Write(data)
 	check(err)
 	//Give time for the mutex to unlactch. not the most elegant thing
@@ -226,4 +254,55 @@ func (ch *datawrite) APIserve(w http.ResponseWriter, r *http.Request) {
 	<-wait.C
 }
 
+
+func (ch *datawrite) APIServe(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time, Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods",  "GET, POST, OPTIONS, PUT")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	defer r.Body.Close()
+	var retPkt APIPacket
+	reqip :=strings.Split(r.RemoteAddr,":")[0]
+	log.Println("API Request IP from: ",reqip)
+	if ch.FEIPs[reqip]{
+		var onleft bool
+		if ch.numcheckins == 0 {
+			retPkt.Gamestatus = "0"
+			onleft = true
+		}else if ch.numcheckins == 1{
+			retPkt.Gamestatus = "1"
+			onleft = false
+			ch.gamestart = true
+		}else {
+			panic("3 FRONTENDS HAVE CHECKED IN")
+		}
+		for sheep,idx := range ch.FE.camToFEID{
+			if onleft && sheep.currY < PXWIDTH/2{
+				retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
+			}
+			if !onleft && sheep.currY > PXWIDTH/2{
+				retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
+			}
+		}
+		ch.numcheckins += 1
+	}else{
+		if ch.gamestatus == 0 {
+			retPkt.Gamestatus = "Ongoing"
+		}else if ch.gamestatus == 1 {
+			retPkt.Gamestatus = "Player 1 has won"
+		}else if ch.gamestatus == 2 {
+			retPkt.Gamestatus = "Player 2 has won"
+		}
+		if ch.numcheckins < 2 {
+			retPkt.Gamestatus = "Waiting for players to Check in"
+		}
+		retPkt.AssignedBots = nil
+	}
+	retBytes, err := json.Marshal(retPkt)
+	check(err)
+	_, err = w.Write(retBytes)
+	check(err)
+}
 
