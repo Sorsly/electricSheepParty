@@ -15,7 +15,7 @@ import (
 //Structure for loading the ipconfig file
 type Config struct {
 	All []string `json:"all"`
-	Cpu string   `json:"cpu"`
+	Cpu []string   `json:"cpu"`
 	Cam []string `json:"cam"`
 	Bot []string `json:"bot"`
 	Fes []string `json:"fes"`

@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 	"math"
+	"strings"
 )
 
 const NUMBOTS = 1 //Number of bots in the game
@@ -25,15 +26,23 @@ func main_full() {
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
-	host := ips.Cpu
-	log.Println(host)
-	uploaddomain(CAROLYNSERVER,host)
+	var lohost string
+	var palhost string
+	if strings.Contains(ips.Cpu[0],"192.168"){
+		lohost = ips.Cpu[0]
+		palhost = ips.Cpu[1]
+	}else {
+		lohost = ips.Cpu[1]
+		palhost = ips.Cpu[0]
+	}
+	log.Println(lohost)
+	uploaddomain(CAROLYNSERVER,palhost)
 	//This is the starting port for the sheeps response
 	inportstart := 2000
 	var commandwg sync.WaitGroup
 
 	// String to communicate out with bots
-	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, OUTPORT))
+	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(lohost, OUTPORT))
 	CheckError(err)
 
 	//Initializing camera
@@ -45,7 +54,7 @@ func main_full() {
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, host, uint16(inportstart+i))
+		sheeps[i] = initsheep(ip, lohost, uint16(inportstart+i))
 		sheeps[i].commands.sheepF &= 0xEF
 	}
 
