@@ -41,10 +41,10 @@ def getIPS(*args):
     comIps = [ip for ip in allIps if ip not in camIps and ip not in botIps]
     finalip = {}
     finalip['all'] = list(allIps)
-    finalip['cpu'] = cpuip
     finalip['cam'] = camIps
     finalip['bot'] = botIps
     finalip['fes'] = comIps
+    finalip['cpu'] = cpuip.split(" ")
 
     with open("CCCP/" + ipfile, "w") as fh:
         fh.write(dumps(finalip))
