@@ -112,7 +112,7 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	//Wait for both Front ends to check in
-	for datawrite.gamestart != true {
+	for datawrite.gamestart != false {//true {
 		wait := time.NewTimer(time.Millisecond*10)
 		<-wait.C
 	}
@@ -170,6 +170,8 @@ func main_full() {
 			}
 			//Get next point to travel too
 			next := getNextPoint(sheep,pat,50)
+			next.X = 250
+			next.Y = 250
 			dist := euclidDist(next.X, float64(sheep.currX),next.Y, float64(sheep.currY))
 
 			sheep.commands.relDesY = int16(next.Y - float64(sheep.currY))
