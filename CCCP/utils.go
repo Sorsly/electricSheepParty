@@ -7,12 +7,15 @@ import (
 	"os"
 	"math"
 	"log"
+	"net/http"
+	"strings"
+	"io/ioutil"
 )
 
 //Structure for loading the ipconfig file
 type Config struct {
 	All []string `json:"all"`
-	Cpu string   `json:"cpu"`
+	Cpu []string   `json:"cpu"`
 	Cam []string `json:"cam"`
 	Bot []string `json:"bot"`
 	Fes []string `json:"fes"`
@@ -43,6 +46,40 @@ func samepoint(p1 Path,p2 Path) bool{
 		return true
 	}
 	return false
+}
+func uploaddomain(outdomain string,ip string){
+	chunks := strings.Split(ip,".")
+	domainchunks := make([]string,7)
+	domainchunks[0] = "pal-nat"
+	domainchunks[1] = chunks[1]
+	domainchunks[2] = "-"
+	domainchunks[3] = chunks[2]
+	domainchunks[4] = "-"
+	domainchunks[5] = chunks[3]
+	domainchunks[6] = ".itap.purdue.edu"
+	domain := strings.Join(domainchunks,"")
+	log.Println(domain)
+	client := &http.Client{}
+	request, err := http.NewRequest("PUT", outdomain, strings.NewReader(domain))
+	request.ContentLength = int64(len(domain))
+	request.Header.Add("domain",domain)
+	response, err := client.Do(request)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		defer response.Body.Close()
+		contents, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("The calculated length is:", len(string(contents)), "for the url:", outdomain)
+		fmt.Println("   ", response.StatusCode)
+		hdr := response.Header
+		for key, value := range hdr {
+			fmt.Println("   ", key, ":", value)
+		}
+		fmt.Println(string(contents))
+	}
 }
 //Taking in the path of the sheep, finds the next point the sheep should travel too
 func getNextPoint(sh * Sheep, point [] Path, thresh float64)(ret Path){

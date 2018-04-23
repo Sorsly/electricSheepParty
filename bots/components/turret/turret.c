@@ -16,7 +16,7 @@ static const int  recep = 1;
 static const char *TAG = "TURRET";
 
 //Initializes the turret
-void init_turret(char * health){
+void init_turret(uint8_t * health){
 	//PWM stuff for the top servo
 	ESP_ERROR_CHECK(mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, 27));
 	mcpwm_config_t conf0;
@@ -32,7 +32,7 @@ void init_turret(char * health){
 }
 
 //Enables hit capability
-void canhit(char * health){
+void canhit(uint8_t * health){
 	gpio_isr_handler_add(recep, hit_register_isr, health);
 }
 //Sets the angle of the servo
@@ -60,7 +60,7 @@ void fire_laser(bool fire){
 }
 
 //Register a hit
-void hit_register_isr(char * arg){
+void hit_register_isr(uint8_t * arg){
 	(*arg )--;
 	gpio_isr_handler_remove(recep);
 }

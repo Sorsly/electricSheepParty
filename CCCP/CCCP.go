@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 	"math"
+	"strings"
 )
 
 const NUMBOTS = 1 //Number of bots in the game
@@ -18,20 +19,31 @@ const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
 const REPROGRAMON = false
+const CAROLYNSERVER = "http://ec2-52-15-233-132.us-east-2.compute.amazonaws.com:3000/url/"
+const MARGIN = 10
 
 //Running main process
 func main_full() {
 	runtime.GOMAXPROCS(10)
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
-	host := ips.Cpu
-	log.Println(host)
+	var lohost string
+	var palhost string
+	if strings.Contains(ips.Cpu[0],"192.168"){
+		lohost = ips.Cpu[0]
+		palhost = ips.Cpu[1]
+	}else {
+		lohost = ips.Cpu[1]
+		palhost = ips.Cpu[0]
+	}
+	log.Println(lohost)
+	uploaddomain(CAROLYNSERVER,palhost)
 	//This is the starting port for the sheeps response
 	inportstart := 2000
 	var commandwg sync.WaitGroup
 
 	// String to communicate out with bots
-	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort("0.0.0.0", OUTPORT))
+	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(lohost, OUTPORT))
 	CheckError(err)
 
 	//Initializing camera
@@ -43,7 +55,7 @@ func main_full() {
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, len(ips.Bot))
 	for i, ip := range ips.Bot {
-		sheeps[i] = initsheep(ip, "0.0.0.0", uint16(inportstart+i))
+		sheeps[i] = initsheep(ip, lohost, uint16(inportstart+i))
 		sheeps[i].commands.sheepF &= 0xEF
 	}
 
@@ -165,6 +177,22 @@ func main_full() {
 			des_angle :=math.Atan2(-float64(sheep.commands.relDesY),float64(sheep.commands.relDesX))*180/3.141
 			if des_angle < 0{
 				des_angle += 360
+			}
+			if sheep.currX < MARGIN {
+				sheep.commands.relDesY = 0
+				sheep.commands.relDesX = 40
+			}
+			if sheep.currX > PXWIDTH - MARGIN {
+				sheep.commands.relDesY = 0
+				sheep.commands.relDesX = -40
+			}
+			if sheep.currY < MARGIN {
+				sheep.commands.relDesY = 40
+				sheep.commands.relDesX = 0
+			}
+			if sheep.currY > PXHEIGHT - MARGIN{
+				sheep.commands.relDesY = -40
+				sheep.commands.relDesX = 0
 			}
 			log.Println("####################GAME STEP ##################################")
 			log.Println("Servo Desired: ",sheep.commands.servoAngle)
