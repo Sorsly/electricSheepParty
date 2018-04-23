@@ -50,7 +50,7 @@ typedef struct botmemory {
 }botmemory;
 //The data sent back to the CCCP
 typedef struct resp{
-    char health;
+    uint8_t health;
     char accelX;
     char accelY;
     uint16_t lastAngleError;
