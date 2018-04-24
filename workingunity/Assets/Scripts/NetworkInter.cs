@@ -11,10 +11,15 @@ using Newtonsoft.Json;
 class NetworkInter : MonoBehaviour
 {
     private byte[] results;
-    public Friendly[] friends;
+    private List<Friendly> friends;
+    public Friendly friendTemp;
+    public turret turretTemp;
     public Enemy[] enemies;
-    public string IP;
+    public string dbase;
+    private string IP;
     private int numbots;
+    private CCCPInfo info;
+    public statushandler stats;
     class toCCCP
     {
         public bool ready;
@@ -25,10 +30,22 @@ class NetworkInter : MonoBehaviour
         public List<bool> fires;
         public List<ulong> Dturretposs;
     }
+    class dbaseresp
+    {
+        public string dname;
+    }
+    class CCCPInfo
+    {
+        public int[] AssignedBots;
+        public string Gamestaus;
+        public int Numbots;
+    }
     void Start()
     {
-        
-
+        friends = new List<Friendly>();
+        IP = "localhost";
+        Debug.Log("Trying to enter getdomin");
+        StartCoroutine(getDomain());
     }
     private void Update()
     {
@@ -99,22 +116,84 @@ class NetworkInter : MonoBehaviour
 
         NavMeshPath sendpath = new NavMeshPath();
         string send;
-        foreach (var friend in friends)
+        if (friends.Count !=0)
         {
-            sendpath = friend.pathS();
-            tocccp.paths.Add(sendpath.corners);
-            tocccp.status.Add(sendpath.status);
-            tocccp.ids.Add(friend.idnum);
-            tocccp.fires.Add(friend.fire);
-            tocccp.Dturretposs.Add(friend.desiredturretpos);
-        }
+            foreach (var friend in friends)
+            {
+                sendpath = friend.pathS();
+                tocccp.paths.Add(sendpath.corners);
+                tocccp.status.Add(sendpath.status);
+                tocccp.ids.Add(friend.idnum);
+                tocccp.fires.Add(friend.fire);
+                tocccp.Dturretposs.Add(friend.desiredturretpos);
+            }
 
-        send = JsonConvert.SerializeObject(tocccp);
-        Debug.Log(send);
+            send = JsonConvert.SerializeObject(tocccp);
+        }
+        else
+        {
+            send = "{}";
+        }
+       // Debug.Log(send);
         return send;
+    }
+    IEnumerator checkIn()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://" + IP+"/info"))
+        {
+            Debug.Log("CHECKING IN DOMAIN");
+            yield return www.Send();
+            Friendly newFriendly;
+            turret newTurret;
+            if (www.isNetworkError)
+            {
+                Debug.Log("NETWORK ERROR IN GETDOMAIN");
+                Debug.Log(www.error);
+            }
+            else
+            {
+                info =JsonUtility.FromJson<CCCPInfo>(www.downloadHandler.text);
+                Debug.Log(info.AssignedBots);
+                foreach(int idnum in info.AssignedBots)
+                {
+                    Debug.Log("Creating New Object");
+                    newFriendly = Instantiate(friendTemp);
+                    newTurret = Instantiate(turretTemp);
+                    newFriendly.idnum = idnum;
+                    newFriendly.turr = newTurret;
+                    newTurret.chassis = newFriendly.gameObject;
+                    newTurret.target = newTurret.gameObject;
+                    friends.Add(newFriendly);
+                    //stats.friends.Add(newFriendly);
+                }
+            }
+        }
+    }
+    IEnumerator getDomain()
+    {
+        Debug.Log(dbase);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://" + dbase,"foo"))
+        {
+            Debug.Log("GETTING DOMAIN");
+            yield return www.Send();
+
+            if (www.isNetworkError)
+            {
+                Debug.Log("NETWORK ERROR IN GETDOMAIN");
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log(www.downloadHandler.text);
+                IP = JsonUtility.FromJson<dbaseresp>(www.downloadHandler.text).dname;
+                Debug.Log(IP);
+                StartCoroutine(checkIn());
+            }
+        }
     }
     IEnumerator Upload()
     {
+        //Debug.Log(IP);
         string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
         using (UnityWebRequest www = UnityWebRequest.Put("http://" + IP, myData))
