@@ -253,7 +253,7 @@ void move(commands * cmd, resp *state,botmemory * mem){
     double motorR = 0;
 
     // Control Block
-    if (abs(angleErr)>5 || transErr>35){
+    if (abs(angleErr)>5 || transErr>25){
         U_t = K_pt*transErr + K_dt*vTrans;
         U_a = K_pa*angleErr + K_da*vAngle;
         motorL = -U_t + U_a;
