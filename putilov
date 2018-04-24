@@ -28,7 +28,10 @@ def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
     if "192.168." not in cpuip:
         raise Exception("YOU ARE NOT CONNECTED TO THE LAN")
-    rawdata = subprocess.check_output(["sudo", "nmap", "-PU", "-p0", cpuip + "/24"]).decode()
+    ips = cpuip.split(" ")
+    rawdata = ""
+    for ip in ips:
+        rawdata += subprocess.check_output(["sudo", "nmap", "-PU", "-p0", ip + "/24"]).decode()
 
     query = r"Nmap scan report for (?P<ip>\d+\.\d+.\d+\.\d+).*?MAC Address: .*?\((?P<dev>.+?)\)"
     found = re.findall(query, rawdata, re.DOTALL)

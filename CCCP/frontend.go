@@ -41,6 +41,7 @@ type FEPacket struct {
 type APIPacket struct {
 	AssignedBots []int
 	Gamestatus   string
+	Numbots		 int
 }
 //Node in a path
 type Path struct {
@@ -264,42 +265,30 @@ func (ch *datawrite) APIServe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	defer r.Body.Close()
 	var retPkt APIPacket
-	reqip :=strings.Split(r.RemoteAddr,":")[0]
-	log.Println("API Request IP from: ",reqip)
-	if ch.FEIPs[reqip]{
-		var onleft bool
-		if ch.numcheckins == 0 {
-			retPkt.Gamestatus = "0"
-			onleft = true
-		}else if ch.numcheckins == 1{
-			retPkt.Gamestatus = "1"
-			onleft = false
-			ch.gamestart = true
-		}else {
-			panic("3 FRONTENDS HAVE CHECKED IN")
-		}
-		for sheep,idx := range ch.FE.camToFEID{
-			if onleft && sheep.currY < PXWIDTH/2{
-				retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
-			}
-			if !onleft && sheep.currY > PXWIDTH/2{
-				retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
-			}
-		}
-		ch.numcheckins += 1
-	}else{
-		if ch.gamestatus == 0 {
-			retPkt.Gamestatus = "Ongoing"
-		}else if ch.gamestatus == 1 {
-			retPkt.Gamestatus = "Player 1 has won"
-		}else if ch.gamestatus == 2 {
-			retPkt.Gamestatus = "Player 2 has won"
-		}
-		if ch.numcheckins < 2 {
-			retPkt.Gamestatus = "Waiting for players to Check in"
-		}
-		retPkt.AssignedBots = nil
+	_ =strings.Split(r.RemoteAddr,":")[0]
+	log.Println("API Request IP from: ",r.RemoteAddr)
+	var onleft bool
+	if ch.numcheckins == 0 {
+		retPkt.Gamestatus = "0"
+		onleft = true
+	}else if ch.numcheckins == 1{
+		retPkt.Gamestatus = "1"
+		onleft = false
+		ch.gamestart = true
+	}else {
+		panic("3 FRONTENDS HAVE CHECKED IN")
 	}
+	for sheep,idx := range ch.FE.camToFEID{
+		if onleft && sheep.currX < PXWIDTH/2{
+			retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
+		}
+		if !onleft && sheep.currX > PXWIDTH/2{
+			retPkt.AssignedBots = append(retPkt.AssignedBots, idx)
+		}
+	}
+	ch.numcheckins += 1
+	retPkt.Numbots = NUMBOTS
+	log.Println(retPkt)
 	retBytes, err := json.Marshal(retPkt)
 	check(err)
 	_, err = w.Write(retBytes)

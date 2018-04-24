@@ -29,6 +29,7 @@ func main_full() {
 	ips := getConfig("ips.txt")
 	var lohost string
 	var palhost string
+	log.Println(palhost)
 	if strings.Contains(ips.Cpu[0],"192.168"){
 		lohost = ips.Cpu[0]
 		palhost = ips.Cpu[1]
@@ -112,14 +113,13 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	//Wait for both Front ends to check in
-	for datawrite.gamestart != true {
+	for datawrite.gamestart != false {//true {
 		wait := time.NewTimer(time.Millisecond*10)
 		<-wait.C
 	}
 
 	//Random constant used in game
 	gamedone := false
-	fire := false
 	top := true
 	dir := 1
 	var servoangle int
@@ -137,7 +137,6 @@ func main_full() {
 				sheep.currX = xs[i]
 				sheep.currY = ys[i]
 				sheep.commands.camOrient = uint16(orients[i])
-				log.Println("SheepPos:",sheep.currX,sheep.currY)
 			}
 		}
 		//Using these updated positions, update the frontend interface to reflect that
@@ -146,7 +145,6 @@ func main_full() {
 		ratespin += 1
 		if ratespin % 10 == 0 {
 			servoangle += dir
-			fire = !fire
 			if servoangle%180 == 0 {
 				dir = -dir
 			}
@@ -204,6 +202,7 @@ func main_full() {
 			log.Println("Trying To get to: ", sheep.commands.relDesX, sheep.commands.relDesY)
 			log.Println("Path: ",pat)
 			log.Println("PathHead: ",sheep.pathhead)
+			log.Println("Fire?: ",fire)
 		}
 
 
@@ -223,6 +222,7 @@ func main_full() {
 		if datawrite.gamestatus != 0 {
 			gamedone = true
 		}
+
 	}
 
 	log.Println("GAME COMPLETE")
