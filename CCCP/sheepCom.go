@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
-	"log"
 )
 
 //these define the bit positions of the various commands for the botflag
@@ -172,7 +171,6 @@ func (s Sheep) sendCommands(commout *net.UDPAddr) {
 		s.commands.kDt,
 		s.commands.kDa,
 		}
-	log.Println("Raw Commands to BOT: ",msg)
 	Conn.Write(msg)
 
 }

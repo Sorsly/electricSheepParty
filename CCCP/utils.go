@@ -58,7 +58,6 @@ func uploaddomain(outdomain string,ip string){
 	domainchunks[5] = chunks[3]
 	domainchunks[6] = ".itap.purdue.edu"
 	domain := strings.Join(domainchunks,"")
-	log.Println(domain)
 	client := &http.Client{}
 	request, err := http.NewRequest("PUT", outdomain, strings.NewReader(domain))
 	request.ContentLength = int64(len(domain))
@@ -89,11 +88,9 @@ func getNextPoint(sh * Sheep, point [] Path, thresh float64)(ret Path){
 		sh.pathidx = 1
 	}
 	dist := euclidDist(float64(sh.currX), point[sh.pathidx].X*2, float64(sh.currY), point[sh.pathidx].Y*2)
-	log.Println("Dist: ",dist)
 	if  dist < thresh && dist != 0{
 		sh.pathidx += 1
 	}
-	log.Println("Path Index:",sh.pathidx)
 	ret.X = point[sh.pathidx].X*2
 	ret.Y = point[sh.pathidx].Y*2
 	if samepoint(ret,Path{X:0,Y:0}){
