@@ -12,9 +12,10 @@ class NetworkInter : MonoBehaviour
 {
     private byte[] results;
     private List<Friendly> friends;
+    private List<Enemy> enemies;
     public Friendly friendTemp;
+    public Enemy enemyTemp;
     public turret turretTemp;
-    public Enemy[] enemies;
     public string dbase;
     private string IP;
     private int numbots;
@@ -43,6 +44,7 @@ class NetworkInter : MonoBehaviour
     void Start()
     {
         friends = new List<Friendly>();
+        enemies = new List<Enemy>();
         IP = "localhost";
         Debug.Log("Trying to enter getdomin");
         StartCoroutine(getDomain());
@@ -61,8 +63,6 @@ class NetworkInter : MonoBehaviour
     }
     void DoLast()
     {
-        if (results.Length != 0)
-        {
             numbots = results[0];
             ulong xPos;
             ulong yPos;
@@ -94,13 +94,12 @@ class NetworkInter : MonoBehaviour
                 turretPos = BitConverter.ToUInt64(results, 2 + 2 * numbots * 8 + enemy.idnum * 8);
                 orient = BitConverter.ToUInt64(results, 2 + 3 * numbots * 8 + enemy.idnum * 8);
                 health = BitConverter.ToUInt64(results, 2 + 4 * numbots * 8 + enemy.idnum * 8);
-                enemy.transform.position = new Vector3(xPos, enemy.transform.position.y, yPos);
+                enemy.transform.position = new Vector3(xPos/2, enemy.transform.position.y, yPos/2);
 
                 Vector3 neworient = new Vector3(0, orient);
                 enemy.transform.eulerAngles = neworient;
                 enemy.health = health;
                 enemy.turr.transform.eulerAngles = new Vector3(90, turretPos);
-            }
         }
     }
     private string genJSON()
@@ -113,11 +112,8 @@ class NetworkInter : MonoBehaviour
         tocccp.ids = new List<int>();
         tocccp.Dturretposs = new List<ulong>();
         tocccp.fires = new List<bool>();
-
-        NavMeshPath sendpath = new NavMeshPath();
         string send;
-        if (friends.Count !=0)
-        {
+        NavMeshPath sendpath = new NavMeshPath();
             foreach (var friend in friends)
             {
                 sendpath = friend.pathS();
@@ -129,12 +125,7 @@ class NetworkInter : MonoBehaviour
             }
 
             send = JsonConvert.SerializeObject(tocccp);
-        }
-        else
-        {
-            send = "{}";
-        }
-       // Debug.Log(send);
+        Debug.Log(send);
         return send;
     }
     IEnumerator checkIn()
@@ -144,6 +135,7 @@ class NetworkInter : MonoBehaviour
             Debug.Log("CHECKING IN DOMAIN");
             yield return www.Send();
             Friendly newFriendly;
+            Enemy newEnemy;
             turret newTurret;
             if (www.isNetworkError)
             {
@@ -164,8 +156,25 @@ class NetworkInter : MonoBehaviour
                     newTurret.chassis = newFriendly.gameObject;
                     newTurret.target = newTurret.gameObject;
                     friends.Add(newFriendly);
-                    //stats.friends.Add(newFriendly);
+                    stats.addFriendly(newFriendly);
                 }
+                for(int i = 0; i < info.Numbots; i++)
+                {
+                    if( Array.IndexOf(info.AssignedBots,i) == -1)
+                    {
+                        newEnemy = Instantiate(enemyTemp);
+                        newTurret = Instantiate(turretTemp);
+                        newEnemy.idnum = i;
+                        newEnemy.turr = newTurret;
+                        newTurret.chassis = newEnemy.gameObject;
+                        newTurret.target = newTurret.gameObject;
+                        enemies.Add(newEnemy);
+                        stats.addEnemy(newEnemy);
+                    }
+
+
+                }
+                stats.instantiateHealth();
             }
         }
     }
@@ -186,14 +195,12 @@ class NetworkInter : MonoBehaviour
             {
                 Debug.Log(www.downloadHandler.text);
                 IP = JsonUtility.FromJson<dbaseresp>(www.downloadHandler.text).dname;
-                Debug.Log(IP);
                 StartCoroutine(checkIn());
             }
         }
     }
     IEnumerator Upload()
     {
-        //Debug.Log(IP);
         string msg =  genJSON();
         byte[] myData = System.Text.Encoding.UTF8.GetBytes(msg);
         using (UnityWebRequest www = UnityWebRequest.Put("http://" + IP, myData))

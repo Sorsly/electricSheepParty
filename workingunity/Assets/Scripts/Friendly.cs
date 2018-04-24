@@ -35,11 +35,15 @@ public class Friendly : MonoBehaviour {
         desiredturretpos = turr.getDesired();
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
-            playerAgent.CalculatePath(GetPointUnderCursor(), path);
-        }
-        if (Input.GetMouseButtonDown(0) && isSelected == true && SelectedEnemy())
-        {
-            playerAgent.CalculatePath(intersectPath(5), path);
+            if (SelectedEnemy())
+            {
+                playerAgent.CalculatePath(intersectPath(5), path);
+            }
+            else
+            {
+                playerAgent.CalculatePath(GetPointUnderCursor(), path);
+            }
+            
         }
         if (Input.GetKey("space"))
         {
