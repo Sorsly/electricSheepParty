@@ -136,7 +136,15 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 		s.updateState(resp)
 	}
 }
-
+func (s * Sheep) setTurrAngle(desired uint64){
+	servoToHit := int(desired) - int(s.commands.camOrient)
+	if servoToHit > 180 {
+		servoToHit = 180
+	}else if servoToHit < 0{
+		servoToHit = 0
+	}
+	s.commands.servoAngle = uint8(servoToHit)
+}
 //Sends state commands to a sheep
 func (s Sheep) sendCommands(commout *net.UDPAddr) {
 	//commout is the string to send out commands form local address on outport
