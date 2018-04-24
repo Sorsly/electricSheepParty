@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const NUMBOTS = 1 //Number of bots in the game
+const NUMBOTS = 3 //Number of bots in the game
 const PXWIDTH = 640
 const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
@@ -121,10 +121,6 @@ func main_full() {
 	//Random constant used in game
 	gamedone := false
 	top := true
-	dir := 1
-	var servoangle int
-	servoangle = 120
-	ratespin := 0
 
 	log.Println("Entering Game")
 	for gamedone == false {
@@ -142,19 +138,11 @@ func main_full() {
 		//Using these updated positions, update the frontend interface to reflect that
 		datawrite.FE.UpdateGndBots(sheeps, false, false)
 
-		ratespin += 1
-		if ratespin % 10 == 0 {
-			servoangle += dir
-			if servoangle%180 == 0 {
-				dir = -dir
-			}
-		}
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, _, fire, turretAngl,_ := datawrite.frInfo(sheep)
-			turretAngl = uint64(servoangle)
 			//Set servo angle
-			sheep.commands.servoAngle = uint8(turretAngl)
+			sheep.setTurrAngle(turretAngl)
 			//Fire or don't fire
 			if fire {
 				sheep.commands.sheepF |= SHEEPFIRE
@@ -232,23 +220,47 @@ func main_full() {
 func main_frontend() {
 
 	//Initializing sheep connections
-	sheeps := make([]*Sheep, 1)
+	sheeps := make([]*Sheep, NUMBOTS)
 	ips := getConfig("ips.txt")
-	for i := 0; i < 1; i += 1 {
+	var palhost string
+	log.Println(palhost)
+	if strings.Contains(ips.Cpu[0],"192.168"){
+		palhost = ips.Cpu[1]
+	}else {
+		palhost = ips.Cpu[0]
+	}
+	for i := 0; i < NUMBOTS; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
 	}
+	uploaddomain(CAROLYNSERVER,palhost)
+	//Initializing Frontend Server
 	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
+	//Setup server for the unity to make put requests too
 	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
+	http.HandleFunc("/info", http.HandlerFunc(datawrite.APIServe))
 	go http.ListenAndServe(numtoportstr(80), nil)
-	sheeps[0].currX = 1
-	sheeps[0].currY = 1
+	sheeps[0].currX = 250
+	sheeps[0].currY = 250
+	sheeps[1].currX = 250
+	sheeps[1].currY = 410
+	sheeps[2].currX = 300
+	sheeps[2].currY = 400
+	sheeps[0].resp.health = 10
+	sheeps[1].resp.health = 10
+	sheeps[2].resp.health = 10
 
+	log.Println("Enter Game")
 	for {
-		sheeps[0].commands.servoAngle += 1
-		if sheeps[0].commands.servoAngle == 180{
-			sheeps[0].commands.servoAngle = 0
-		}
 		datawrite.FE.UpdateGndBots(sheeps, false, false)
+
+		_, _, _, turretAngl,_ := datawrite.frInfo(sheeps[0])
+		sheeps[0].setTurrAngle(turretAngl)
+		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[1])
+		sheeps[1].setTurrAngle(turretAngl)
+		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[2])
+		sheeps[2].setTurrAngle(turretAngl)
+		sheeps[2].currX = (sheeps[2].currX + 10)%400
+
 		log.Println("updoot")
 		wait := time.NewTimer(time.Second)
 		<-wait.C
