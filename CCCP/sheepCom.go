@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
-	"log"
 )
 
 //these define the bit positions of the various commands for the botflag
