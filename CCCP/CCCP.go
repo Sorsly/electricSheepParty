@@ -144,11 +144,7 @@ func main_full() {
 			//Set servo angle
 			sheep.setTurrAngle(turretAngl)
 			//Fire or don't fire
-			if fire {
-				sheep.commands.sheepF |= SHEEPFIRE
-			}else{
-				sheep.commands.sheepF &= 0xF7
-			}
+			sheep.firing(fire,0.2)
 			if top {
 				sheep.commands.sheepF |= SHEEPLIGHT
 			}else{
@@ -253,16 +249,18 @@ func main_frontend() {
 	for {
 		datawrite.FE.UpdateGndBots(sheeps, false, false)
 
-		_, _, _, turretAngl,_ := datawrite.frInfo(sheeps[0])
+		_, _, fire, turretAngl,_ := datawrite.frInfo(sheeps[0])
+		log.Println("Fire Bot 1: ",fire)
+		sheeps[0].firing(fire,1)
+		log.Println("Laser State: ",sheeps[0].commands.sheepF & SHEEPFIRE)
 		sheeps[0].setTurrAngle(turretAngl)
 		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[1])
 		sheeps[1].setTurrAngle(turretAngl)
 		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[2])
 		sheeps[2].setTurrAngle(turretAngl)
-		sheeps[2].currX = (sheeps[2].currX + 10)%400
+		sheeps[2].currX = (sheeps[2].currX + 1)%400
 
-		log.Println("updoot")
-		wait := time.NewTimer(time.Second)
+		wait := time.NewTimer(time.Millisecond*50)
 		<-wait.C
 	}
 }
@@ -276,7 +274,7 @@ func main_camera() {
 
 func main(){
 	// This works and strip "/static/" fragment from path
-	main_full()
+	//main_full()
 	//main_camera()
-	//main_frontend()
+	main_frontend()
 }
