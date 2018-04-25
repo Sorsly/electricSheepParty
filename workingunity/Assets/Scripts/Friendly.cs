@@ -45,7 +45,7 @@ public class Friendly : MonoBehaviour {
             }
             
         }
-        if (Input.GetKey("space"))
+        if (Input.GetKey("space") ||(Mathf.Abs((int)turretpos - (int)desiredturretpos)<20))
         {
             fire = true;
         }
@@ -60,11 +60,19 @@ public class Friendly : MonoBehaviour {
     {
         float dY = turr.target.transform.position.y - transform.position.y;
         float dX = turr.target.transform.position.x - transform.position.x;
-        float theta = Mathf.Atan(dY / dX);
+        dY = -dY;
+        float angle;
+        angle = Mathf.Atan2(dY, dX);
+        angle = Mathf.FloorToInt(angle * 180 / Mathf.PI + 90);
+        if (angle < 0)
+        {
+            angle += 360;
+        }
+
         float mag = Mathf.Sqrt(dY * dY + dX * dX);
         Vector3 retpoint;
-        retpoint.x = Mathf.Cos(theta) * (mag - enemDist) + turr.target.transform.position.x;
-        retpoint.z = Mathf.Sin(theta) * (mag - enemDist) + turr.target.transform.position.y;
+        retpoint.x = Mathf.Cos(angle) * (mag - enemDist) + turr.target.transform.position.x;
+        retpoint.z = Mathf.Sin(angle) * (mag - enemDist) + turr.target.transform.position.y;
         retpoint.y = transform.position.y;
         return retpoint;
     }

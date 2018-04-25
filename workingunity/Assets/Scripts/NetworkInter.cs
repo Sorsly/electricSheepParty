@@ -82,6 +82,7 @@ class NetworkInter : MonoBehaviour
                 Vector3 neworient = new Vector3(0, orient);
                 friend.transform.eulerAngles = neworient;
                 friend.health = health;
+                friend.turretpos = turretPos;
                 friend.turr.transform.eulerAngles = new Vector3(90, turretPos);
             }
 
