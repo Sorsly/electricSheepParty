@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class statushandler : MonoBehaviour {
-    public Friendly[] friends;
-    public Enemy[] enemies;
+    private List<Friendly> friends;
+    private List<Enemy> enemies;
     public GameObject defaulttext;
     public int offsetX;
     public int offsetY;
@@ -15,6 +15,19 @@ public class statushandler : MonoBehaviour {
     void Start()
     {
 
+        friends = new List<Friendly>();
+        enemies = new List<Enemy>();
+    }
+    public void addFriendly(Friendly friend)
+    {
+        friends.Add(friend);
+    }
+    public void addEnemy(Enemy enemy)
+    {
+        enemies.Add(enemy);
+    }
+    public void instantiateHealth()
+    {
         foreach (var friend in friends)
         {
             friend.hovertext = Instantiate(defaulttext);
@@ -29,7 +42,6 @@ public class statushandler : MonoBehaviour {
             txtMesh.text = "enemy";
         }
     }
-	
 	// Update is called once per frame
 	void Update () {
         foreach (var friend in friends)
