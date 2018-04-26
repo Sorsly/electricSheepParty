@@ -23,6 +23,8 @@ def programserver(*args):
 
 # Runs the pathfinder
 
+def eraseflash(*args):
+    os.system("sudo openocd -s share/openocd/scripts -f interface/jlink.cfg     -f board/esp-wroom-32.cfg -c \"init; reset halt; flash erase_sector 0 1 1023; exit\"")
 # Generates the file with all the ips on the network
 def getIPS(*args):
     cpuip = subprocess.check_output(["hostname", "-I"]).decode().strip('\n').strip(' ')
@@ -137,6 +139,7 @@ def main():
         "cccp": CCCP,
         "serve":programserver,
         "calibrate":calibrate,
+        "erase":eraseflash,
         "run":run
     }
     if len(sys.argv) == 1 or sys.argv[1] not in available_builds:

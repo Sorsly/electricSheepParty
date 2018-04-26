@@ -328,6 +328,7 @@ void app_main() {
     resp * state = malloc(sizeof(state));
     botmemory * mem = malloc(sizeof(botmemory));
 
+
     state->health = 10;
     mem->beenhit = false;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
@@ -342,8 +343,8 @@ void app_main() {
     init_wifi();
     // Wait for when the bot has connected to the AP
     while(!connected_to_ap){}
-    init_turret(&(mem->beenhit));
  //   init_i2c();
+    init_turret(&(mem->beenhit));
     init_motors();
     init_gpio();
 

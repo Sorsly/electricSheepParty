@@ -10,7 +10,7 @@
 
 #define EXAMPLE_WIFI_SSID "Sliva"
 #define EXAMPLE_WIFI_PASS "plumsaretasty"
-#define EXAMPLE_SERVER_IP   "192.168.42.23"
+#define EXAMPLE_SERVER_IP   "192.168.42.33"
 #define EXAMPLE_SERVER_PORT "1944"
 #define EXAMPLE_FILENAME "sheepy.bin"
 #define BUFFSIZE 1024

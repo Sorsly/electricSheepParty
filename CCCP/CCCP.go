@@ -13,12 +13,12 @@ import (
 	"strings"
 )
 
-const NUMBOTS = 3 //Number of bots in the game
+const NUMBOTS = 5 //Number of bots in the game
 const PXWIDTH = 640
 const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
 const CAMPORT = "1918" //The port the camera will send its data down
-const REPROGRAMON = false
+const REPROGRAMON = true
 const CAROLYNSERVER = "http://ec2-52-15-233-132.us-east-2.compute.amazonaws.com:3000/url/"
 const MARGIN = 10
 
@@ -68,6 +68,7 @@ func main_full() {
 		}
 		wait := time.NewTimer(10*time.Second)
 		<-wait.C
+		panic("REPROGRAMMED")
 	}
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
 	//And then the position of all the bots is found. All the id's found are then iterated over, and if
@@ -274,7 +275,7 @@ func main_camera() {
 
 func main(){
 	// This works and strip "/static/" fragment from path
-	//main_full()
+	main_full()
 	//main_camera()
-	main_frontend()
+	//main_frontend()
 }
