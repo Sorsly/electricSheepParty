@@ -223,11 +223,7 @@ void move(commands * cmd, resp *state,botmemory * mem){
     fire_laser(cmd->sheepf & 0x08);
     set_angle((uint32_t)cmd->servoAngle);
     top_on(cmd->sheepf & 0x10);
-    if(mem->beenhit){
-        state->health--;
-        mem->beenhit = false;
-        canhit(&(mem->beenhit));
-    }
+    canhit(&(state->health));
     //Not move command
     if(cmd->relDesX == 0 && cmd->relDesY == 0){
         left_ctl(true,0);
@@ -325,12 +321,11 @@ void app_main() {
 
     //The commands of the bot and the state of the bot. Dictate the bots movements
     commands * nextCommands = malloc(sizeof(commands));
-    resp * state = malloc(sizeof(state));
+    resp * state = malloc(sizeof(resp));
     botmemory * mem = malloc(sizeof(botmemory));
 
 
     state->health = 10;
-    mem->beenhit = false;
     //init nvs_flash. NVS flash is used by the wifi to save configurations, making it faster to connect
     esp_err_t nvsret = nvs_flash_init();
 
@@ -344,7 +339,7 @@ void app_main() {
     // Wait for when the bot has connected to the AP
     while(!connected_to_ap){}
  //   init_i2c();
-    init_turret(&(mem->beenhit));
+    init_turret(&(state->health));
     init_motors();
     init_gpio();
 
@@ -368,6 +363,12 @@ void app_main() {
         if(nextCommands->sheepf &  0x20){
             break;
         }
+        if(state->health < 1){
+            break;
+        }
     }
+    top_on(false);
+    left_ctl(true,0);
+    right_ctl(true,0);
 
 }

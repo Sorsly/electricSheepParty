@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
+	"log"
 )
 
 //these define the bit positions of the various commands for the botflag
@@ -139,12 +140,9 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 	}
 }
 func (s * Sheep) setTurrAngle(desired uint64){
-	servoToHit := int(desired) - int(s.commands.camOrient)
-	if servoToHit > 180 {
-		servoToHit = 180
-	}else if servoToHit < 0{
-		servoToHit = 0
-	}
+
+	log.Println("Angletohit:",desired)
+	servoToHit := int(desired*250/180)
 	s.commands.servoAngle = uint8(servoToHit)
 }
 
