@@ -45,9 +45,9 @@ class NetworkInter : MonoBehaviour
     {
         friends = new List<Friendly>();
         enemies = new List<Enemy>();
-        IP = "localhost";
+        IP = "192.168.42.23";
         Debug.Log("Trying to enter getdomin");
-        StartCoroutine(getDomain());
+        StartCoroutine(checkIn()); //getDomain());
     }
     private void Update()
     {
@@ -155,7 +155,6 @@ class NetworkInter : MonoBehaviour
                     newFriendly.idnum = idnum;
                     newFriendly.turr = newTurret;
                     newTurret.chassis = newFriendly.gameObject;
-                    newTurret.target = newTurret.gameObject;
                     friends.Add(newFriendly);
                     stats.addFriendly(newFriendly);
                 }
@@ -168,7 +167,6 @@ class NetworkInter : MonoBehaviour
                         newEnemy.idnum = i;
                         newEnemy.turr = newTurret;
                         newTurret.chassis = newEnemy.gameObject;
-                        newTurret.target = newTurret.gameObject;
                         enemies.Add(newEnemy);
                         stats.addEnemy(newEnemy);
                     }

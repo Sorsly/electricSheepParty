@@ -31,8 +31,11 @@ public class Friendly : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-       
-        desiredturretpos = turr.getDesired();
+        if (turr.target)
+        {
+            desiredturretpos = turr.getDesired();
+        }
+        
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
             if (SelectedEnemy())
@@ -45,7 +48,8 @@ public class Friendly : MonoBehaviour {
             }
             
         }
-        if (Input.GetKey("space") ||(Mathf.Abs((int)turretpos - (int)desiredturretpos)<20))
+
+        if (Input.GetKey("space") ||(Mathf.Abs((int)turretpos + (int)transform.eulerAngles.y - (int)desiredturretpos)<30))
         {
             fire = true;
         }
