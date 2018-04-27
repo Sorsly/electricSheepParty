@@ -17,6 +17,8 @@ public class Friendly : MonoBehaviour {
     private NavMeshPath path;
     public turret turr;
     public GameObject hovertext;
+    private float turrdirection;
+    private float direction;
     #region Monobehavior API
     void Awake()
     {
@@ -25,17 +27,18 @@ public class Friendly : MonoBehaviour {
     }
     // Use this for initialization
     void Start () {
-		
+        turrdirection = 90;
+        direction = 0.5f;
 	}
 
     // Update is called once per frame
     void Update()
     {
-        if (turr.target)
+        /*if (turr.target)
         {
             desiredturretpos = turr.getDesired();
         }
-        
+        */
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
             if (SelectedEnemy())
@@ -48,7 +51,28 @@ public class Friendly : MonoBehaviour {
             }
             
         }
-
+        if(Input.GetKey("a") && isSelected == true)
+        {
+            if (turrdirection > 0)
+            {
+                turrdirection -= direction;
+            }
+            if(turrdirection< 0)
+            {
+                turrdirection = 0;
+            }
+        }
+        if (Input.GetKey("d") && isSelected == true)
+        {
+            if (turrdirection < 180)
+            {
+                turrdirection += direction;
+            }
+            if (turrdirection > 180)
+            {
+                turrdirection = 180;
+            }
+        }
         if (Input.GetKey("space") ||(Mathf.Abs((int)turretpos + (int)transform.eulerAngles.y - (int)desiredturretpos)<30))
         {
             fire = true;
@@ -57,7 +81,7 @@ public class Friendly : MonoBehaviour {
         {
             fire = false;
         }
-
+        desiredturretpos = (ulong)Mathf.FloorToInt(turrdirection);
     }
 #endregion
     private Vector3 intersectPath(float enemDist)

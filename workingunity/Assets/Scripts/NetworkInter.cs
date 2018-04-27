@@ -48,10 +48,14 @@ class NetworkInter : MonoBehaviour
         IP = "192.168.42.23";
         Debug.Log("Trying to enter getdomin");
         StartCoroutine(checkIn()); //getDomain());
+        InvokeRepeating("connect", 2.0f, 0.2f);
+    }
+    private void connect()
+    {
+        StartCoroutine(Upload());
     }
     private void Update()
     {
-        StartCoroutine(Upload());
 
     }
     public static string ByteArrayToString(byte[] ba)
