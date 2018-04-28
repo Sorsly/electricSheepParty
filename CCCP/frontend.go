@@ -13,7 +13,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 	"strings"
 )
@@ -51,7 +50,6 @@ type Path struct {
 //The CV data buffer
 type FrontEnd struct {
 	numbots uint8
-	toFEmtx sync.Mutex
 	camToFEID map[*Sheep]int
 	toFE    struct {
 		//FEflags b0 = init
@@ -63,7 +61,6 @@ type FrontEnd struct {
 		orient    []uint64
 		health    []uint64
 	}
-	feFEmtx sync.Mutex
 	frFE    struct {
 		ready   bool
 		alldead bool
@@ -90,8 +87,6 @@ type datawrite struct {
 //for a certain sheep, give the desired commands for that sheep
 func (da * datawrite) frInfo(sh * Sheep)([]Path,int,bool,uint64,bool){
 	idx := da.FE.camToFEID[sh]
-	da.FE.feFEmtx.Lock()
-	defer da.FE.feFEmtx.Unlock()
 	return da.FE.frFE.path[idx], da.FE.frFE.pathStatus[idx], da.FE.frFE.fire[idx],da.FE.frFE.turretReq[idx], da.FE.frFE.ready
 }
 func check(e error) {
@@ -102,8 +97,6 @@ func check(e error) {
 
 //This takes in the sheep and game state and updates the datastructure which is sent to the frontend
 func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) {
-	buff.toFEmtx.Lock()
-	defer buff.toFEmtx.Unlock()
 
 	if init {
 		buff.toFE.FEflags |= 0x01
@@ -129,8 +122,6 @@ func (buff *FrontEnd) UpdateGndBots(sheeps []*Sheep, init bool, gamestart bool) 
 //Takes the frontend data and loads it into a big byte array, for sending as a response body to the frontend
 func (buff *FrontEnd) Dump() (read int, img []byte) {
 	datasize := 40*buff.numbots + 2
-	buff.toFEmtx.Lock()
-	defer buff.toFEmtx.Unlock()
 	msg := make([]byte, datasize)
 	indx := 0
 
@@ -215,8 +206,6 @@ func (fe *FrontEnd) loadFERaw(raw []byte) {
 	pathsteps := 0
 	err := json.Unmarshal(raw, &decoded)
 	check(err)
-	fe.feFEmtx.Lock()
-	defer fe.feFEmtx.Unlock()
 	fe.frFE.ready = decoded.Ready1
 	fe.frFE.alldead = decoded.Alldead
 	for idx, id := range decoded.Ids {
@@ -276,7 +265,14 @@ func (ch *datawrite) APIServe(w http.ResponseWriter, r *http.Request) {
 		onleft = false
 		ch.gamestart = true
 	}else {
-		panic("3 FRONTENDS HAVE CHECKED IN")
+		retPkt.Numbots = NUMBOTS
+		retPkt.AssignedBots = nil
+		retPkt.Gamestatus = "2"
+		retBytes, err := json.Marshal(retPkt)
+		check(err)
+		_, err = w.Write(retBytes)
+		check(err)
+		return
 	}
 	for sheep,idx := range ch.FE.camToFEID{
 		if onleft && sheep.currX < PXWIDTH/2{

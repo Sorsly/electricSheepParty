@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"sync"
 	"time"
+	"log"
 )
 
 //these define the bit positions of the various commands for the botflag
@@ -28,6 +29,7 @@ type Sheep struct {
 	currY     uint64       //Current position Y
 	pathidx	  int
 	pathhead Path
+	lastswitchfire time.Time
 	commands  struct {
 		sheepF uint8
 		// sheepF b0 = rst
@@ -73,6 +75,7 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.currY = 0
 	s.pathidx = 0
 	s.pathhead = Path{X:0,Y:0}
+	s.lastswitchfire = time.Now()
 
 	outServerAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ipAdd, "1917"))
 	CheckError(err)
@@ -137,13 +140,26 @@ func (s *Sheep) recState(group *sync.WaitGroup) {
 	}
 }
 func (s * Sheep) setTurrAngle(desired uint64){
-	servoToHit := int(desired) - int(s.commands.camOrient)
-	if servoToHit > 180 {
-		servoToHit = 180
-	}else if servoToHit < 0{
-		servoToHit = 0
-	}
+
+	log.Println("Angletohit:",desired)
+	servoToHit := int(desired*250/180)
 	s.commands.servoAngle = uint8(servoToHit)
+}
+
+func (s * Sheep) firing(state bool, ontime float64){
+	if state {
+		if time.Now().Sub(s.lastswitchfire).Seconds() > ontime{
+			if s.commands.sheepF & SHEEPFIRE == 0{
+				s.commands.sheepF |= SHEEPFIRE
+			}else{
+				s.commands.sheepF &= 0xF7
+			}
+			s.lastswitchfire = time.Now()
+		}
+	}else{
+		s.commands.sheepF &= 0xF7
+		s.lastswitchfire = time.Now()
+	}
 }
 //Sends state commands to a sheep
 func (s Sheep) sendCommands(commout *net.UDPAddr) {

@@ -29,6 +29,7 @@ void init_turret(uint8_t * health){
 
 	//ISR for hit registration
 	gpio_install_isr_service(ESP_INTR_FLAG_EDGE);
+	canhit(health);
 }
 
 //Enables hit capability
@@ -61,6 +62,6 @@ void fire_laser(bool fire){
 
 //Register a hit
 void hit_register_isr(uint8_t * arg){
-	(*arg )--;
+	*arg  = *arg -1;
 	gpio_isr_handler_remove(recep);
 }

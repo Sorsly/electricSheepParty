@@ -47,6 +47,7 @@ typedef struct commands {
 typedef struct botmemory {
     double lastAngleError;
     double lastTransError;
+    bool beenhit;
 }botmemory;
 //The data sent back to the CCCP
 typedef struct resp{

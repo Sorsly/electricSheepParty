@@ -10,10 +10,9 @@ import (
 	"sync"
 	"time"
 	"math"
-	"strings"
 )
 
-const NUMBOTS = 3 //Number of bots in the game
+const NUMBOTS = 2//Number of bots in the game
 const PXWIDTH = 640
 const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
@@ -28,17 +27,9 @@ func main_full() {
 	//Loads all the IP addresses of FEs, CCCP, and bots
 	ips := getConfig("ips.txt")
 	var lohost string
-	var palhost string
-	log.Println(palhost)
-	if strings.Contains(ips.Cpu[0],"192.168"){
-		lohost = ips.Cpu[0]
-		palhost = ips.Cpu[1]
-	}else {
-		lohost = ips.Cpu[1]
-		palhost = ips.Cpu[0]
-	}
+	lohost = ips.Cpu[0]
 	log.Println(lohost)
-	uploaddomain(CAROLYNSERVER,palhost)
+//	uploaddomain(CAROLYNSERVER,palhost)
 	//This is the starting port for the sheeps response
 	inportstart := 2000
 	var commandwg sync.WaitGroup
@@ -48,7 +39,8 @@ func main_full() {
 	CheckError(err)
 
 	//Initializing camera
-	cam := initcamera(NUMBOTS, CAMPORT)
+	camip := "localhost"
+	cam := initcamera(NUMBOTS, CAMPORT,camip)
 
 	//Initializing idhash. used to get a certain sheep object from an id
 	camToIdx := make(map[uint64]*Sheep)
@@ -58,6 +50,7 @@ func main_full() {
 	for i, ip := range ips.Bot {
 		sheeps[i] = initsheep(ip, lohost, uint16(inportstart+i))
 		sheeps[i].commands.sheepF &= 0xEF
+		sheeps[i].commands.servoAngle = 90
 	}
 
 	if REPROGRAMON {
@@ -68,6 +61,7 @@ func main_full() {
 		}
 		wait := time.NewTimer(10*time.Second)
 		<-wait.C
+		panic("REPROGRAMMED")
 	}
 	//IDing process. How it works is that for each sheep, its light is turned on, a moment is waited
 	//And then the position of all the bots is found. All the id's found are then iterated over, and if
@@ -79,11 +73,10 @@ func main_full() {
 		sheep.commands.sheepF |= SHEEPLIGHT
 		sheep.sendCommands(outServerAddr)
 
-		wait := time.NewTimer(time.Second)
+		wait := time.NewTimer(time.Second*2)
 		<-wait.C
 
 		ids, xs, ys,orients := cam.getPos()
-		log.Println("IDing ids",ids)
 		for idx,id := range ids {
 			_, inHash := camToIdx[id]
 			if !inHash {
@@ -103,6 +96,7 @@ func main_full() {
 			sheep.sendCommands(outServerAddr)
 			sheep.commands.sheepF &= 0xFE
 		}
+		log.Println("IDing ids",ids)
 	}
 
 	//Initializing Frontend Server
@@ -113,7 +107,8 @@ func main_full() {
 	go http.ListenAndServe(numtoportstr(80), nil)
 
 	//Wait for both Front ends to check in
-	for datawrite.gamestart != false {//true {
+	log.Println("Waiting For FE to Connect")
+	for datawrite.gamestart != true {
 		wait := time.NewTimer(time.Millisecond*10)
 		<-wait.C
 	}
@@ -141,14 +136,10 @@ func main_full() {
 		//using the frontend commands, prepare the command structure for each sheep
 		for _, sheep := range sheeps{
 			pat, _, fire, turretAngl,_ := datawrite.frInfo(sheep)
+			//Fire or don't fire
+			sheep.firing(fire,0.4)
 			//Set servo angle
 			sheep.setTurrAngle(turretAngl)
-			//Fire or don't fire
-			if fire {
-				sheep.commands.sheepF |= SHEEPFIRE
-			}else{
-				sheep.commands.sheepF &= 0xF7
-			}
 			if top {
 				sheep.commands.sheepF |= SHEEPLIGHT
 			}else{
@@ -164,6 +155,7 @@ func main_full() {
 			if des_angle < 0{
 				des_angle += 360
 			}
+			/*
 			if sheep.currX < MARGIN {
 				sheep.commands.relDesY = 0
 				sheep.commands.relDesX = 40
@@ -180,8 +172,10 @@ func main_full() {
 				sheep.commands.relDesY = -40
 				sheep.commands.relDesX = 0
 			}
+			*/
 			log.Println("####################GAME STEP ##################################")
-			log.Println("Servo Desired: ",sheep.commands.servoAngle)
+			log.Println("Servo Desired: ",turretAngl)
+			log.Println("Servo Actual: ",sheep.commands.servoAngle)
 			log.Println("Dist: ",dist)
 			log.Println("Next: ",next)
 			log.Println("SheepHealth: ",sheep.resp.health)
@@ -222,53 +216,50 @@ func main_frontend() {
 	//Initializing sheep connections
 	sheeps := make([]*Sheep, NUMBOTS)
 	ips := getConfig("ips.txt")
-	var palhost string
-	log.Println(palhost)
-	if strings.Contains(ips.Cpu[0],"192.168"){
-		palhost = ips.Cpu[1]
-	}else {
-		palhost = ips.Cpu[0]
-	}
 	for i := 0; i < NUMBOTS; i += 1 {
 		sheeps[i] = initsheep("localhost", "localhost", uint16(1000))
 	}
-	uploaddomain(CAROLYNSERVER,palhost)
+	sheeps[0].currX = 250
+	sheeps[0].currY = 250
+	sheeps[1].currX = 400
+	sheeps[1].currY = 400
+	sheeps[0].resp.health = 10
+	sheeps[1].resp.health = 10
+	//uploaddomain(CAROLYNSERVER,palhost)
 	//Initializing Frontend Server
 	datawrite := MkChanDataWrite(ips.Fes, NUMBOTS,sheeps)
 	//Setup server for the unity to make put requests too
 	http.HandleFunc("/", http.HandlerFunc(datawrite.Botctrlserve))
 	http.HandleFunc("/info", http.HandlerFunc(datawrite.APIServe))
 	go http.ListenAndServe(numtoportstr(80), nil)
-	sheeps[0].currX = 250
-	sheeps[0].currY = 250
-	sheeps[1].currX = 250
-	sheeps[1].currY = 410
-	sheeps[2].currX = 300
-	sheeps[2].currY = 400
-	sheeps[0].resp.health = 10
-	sheeps[1].resp.health = 10
-	sheeps[2].resp.health = 10
+
+	log.Println("Waiting For FE to Connect")
+	for datawrite.gamestart != true {
+		wait := time.NewTimer(time.Millisecond*10)
+		<-wait.C
+	}
+
 
 	log.Println("Enter Game")
 	for {
 		datawrite.FE.UpdateGndBots(sheeps, false, false)
 
-		_, _, _, turretAngl,_ := datawrite.frInfo(sheeps[0])
+		_, _, fire, turretAngl,_ := datawrite.frInfo(sheeps[0])
+		sheeps[0].firing(fire,1)
 		sheeps[0].setTurrAngle(turretAngl)
-		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[1])
+		log.Println(sheeps[0].commands.servoAngle)
+		_, _, fire, turretAngl,_ = datawrite.frInfo(sheeps[1])
+		sheeps[1].firing(fire,1)
 		sheeps[1].setTurrAngle(turretAngl)
-		_, _, _, turretAngl,_ = datawrite.frInfo(sheeps[2])
-		sheeps[2].setTurrAngle(turretAngl)
-		sheeps[2].currX = (sheeps[2].currX + 10)%400
+		sheeps[1].currY = (sheeps[1].currY + 1)%500
 
-		log.Println("updoot")
-		wait := time.NewTimer(time.Second)
+		wait := time.NewTimer(time.Millisecond*50)
 		<-wait.C
 	}
 }
 //Code to test the camera
 func main_camera() {
-	cam := initcamera(5, "1918")
+	cam := initcamera(5, "1918","localhost")
 	for {
 		log.Println(cam.getPos())
 	}

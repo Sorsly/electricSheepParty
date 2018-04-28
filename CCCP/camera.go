@@ -23,9 +23,9 @@ type Camera struct {
 
 //This is a non blocking tcp server which the camera process connects into. If the camera does not need
 //The raw data, it does not load it into the process which parses it through a channel
-func (c *Camera) recvList(portnum string) {
+func (c *Camera) recvList(portnum string,camip string) {
 
-	l, err := net.Listen("tcp", "localhost:"+portnum)
+	l, err := net.Listen("tcp", camip + ":"+portnum)
 	CheckError(err)
 	for {
 		conn, err := l.Accept()
@@ -41,7 +41,7 @@ func (c *Camera) recvList(portnum string) {
 	}
 }
 //Initializes the camera
-func initcamera(botcnt int, portlisten string) *Camera {
+func initcamera(botcnt int, portlisten string,camip string) *Camera {
 	c := new(Camera)
 	c.numbots = botcnt
 	c.camres.ids = make([]uint64, botcnt)
@@ -50,7 +50,7 @@ func initcamera(botcnt int, portlisten string) *Camera {
 	c.camres.orient = make([]uint64, botcnt)
 	c.buffer = make([]byte, botcnt*500)
 	c.revraw = make(chan []byte)
-	go c.recvList(portlisten)
+	go c.recvList(portlisten,camip)
 	return c
 }
 
