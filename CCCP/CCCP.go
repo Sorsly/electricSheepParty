@@ -12,7 +12,7 @@ import (
 	"math"
 )
 
-const NUMBOTS = 1//Number of bots in the game
+const NUMBOTS = 2//Number of bots in the game
 const PXWIDTH = 640
 const PXHEIGHT = 480
 const OUTPORT = "1917" // The port the bots will recieve commands from
@@ -50,6 +50,7 @@ func main_full() {
 	for i, ip := range ips.Bot {
 		sheeps[i] = initsheep(ip, lohost, uint16(inportstart+i))
 		sheeps[i].commands.sheepF &= 0xEF
+		sheeps[i].commands.servoAngle = 90
 	}
 
 	if REPROGRAMON {
@@ -107,7 +108,7 @@ func main_full() {
 
 	//Wait for both Front ends to check in
 	log.Println("Waiting For FE to Connect")
-	for datawrite.gamestart != false{ //} true {
+	for datawrite.gamestart != true {
 		wait := time.NewTimer(time.Millisecond*10)
 		<-wait.C
 	}

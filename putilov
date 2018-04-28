@@ -53,6 +53,7 @@ def getIPS(*args):
 
     with open("CCCP/" + ipfile, "w") as fh:
         fh.write(dumps(finalip))
+    os.system("cat CCCP/ips.txt ") 
 
 
 #Takes the compiled images of the app, and burns it onto the chip over JTAG
