@@ -85,8 +85,8 @@ func initsheep(ipAdd string, hostip string, respPort uint16) *Sheep {
 	s.endpoint = outServerAddr
 	s.resppoint = respServerAddr
 
-	s.commands.kPt = 88
-	s.commands.kPa = 50
+	s.commands.kPt = 100
+	s.commands.kPa = 30
 	s.commands.kDt = 100
 	s.commands.kDa = 71
 

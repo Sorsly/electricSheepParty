@@ -243,9 +243,9 @@ void move(commands * cmd, resp *state,botmemory * mem){
     double angleErr = angleBetween(cmd->relDesX,-cmd->relDesY,transErr,curr_angle);
     double vTrans = transErr - mem->lastTransError;
     double vAngle = angleErr - mem->lastAngleError;
-    double K_pt =  (100.0/cmd->K_pt)*100.0/800;
+    double K_pt = -(100.0/cmd->K_pt)*100.0/800;
     double K_pa = -(100.0/cmd->K_pa)*100.0/PI;
-    double K_dt =  (100.0/cmd->K_dt)*100.0/800;
+    double K_dt = -(100.0/cmd->K_dt)*100.0/800;
     double K_da = -(100.0/cmd->K_da)*100.0/PI;
     double U_t = 0;
     double U_a = 0;
@@ -256,8 +256,8 @@ void move(commands * cmd, resp *state,botmemory * mem){
     if (abs(angleErr)>5 || transErr>25){
         U_t = K_pt*transErr + K_dt*vTrans;
         U_a = K_pa*angleErr + K_da*vAngle;
-        motorL = -U_t + U_a;
-        motorR = -U_t - U_a;
+        motorL = U_t + U_a;
+        motorR = U_t - U_a;
         if(abs(motorR + cmd->twiddleR )> 100){
             motorR = 100 - cmd->twiddleR;
         }
