@@ -17,6 +17,8 @@ public class Friendly : MonoBehaviour {
     private NavMeshPath path;
     public turret turr;
     public GameObject hovertext;
+    private float turrdirection;
+    private float direction;
     #region Monobehavior API
     void Awake()
     {
@@ -25,35 +27,80 @@ public class Friendly : MonoBehaviour {
     }
     // Use this for initialization
     void Start () {
-		
+        turrdirection = 90;
+        direction = 0.5f;
 	}
 
     // Update is called once per frame
     void Update()
     {
-       
-        desiredturretpos = turr.getDesired();
+        /*if (turr.target)
+        {
+            desiredturretpos = turr.getDesired();
+        }
+        */
         if (Input.GetMouseButtonDown(1) && isSelected == true)
         {
-            playerAgent.CalculatePath(GetPointUnderCursor(), path);
+            if (SelectedEnemy())
+            {
+                playerAgent.CalculatePath(intersectPath(5), path);
+            }
+            else
+            {
+                playerAgent.CalculatePath(GetPointUnderCursor(), path);
+            }
+            
         }
-        if (Input.GetMouseButtonDown(0) && isSelected == true && SelectedEnemy())
+        if(Input.GetKey("a") && isSelected == true)
         {
-            playerAgent.CalculatePath(intersectPath(5), path);
+            if (turrdirection > 0)
+            {
+                turrdirection -= direction;
+            }
+            if(turrdirection< 0)
+            {
+                turrdirection = 0;
+            }
         }
-        Debug.Log("Actual");
-        Debug.Log(transform.position);
+        if (Input.GetKey("d") && isSelected == true)
+        {
+            if (turrdirection < 180)
+            {
+                turrdirection += direction;
+            }
+            if (turrdirection > 180)
+            {
+                turrdirection = 180;
+            }
+        }
+        if (Input.GetKey("space") ||(Mathf.Abs((int)turretpos + (int)transform.eulerAngles.y - (int)desiredturretpos)<30))
+        {
+            fire = true;
+        }
+        else
+        {
+            fire = false;
+        }
+        desiredturretpos = (ulong)Mathf.FloorToInt(turrdirection);
     }
 #endregion
     private Vector3 intersectPath(float enemDist)
     {
         float dY = turr.target.transform.position.y - transform.position.y;
         float dX = turr.target.transform.position.x - transform.position.x;
-        float theta = Mathf.Atan(dY / dX);
+        dY = -dY;
+        float angle;
+        angle = Mathf.Atan2(dY, dX);
+        angle = Mathf.FloorToInt(angle * 180 / Mathf.PI + 90);
+        if (angle < 0)
+        {
+            angle += 360;
+        }
+
         float mag = Mathf.Sqrt(dY * dY + dX * dX);
         Vector3 retpoint;
-        retpoint.x = Mathf.Cos(theta) * (mag - enemDist) + turr.target.transform.position.x;
-        retpoint.z = Mathf.Sin(theta) * (mag - enemDist) + turr.target.transform.position.y;
+        retpoint.x = Mathf.Cos(angle) * (mag - enemDist) + turr.target.transform.position.x;
+        retpoint.z = Mathf.Sin(angle) * (mag - enemDist) + turr.target.transform.position.y;
         retpoint.y = transform.position.y;
         return retpoint;
     }

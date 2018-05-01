@@ -13,23 +13,14 @@ public class turret : MonoBehaviour {
     {
         float dX = target.transform.position.x - chassis.transform.position.x;
         float dY = target.transform.position.z - chassis.transform.position.z;
-        float angle;
-        if (dX == 0){
-            dX = 0.00001F;
-        }
-        if (dX > 0 && dY > 0 ){
-            angle = Mathf.Atan(dY / dX);
-        }else if( dX > 0 && dY < 0){
-            angle = Mathf.Atan(dY / dX) + 2*Mathf.PI;
-        }else if(dX < 0 && dY > 0)
-        {
-            angle = Mathf.PI + Mathf.Atan(dY / dX);
-        }
-        else
-        {
-            angle = Mathf.Atan(dY / dX);
-        }
-        angle = Mathf.FloorToInt(angle * 180 / Mathf.PI);
+        float mag = Mathf.Sqrt(dX * dX + dY * dY);
+        float cross = dX * Mathf.Sin(chassis.transform.eulerAngles.y * Mathf.PI / 180) - dY * Mathf.Cos(chassis.transform.eulerAngles.y * Mathf.PI / 180);
+        float angle = Mathf.Asin(cross / mag);
+
+        angle = angle * 180 / Mathf.PI;
+        Debug.Log("ANGLE FROM CROSS: " + angle.ToString());
+        angle += 180;
+
         return(ulong)angle;
     }
 	// Update is called once per frame

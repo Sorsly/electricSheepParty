@@ -1,10 +1,10 @@
 WebGL
 PlayerPath?
-C:/Users/Sorsly/Documents/GitHub/electricSheepParty/CCCP/frontendbuild
+C:/Users/Sorsly/Documents/GitHub/electricSheepParty/workingunity/buildfiles
 SceneListBegin?
 Assets/ESP.unity
 SceneListEnd?
-4e999f3fb9cf495c99690bb71539975b Assembly-CSharp.dll:.Enemy
+a3df81b3df123d53fd10cfe580289d64 Assembly-CSharp.dll:.Enemy
 a35dc9cca2faebc5f5f1aeb9e8e47bbe UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.UI.dll:UnityEngine.EventSystems.BaseInput
 49cd62a578efc0a599b810a2b66cd49c UnityEngine.UI.dll:UnityEngine.UI.Button
@@ -91,7 +91,8 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.XR.WSA.SpatialMappingRenderer
-25a7daf2cb0f8e452be8ef0b632e9ff0 Assembly-CSharp.dll:.Friendly
+ed89a6ed3fe0fad023142e0ec9742da6 Assembly-CSharp.dll:.statushandler
+72da3944f55ae5aed3ee762785a90afb Assembly-CSharp.dll:.Friendly
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.Advertisements.dll:UnityEngine.Advertisements.CallbackExecutor
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.Advertisements.dll:UnityEngine.Advertisements.Editor.Placeholder
 fc1e0f4d8439d9928083474691511a13 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkAnimator
@@ -112,7 +113,7 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 96d0fbde9fd209878a0a291f82c9bcdd UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.PlaymodeTestsController
 64eb32cc721b1cc68a91ed57461e188c UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.RemoteTestResultSender
 50b8181a609bbb45470e4d4ee80dc3d7 Assembly-CSharp.dll:.turret
-7ecdca7b540c5a703413de0d30adcbaa Assembly-CSharp.dll:.NetworkInter
+c65f1e86298ed2010363cab5ad78ce55 Assembly-CSharp.dll:.NetworkInter
 bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.AudioSpatializerMicrosoft
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInput
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
