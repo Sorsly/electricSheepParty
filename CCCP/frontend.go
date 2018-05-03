@@ -260,6 +260,7 @@ func (ch *datawrite) APIServe(w http.ResponseWriter, r *http.Request) {
 	if ch.numcheckins == 0 {
 		retPkt.Gamestatus = "0"
 		onleft = true
+		ch.gamestart = true
 	}else if ch.numcheckins == 1{
 		retPkt.Gamestatus = "1"
 		onleft = false
